@@ -1,2 +1,3 @@
-# yabtt
+# YaBTT
+
 Yet another BitTorrent tracker.
