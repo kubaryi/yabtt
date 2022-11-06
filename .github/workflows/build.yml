@@ -1,0 +1,32 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Elixir App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Caching dependencies and compilation results
+        uses: actions/cache@v3
+        with:
+          path: |
+            _build
+            deps
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: 25
+          elixir-version: 1.14.1
+      - name: Install dependencies
+        run: mix do deps.get, deps.compile
+      - name: Compile app
+        run: mix compile
