@@ -24,5 +24,9 @@
   "postCreateCommand": "mix deps.get",
 
   // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
-  "remoteUser": "vscode"
+  "remoteUser": "vscode",
+  // Dev Container Features. See https://containers.dev/implementors/features.
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:1": {}
+  }
 }
