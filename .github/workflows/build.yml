@@ -25,7 +25,7 @@ jobs:
         uses: erlef/setup-beam@v1
         with:
           otp-version: 25
-          elixir-version: 1.14.1
+          elixir-version: 1.14
       - name: Install dependencies
         run: mix do deps.get, deps.compile
       - name: Compile app

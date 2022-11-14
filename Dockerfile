@@ -1,8 +1,8 @@
 ARG ALPINE_VERSION=3.16
-ARG ELIXIR_VERSION=alpine
+ARG ELIXIR_VERSION=1.14
 
 # ==== Builder ====
-FROM elixir:${ELIXIR_VERSION} AS builder
+FROM elixir:${ELIXIR_VERSION}-alpine AS builder
 
 # The environment to build with
 ARG MIX_ENV=prod
