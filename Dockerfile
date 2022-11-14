@@ -1,5 +1,5 @@
-ARG DEBIAN_VERSION=stable-slim
-ARG ELIXIR_VERSION=slim
+ARG ALPINE_VERSION=3.16
+ARG ELIXIR_VERSION=alpine
 
 # ==== Builder ====
 FROM elixir:${ELIXIR_VERSION} AS builder
@@ -21,12 +21,15 @@ RUN mix do deps.get, deps.compile, compile, release
 
 
 # ==== Runtime ====
-FROM debian:${DEBIAN_VERSION} AS app
+FROM alpine:${ALPINE_VERSION} AS app
 
 # Set the locale to UTF-8
 ENV LANG=C.UTF-8
 
 WORKDIR /app
+
+# Install dependencies for Erlang and Elixir
+RUN apk add --no-cache openssl libgcc libstdc++ ncurses-libs
 
 # Copy the release from the builder
 COPY --from=builder /app/_build/prod/rel/yabtt .
