@@ -29,7 +29,7 @@ ENV LANG=C.UTF-8
 WORKDIR /app
 
 # Install dependencies for Erlang and Elixir
-RUN apk add --no-cache openssl libgcc libstdc++ ncurses-libs
+RUN apk add --no-cache openssl libstdc++ ncurses-libs
 
 # Copy the release from the builder
 COPY --from=builder /app/_build/prod/rel/yabtt .
