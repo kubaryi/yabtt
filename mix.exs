@@ -22,7 +22,8 @@ defmodule YaBTT.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:plug_cowboy, "~> 2.6.0"}
+      {:plug_cowboy, "~> 2.6.0"},
+      {:bento, "~> 0.9"}
     ]
   end
 end
