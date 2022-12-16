@@ -40,6 +40,6 @@ defmodule Torrent.Track do
   @type t :: %__MODULE__{
           info_hash: String.t(),
           peer: Torrent.Peer.t(),
-          event: String.t()
+          event: String.t() | nil
         }
 end
