@@ -10,6 +10,7 @@ defmodule YaBTT.Application do
     children = [
       # Starts a worker by calling: YaBTT.Worker.start_link(arg)
       # {YaBTT.Worker, arg}
+      {Plug.Cowboy, scheme: :http, plug: Tracker.Router, options: [port: 8000]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
