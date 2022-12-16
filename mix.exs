@@ -23,7 +23,8 @@ defmodule YaBTT.MixProject do
   defp deps do
     [
       {:plug_cowboy, "~> 2.6.0"},
-      {:bento, "~> 0.9"}
+      {:bento, "~> 0.9"},
+      {:jason, "~> 1.4"}
     ]
   end
 end
