@@ -7,7 +7,7 @@ defmodule Torrent.Track do
   client can connect to.
 
   ## Example
-      iex> track = %Torrent.Track{
+      iex> %Torrent.Track{
       ...>   info_hash: "aaaaaaaaaaaaaaaaaaaa",
       ...>   peer: %Torrent.Peer{
       ...>     peer_id: "aaaaaaaaaaaaaaaaaaaa",
@@ -32,10 +32,8 @@ defmodule Torrent.Track do
         event: "started"
       }
   """
-
-  defstruct [:info_hash, :peer, :event]
-
   @enforce_keys [:info_hash, :peer]
+  defstruct [:info_hash, :peer, :event]
 
   @type t :: %__MODULE__{
           info_hash: String.t(),

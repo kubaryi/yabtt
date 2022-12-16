@@ -72,12 +72,21 @@ defmodule Tracker.Announce do
       ...> "downloaded" => "0",
       ...> "uploaded" => "0",
       ...> "port" => "6881"
-      ...> } |> verify_req_params()
-      {:ok, %{"info_hash" => "123", "peer_id" => "456", "left" => "789", ...}}
+      ...> } |> Tracker.Announce.verify_req_params()
+      {:ok,
+        %{"info_hash" => "123",
+          "peer_id" => "456",
+          "left" => "789",
+          "downloaded" => "0",
+          "uploaded" => "0",
+          "port" => "6881"
+        }
+      }
 
   if any required parameters are missing, return `:error`.
 
-      iex> %{"info_hash" => "123", "peer_id" => "456"} |> verify_req_params()
+      iex> %{"info_hash" => "123", "peer_id" => "456"}
+      ...> |> Tracker.Announce.verify_req_params()
       :error
   """
   @spec verify_req_params(map()) :: {:ok, map()} | :error
@@ -97,18 +106,18 @@ defmodule Tracker.Announce do
 
   ## Example
 
-      iex> %{"event" => "started"} |> verify_peer_event()
+      iex> Tracker.Announce.verify_peer_event({:ok, %{"event" => "started"}})
       {:ok, %{"event" => "started"}}
 
-      iex> %{"event" => "non-compliant"} |> verify_peer_event()
+      iex> Tracker.Announce.verify_peer_event({:ok, %{"event" => "non-compliant"}})
       :error
 
-      iex> %{} |> verify_peer_event()
+      iex> Tracker.Announce.verify_peer_event({:ok, %{}})
       {:ok, %{}}
   """
   @spec verify_peer_event({:ok, map()} | :error) :: {:ok, map()} | :error
   def verify_peer_event({:ok, params}) do
-    case Map.fetch(params, "enent") do
+    case Map.fetch(params, "event") do
       {:ok, event} when event in ["started", "stopped", "completed"] -> {:ok, params}
       {:ok, _} -> :error
       :error -> {:ok, params}
@@ -130,12 +139,12 @@ defmodule Tracker.Announce do
 
       iex> params = %{"info_hash" => "123", "peer_id" => "456", "ip" => "127.0.0.2"}
       iex> remote_ip = {127, 0, 0, 1}
-      iex> handle_ip(params, remote_ip)
+      iex> Tracker.Announce.handle_ip({:ok, params}, remote_ip)
       {:ok, %{"info_hash" => "123", "peer_id" => "456", "ip" => "127.0.0.2"}}
 
       iex> params = %{"info_hash" => "123", "peer_id" => "456"}
       iex> remote_ip = {127, 0, 0, 1}
-      iex> handle_ip(params, remote_ip)
+      iex> Tracker.Announce.handle_ip({:ok, params}, remote_ip)
       {:ok, %{"info_hash" => "123", "peer_id" => "456", "ip" => "127.0.0.1"}}
   """
   @spec handle_ip({:ok, map()} | :error, tuple()) :: {:ok, map()} | :error
@@ -167,8 +176,8 @@ defmodule Tracker.Announce do
 
       iex> conn = %Plug.Conn{}
       iex> msg = {:ok, %{"interval" => 1800, "min interval" => 1800, "peers" => []}}
-      iex> put_resp_msg(conn, msg)
-      %Plug.Conn{...}
+      iex> Tracker.Announce.put_resp_msg(conn, msg)
+
   """
   @spec put_resp_msg(Plug.Conn.t(), {:ok, Bento.Encoder.t()} | :error) :: Plug.Conn.t()
   def put_resp_msg(conn, {:ok, data}) do

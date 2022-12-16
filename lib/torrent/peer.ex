@@ -6,7 +6,7 @@ defmodule Torrent.Peer do
   of peers to the client, and the client connects to them to download the file.
 
   ## Example
-      iex> peer = %Torrent.Peer{
+      iex> %Torrent.Peer{
       ...>   peer_id: "aaaaaaaaaaaaaaaaaaaa",
       ...>   ip: "192.168.0.1",
       ...>   port: 6881,
@@ -24,9 +24,8 @@ defmodule Torrent.Peer do
       }
   """
 
-  defstruct [:peer_id, :ip, :port, :uploaded, :downloaded, :left]
-
   @enforce_keys [:peer_id, :ip, :port, :uploaded, :downloaded, :left]
+  defstruct [:peer_id, :ip, :port, :uploaded, :downloaded, :left]
 
   @type t :: %__MODULE__{
           peer_id: String.t(),
