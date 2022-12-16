@@ -35,7 +35,7 @@ defmodule Torrent.Track do
 
   defstruct [:info_hash, :peer, :event]
 
-  @enforce_keys [:info_hash, :peer, :event]
+  @enforce_keys [:info_hash, :peer]
 
   @type t :: %__MODULE__{
           info_hash: String.t(),
