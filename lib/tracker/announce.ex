@@ -45,6 +45,7 @@ defmodule Tracker.Announce do
     resp_msg =
       conn.params
       |> verify_req_params(["info_hash", "peer_id", "left", "downloaded", "uploaded", "port"])
+      |> handle_ip_address(conn.remote_ip)
 
     conn
     |> put_resp_content_type("plain/text")
@@ -82,6 +83,43 @@ defmodule Tracker.Announce do
 
     if contains_fields?.(Map.keys(params)), do: {:ok, params}, else: :error
   end
+
+  @doc """
+  Verify and process IP addresses in params. If the IP address is not present in the params,
+  use the remote IP address.
+
+  ## Parameters
+
+  - params: The parameters received from the request.
+  - remote_ip: The remote IP address.
+
+  ## Example
+
+      iex> params = %{"info_hash" => "123", "peer_id" => "456", "ip" => "127.0.0.2"}
+      iex> remote_ip = {127, 0, 0, 1}
+      iex> handle_ip_address(params, remote_ip)
+      {:ok, %{"info_hash" => "123", "peer_id" => "456", "ip" => "127.0.0.2"}}
+
+      iex> params = %{"info_hash" => "123", "peer_id" => "456"}
+      iex> remote_ip = {127, 0, 0, 1}
+      iex> handle_ip_address(params, remote_ip)
+      {:ok, %{"info_hash" => "123", "peer_id" => "456", "ip" => "127.0.0.1"}}
+  """
+  @spec handle_ip_address({:ok, map()} | :error, tuple()) :: {:ok, map()} | :error
+  def handle_ip_address({:ok, params}, remote_ip) do
+    ip =
+      with {:ok, ip_str} <- Map.fetch(params, "ip"),
+           {:ok, ip} <- :inet.parse_address(to_charlist(ip_str)) do
+        ip
+      else
+        _ -> remote_ip
+      end
+
+    # TODO: Output ip as ip_address
+    {:ok, Map.put(params, "ip", to_string(:inet.ntoa(ip)))}
+  end
+
+  def handle_ip_address(:error, _), do: :error
 
   @doc """
   Bind the response message to the connection struct. All the message will be encoded as
