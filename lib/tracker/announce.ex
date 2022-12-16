@@ -42,15 +42,26 @@ defmodule Tracker.Announce do
   def call(conn, _opts) do
     # TODO: Implement the announce logic
 
+    resp_msg =
+      conn.params
+      |> verify_req_params(["info_hash", "peer_id", "left", "downloaded", "uploaded", "port"])
+
     conn
     |> put_resp_content_type("plain/text")
-    |> put_resp_msg({:ok, "OK"})
+    |> put_resp_msg(resp_msg)
     |> send_resp()
   end
 
+  @spec verify_req_params(map(), [String.t()]) :: {:ok, map()} | :error
+  def verify_req_params(params, fields) do
+    contains_fields? = fn keys -> Enum.all?(fields, &(&1 in keys)) end
+
+    if contains_fields?.(Map.keys(params)), do: {:ok, params}, else: :error
+  end
+
   @spec put_resp_msg(Plug.Conn.t(), {:ok, Bento.Encoder.t()} | :error) :: Plug.Conn.t()
-  def put_resp_msg(conn, {:ok, struct}) do
-    case Bento.encode(struct) do
+  def put_resp_msg(conn, {:ok, data}) do
+    case Bento.encode(data) do
       {:ok, msg} -> resp(conn, 200, msg)
       {:error, _} -> put_resp_msg(conn, :error)
     end
