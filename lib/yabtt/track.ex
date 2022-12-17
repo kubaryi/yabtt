@@ -36,27 +36,6 @@ defmodule YaBTT.Tracked do
         }
 end
 
-defimpl Bento.Encoder, for: YaBTT.Tracked do
-  @moduledoc """
-  Implementation of `Bento.Encoder` protocol for `YaBTT.Tracked` struct.
-  """
-
-  alias Bento.Encoder
-  use Bento.Encode
-
-  @doc """
-  Encode the Tracked struct into its Bencoding form.
-
-  ## Example
-      iex> struct(YaBTT.Tracked, %{})
-      ...> |> Bento.Encoder.encode()
-      ...> |> IO.iodata_to_binary()
-      "d10:downloaded4:null5:event4:null9:info_hash4:null2:ip4:null4:left4:null7:peer_id4:null4:port4:null8:uploaded4:nulle"
-  """
-  @spec encode(YaBTT.Tracked.t()) :: Bento.Encoder.t()
-  def encode(track), do: Map.from_struct(track) |> Encoder.Map.encode()
-end
-
 defprotocol YaBTT.Track do
   @moduledoc """
   Protocol and implementations to convert the trackable to `YaBTT.Tracked.t()`.
