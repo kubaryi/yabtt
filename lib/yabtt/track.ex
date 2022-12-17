@@ -64,7 +64,7 @@ defprotocol YaBTT.Track do
 
   @type trackable :: map() | YaBTT.Tracked.t()
   @type ip_addr :: :inet.ip_address()
-  @type t :: YaBTT.Tracked.t() | :error
+  @type t :: YaBTT.Tracked.t() | {:ok, YaBTT.Tracked.t()} | :error
 
   @doc """
   Convert the trackable to Track struct.
@@ -105,9 +105,10 @@ defprotocol YaBTT.Track do
       nil
 
   For the `Map`, it will check the `@enforce_keys`. If the `Map` is valid, it
-  will convert the `Map` to a `Track` struct.
+  will convert the `Map` to a `Track` struct. And it will wrap the `Track` in
+  `{:ok, track}`.
 
-      iex> track = %{
+      iex> {:ok, track} = %{
       ...>   "info_hash" => "aaaaaaaaaaaaaaaaaaaa",
       ...>   "peer_id" => "aaaaaaaaaaaaaaaaaaaa",
       ...>   "port" => 6881,
@@ -195,13 +196,14 @@ defimpl YaBTT.Track, for: Map do
       iex> YaBTT.Track.Map.track(%{}, {1, 2, 3, 5})
       :error
   """
-  @spec track(map, :inet.ip_address()) :: YaBTT.Track.t()
+  @spec track(map, :inet.ip_address()) :: {:ok, YaBTT.Tracked.t()} | :error
   def track(params, ip) do
     if contains_enforce_keys(Map.keys(params)) do
       map_with_atom_keys = simplification(params)
 
       struct(YaBTT.Tracked, map_with_atom_keys)
       |> YaBTT.Track.YaBTT.Tracked.track(ip)
+      |> (fn track -> {:ok, track} end).()
     else
       :error
     end
