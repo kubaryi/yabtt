@@ -44,10 +44,7 @@ defmodule Tracker.Announce do
       with {:ok, params} <- verify_req_params(conn.params) do
         import Tracker.Track
 
-        track =
-          to_track(params)
-          |> handle_event()
-          |> handle_ip(conn.remote_ip)
+        track = to_track(params, conn.remote_ip)
 
         # TODO: Implement the announce logic
 

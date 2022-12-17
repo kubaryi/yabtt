@@ -25,7 +25,7 @@ defmodule Tracker.Track do
   @type t :: %__MODULE__{
           info_hash: String.t(),
           peer_id: String.t(),
-          ip: String.t(),
+          ip: :inet.ip_address(),
           port: integer(),
           uploaded: integer(),
           downloaded: integer(),
@@ -36,7 +36,7 @@ defmodule Tracker.Track do
   @doc """
   Convert the map to Track struct.
 
-  **Note: It won't check @enforce_keys**
+  **Note: It won't check @enforce_keys, except the `event`**
 
   ## Parameters
 
@@ -44,15 +44,15 @@ defmodule Tracker.Track do
 
   ## Example
 
-      iex> params = %{
+      iex> track = %{
       ...>   "info_hash" => "aaaaaaaaaaaaaaaaaaaa",
-      ...>   "peer_id" => "aaaaaaaaaaaaaaaaaaaa",
+      ...>   "event" => "non-compliant",
       ...>   } |> Tracker.Track.to_track()
-      iex> params.info_hash
+      iex> track.info_hash
       "aaaaaaaaaaaaaaaaaaaa"
-      iex> params.peer_id
-      "aaaaaaaaaaaaaaaaaaaa"
-      iex> params.ip
+      iex> track.ip
+      nil
+      iex> track.event
       nil
   """
   @spec to_track(map()) :: t()
@@ -62,8 +62,25 @@ defmodule Tracker.Track do
         {String.to_existing_atom(key), value}
       end
 
-    struct(__MODULE__, map_with_atom_keys)
+    struct(__MODULE__, map_with_atom_keys) |> handle_event()
   end
+
+  @doc """
+  Convert the map to Track struct and handle the IP address.
+
+  ## Parameters
+
+  - params: The map to be converted.
+  - ip: The IP address of the client.
+
+  ## Example
+
+      iex> track = %{} |> Tracker.Track.to_track({1, 2, 3, 4})
+      iex> track.ip
+      {1, 2, 3, 4}
+  """
+  @spec to_track(map, :inet.ip_address()) :: t()
+  def to_track(params, ip), do: to_track(params) |> handle_ip(ip)
 
   @doc """
   Verify the event in Track struct.
