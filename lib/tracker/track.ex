@@ -19,13 +19,15 @@ defmodule Tracker.Track do
       ...> }
   """
 
-  @enforce_keys [:info_hash, :peer_id, :ip, :port, :uploaded, :downloaded, :left]
+  @enforce_keys [:info_hash, :peer_id, :port, :uploaded, :downloaded, :left]
   defstruct [:info_hash, :peer_id, :ip, :port, :uploaded, :downloaded, :left, :event]
+
+  @type ip_addr :: :inet.ip_address()
 
   @type t :: %__MODULE__{
           info_hash: String.t(),
           peer_id: String.t(),
-          ip: :inet.ip_address(),
+          ip: ip_addr(),
           port: integer(),
           uploaded: integer(),
           downloaded: integer(),
@@ -46,23 +48,45 @@ defmodule Tracker.Track do
 
       iex> track = %{
       ...>   "info_hash" => "aaaaaaaaaaaaaaaaaaaa",
+      ...>   "peer_id" => "aaaaaaaaaaaaaaaaaaaa",
+      ...>   "ip" => "1.2.3.4",
+      ...>   "port" => 6881,
+      ...>   "uploaded" => 0,
+      ...>   "downloaded" => 100,
+      ...>   "left" => 0,
       ...>   "event" => "non-compliant",
       ...>   } |> Tracker.Track.to_track()
       iex> track.info_hash
       "aaaaaaaaaaaaaaaaaaaa"
       iex> track.ip
-      nil
+      "1.2.3.4"
       iex> track.event
       nil
-  """
-  @spec to_track(map()) :: t()
-  def to_track(params) do
-    map_with_atom_keys =
-      for {key, value} <- params, into: %{} do
-        {String.to_existing_atom(key), value}
-      end
 
-    struct(__MODULE__, map_with_atom_keys) |> handle_event()
+      iex> track = %{} |> Tracker.Track.to_track()
+      :error
+  """
+  @spec to_track(map()) :: t() | :error
+  def to_track(params) do
+    map_with_atom_keys = simplification(params)
+
+    if contains_enforce_keys(Map.keys(map_with_atom_keys)) do
+      struct(__MODULE__, map_with_atom_keys) |> handle_event()
+    else
+      :error
+    end
+  end
+
+  @spec simplification(map()) :: map()
+  defp simplification(m) do
+    for {key, value} <- m, into: %{} do
+      {String.to_existing_atom(key), value}
+    end
+  end
+
+  @spec contains_enforce_keys(list()) :: boolean()
+  defp contains_enforce_keys(keys) do
+    Enum.all?(@enforce_keys, &(&1 in keys))
   end
 
   @doc """
@@ -75,11 +99,20 @@ defmodule Tracker.Track do
 
   ## Example
 
-      iex> track = %{} |> Tracker.Track.to_track({1, 2, 3, 4})
+      iex> track = %{
+      ...>   "info_hash" => "aaaaaaaaaaaaaaaaaaaa",
+      ...>   "peer_id" => "aaaaaaaaaaaaaaaaaaaa",
+      ...>   "ip" => "1.2.3.4",
+      ...>   "port" => 6881,
+      ...>   "uploaded" => 0,
+      ...>   "downloaded" => 100,
+      ...>   "left" => 0,
+      ...>   "event" => "non-compliant",
+      ...>   } |> Tracker.Track.to_track({1, 2, 3, 4})
       iex> track.ip
       {1, 2, 3, 4}
   """
-  @spec to_track(map, :inet.ip_address()) :: t()
+  @spec to_track(map, ip_addr()) :: t()
   def to_track(params, ip), do: to_track(params) |> handle_ip(ip)
 
   @doc """
@@ -136,11 +169,24 @@ defmodule Tracker.Track do
       iex> track.ip
       {127, 0, 0, 1}
   """
-  @spec handle_ip(t(), :inet.ip_address()) :: t()
+  @spec handle_ip(t(), ip_addr()) :: t()
   def handle_ip(track, remote_ip) do
     case :inet.parse_address(to_charlist(track.ip)) do
       {:ok, ip} -> %{track | ip: ip}
       _ -> %{track | ip: remote_ip}
     end
+  end
+
+  @type peer :: {String.t(), ip_addr(), integer()}
+  @type peer_status :: {integer(), integer(), integer()}
+
+  @spec convert(t()) :: [String.t() | peer() | peer_status()]
+  def convert(track) do
+    [
+      track.info_hash,
+      {track.peer_id, track.ip, track.port},
+      {track.uploaded, track.downloaded, track.left},
+      track.event
+    ]
   end
 end

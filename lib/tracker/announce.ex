@@ -40,64 +40,14 @@ defmodule Tracker.Announce do
   """
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
-    resp_msg =
-      with {:ok, params} <- verify_req_params(conn.params) do
-        import Tracker.Track
-
-        track = to_track(params, conn.remote_ip)
-
-        # TODO: Implement the announce logic
-
-        {:ok, %{track | ip: to_string(:inet.ntoa(track.ip))}}
-      end
+    # TODO: Implement the announce logic
+    track = Tracker.Track.to_track(conn.params, conn.remote_ip)
+    resp_msg = {:ok, %{track | ip: to_string(:inet.ntoa(track.ip))}}
 
     conn
     |> put_resp_content_type("plain/text")
     |> put_resp_msg(resp_msg)
     |> send_resp()
-  end
-
-  @doc """
-  Verify the required parameters.
-
-  ## Parameters
-
-  - params: The parameters received from the request.
-
-  ## Example
-
-  if all required parameters are present, return `{:ok, map()}`.
-
-      iex> %{
-      ...> "info_hash" => "123",
-      ...> "peer_id" => "456",
-      ...> "left" => "789",
-      ...> "downloaded" => "0",
-      ...> "uploaded" => "0",
-      ...> "port" => "6881"
-      ...> } |> Tracker.Announce.verify_req_params()
-      {:ok,
-        %{"info_hash" => "123",
-          "peer_id" => "456",
-          "left" => "789",
-          "downloaded" => "0",
-          "uploaded" => "0",
-          "port" => "6881"
-        }
-      }
-
-  if any required parameters are missing, return `:error`.
-
-      iex> %{"info_hash" => "123", "peer_id" => "456"}
-      ...> |> Tracker.Announce.verify_req_params()
-      :error
-  """
-  @spec verify_req_params(map()) :: {:ok, map()} | :error
-  def verify_req_params(params) do
-    fields = ["info_hash", "peer_id", "left", "downloaded", "uploaded", "port"]
-    contains_fields? = fn keys -> Enum.all?(fields, &(&1 in keys)) end
-
-    if contains_fields?.(Map.keys(params)), do: {:ok, params}, else: :error
   end
 
   @doc """
