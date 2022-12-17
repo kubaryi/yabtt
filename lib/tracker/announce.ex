@@ -40,13 +40,19 @@ defmodule Tracker.Announce do
   """
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
-    # TODO: Implement the announce logic
-
     resp_msg =
-      conn.params
-      |> verify_req_params()
-      |> verify_peer_event()
-      |> handle_ip(conn.remote_ip)
+      with {:ok, params} <- verify_req_params(conn.params) do
+        import Tracker.Track
+
+        track =
+          to_track(params)
+          |> handle_event()
+          |> handle_ip(conn.remote_ip)
+
+        # TODO: Implement the announce logic
+
+        {:ok, %{track | ip: to_string(:inet.ntoa(track.ip))}}
+      end
 
     conn
     |> put_resp_content_type("plain/text")
@@ -96,72 +102,6 @@ defmodule Tracker.Announce do
 
     if contains_fields?.(Map.keys(params)), do: {:ok, params}, else: :error
   end
-
-  @doc """
-  Verify the event parameter.
-
-  ## Parameters
-
-  - params: The parameters received from the request.
-
-  ## Example
-
-      iex> Tracker.Announce.verify_peer_event({:ok, %{"event" => "started"}})
-      {:ok, %{"event" => "started"}}
-
-      iex> Tracker.Announce.verify_peer_event({:ok, %{"event" => "non-compliant"}})
-      :error
-
-      iex> Tracker.Announce.verify_peer_event({:ok, %{}})
-      {:ok, %{}}
-  """
-  @spec verify_peer_event({:ok, map()} | :error) :: {:ok, map()} | :error
-  def verify_peer_event({:ok, params}) do
-    case Map.fetch(params, "event") do
-      {:ok, event} when event in ["started", "stopped", "completed"] -> {:ok, params}
-      {:ok, _} -> :error
-      :error -> {:ok, params}
-    end
-  end
-
-  def verify_peer_event(:error), do: :error
-
-  @doc """
-  Verify and process IP addresses in params. If the IP address is not present in the params,
-  use the remote IP address.
-
-  ## Parameters
-
-  - params: The parameters received from the request.
-  - remote_ip: The remote IP address.
-
-  ## Example
-
-      iex> params = %{"info_hash" => "123", "peer_id" => "456", "ip" => "127.0.0.2"}
-      iex> remote_ip = {127, 0, 0, 1}
-      iex> Tracker.Announce.handle_ip({:ok, params}, remote_ip)
-      {:ok, %{"info_hash" => "123", "peer_id" => "456", "ip" => "127.0.0.2"}}
-
-      iex> params = %{"info_hash" => "123", "peer_id" => "456"}
-      iex> remote_ip = {127, 0, 0, 1}
-      iex> Tracker.Announce.handle_ip({:ok, params}, remote_ip)
-      {:ok, %{"info_hash" => "123", "peer_id" => "456", "ip" => "127.0.0.1"}}
-  """
-  @spec handle_ip({:ok, map()} | :error, tuple()) :: {:ok, map()} | :error
-  def handle_ip({:ok, params}, remote_ip) do
-    ip =
-      with {:ok, ip_str} <- Map.fetch(params, "ip"),
-           {:ok, ip} <- :inet.parse_address(to_charlist(ip_str)) do
-        ip
-      else
-        _ -> remote_ip
-      end
-
-    # TODO: Output ip as ip_address
-    {:ok, Map.put(params, "ip", to_string(:inet.ntoa(ip)))}
-  end
-
-  def handle_ip(:error, _), do: :error
 
   @doc """
   Bind the response message to the connection struct. All the message will be encoded as
