@@ -41,9 +41,11 @@ defprotocol YaBTT.Track do
   Protocol and implementations to convert the trackable to `YaBTT.Tracked.t()`.
   """
 
-  @type trackable :: map() | YaBTT.Tracked.t()
+  alias YaBTT.Tracked
+
+  @type trackable :: map() | Tracked.t()
   @type ip_addr :: :inet.ip_address()
-  @type t :: YaBTT.Tracked.t() | {:ok, YaBTT.Tracked.t()} | :error
+  @type t :: Tracked.t() | {:ok, Tracked.t()} | :error
 
   @doc """
   Convert the trackable to Track struct.
@@ -117,6 +119,9 @@ defimpl YaBTT.Track, for: YaBTT.Tracked do
   Implementation of `YaBTT.Track` for `YaBTT.Tracked.t()`.
   """
 
+  alias YaBTT.Tracked
+  alias YaBTT.Track
+
   @doc """
   Standardized the `Track` struct.
 
@@ -138,17 +143,17 @@ defimpl YaBTT.Track, for: YaBTT.Tracked do
       iex> track.event
       nil
   """
-  @spec track(YaBTT.Tracked.t(), :inet.ip_address()) :: YaBTT.Tracked.t()
+  @spec track(Tracked.t(), Track.ip_addr()) :: Tracked.t()
   def track(track, ip), do: track |> handle_event() |> handle_ip(ip)
 
-  @spec handle_event(YaBTT.Tracked.t()) :: YaBTT.Tracked.t()
+  @spec handle_event(Tracked.t()) :: Tracked.t()
   defp handle_event(track) do
     available = ["started", "stopped", "completed", nil]
 
     if track.event in available, do: track, else: %{track | event: nil}
   end
 
-  @spec handle_ip(YaBTT.Tracked.t(), :inet.ip_address()) :: YaBTT.Tracked.t()
+  @spec handle_ip(Tracked.t(), Track.ip_addr()) :: Tracked.t()
   defp handle_ip(track, remote_ip) do
     case :inet.parse_address(to_charlist(track.ip)) do
       {:ok, ip} -> %{track | ip: ip}
@@ -161,6 +166,12 @@ defimpl YaBTT.Track, for: Map do
   @moduledoc """
   Implementation of `YaBTT.Track` for `Map`.
   """
+
+  alias YaBTT.Tracked
+  alias YaBTT.Track
+
+  @type map_with_string_keys :: %{String.t() => String.t()}
+  @type map_with_atom_keys :: %{atom() => String.t()}
 
   @doc """
   Convert the map to Track struct.
@@ -175,21 +186,18 @@ defimpl YaBTT.Track, for: Map do
       iex> YaBTT.Track.Map.track(%{}, {1, 2, 3, 5})
       :error
   """
-  @spec track(map, :inet.ip_address()) :: {:ok, YaBTT.Tracked.t()} | :error
+  @spec track(map_with_string_keys, Track.ip_addr()) :: Track.t()
   def track(params, ip) do
     if contains_enforce_keys(Map.keys(params)) do
       map_with_atom_keys = simplification(params)
 
-      struct(YaBTT.Tracked, map_with_atom_keys)
-      |> YaBTT.Track.YaBTT.Tracked.track(ip)
+      struct(Tracked, map_with_atom_keys)
+      |> Track.YaBTT.Tracked.track(ip)
       |> (fn track -> {:ok, track} end).()
     else
       :error
     end
   end
-
-  @type map_with_string_keys :: %{String.t() => String.t()}
-  @type map_with_atom_keys :: %{atom() => String.t()}
 
   @spec simplification(map_with_string_keys()) :: map_with_atom_keys()
   defp simplification(map_with_string_keys) do
