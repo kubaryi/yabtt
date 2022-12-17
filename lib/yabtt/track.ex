@@ -37,7 +37,9 @@ defmodule YaBTT.Tracked do
 end
 
 defimpl Bento.Encoder, for: YaBTT.Tracked do
-  @moduledoc false
+  @moduledoc """
+  Implementation of `Bento.Encoder` protocol for `YaBTT.Tracked` struct.
+  """
 
   alias Bento.Encoder
   use Bento.Encode
@@ -56,7 +58,9 @@ defimpl Bento.Encoder, for: YaBTT.Tracked do
 end
 
 defprotocol YaBTT.Track do
-  @moduledoc false
+  @moduledoc """
+  Protocol and implementations to convert the trackable to `YaBTT.Tracked.t()`.
+  """
 
   @type trackable :: map() | YaBTT.Tracked.t()
   @type ip_addr :: :inet.ip_address()
@@ -129,7 +133,9 @@ defprotocol YaBTT.Track do
 end
 
 defimpl YaBTT.Track, for: YaBTT.Tracked do
-  @moduledoc false
+  @moduledoc """
+  Implementation of `YaBTT.Track` for `YaBTT.Tracked.t()`.
+  """
 
   @doc """
   Standardized the `Track` struct.
@@ -172,7 +178,9 @@ defimpl YaBTT.Track, for: YaBTT.Tracked do
 end
 
 defimpl YaBTT.Track, for: Map do
-  @moduledoc false
+  @moduledoc """
+  Implementation of `YaBTT.Track` for `Map`.
+  """
 
   @doc """
   Convert the map to Track struct.
