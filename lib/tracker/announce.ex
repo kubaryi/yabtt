@@ -41,7 +41,7 @@ defmodule Tracker.Announce do
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
     # TODO: Implement the announce logic
-    track = Tracker.Track.to_track(conn.params, conn.remote_ip)
+    track = YaBTT.Track.track(conn.params, conn.remote_ip)
     resp_msg = {:ok, %{track | ip: to_string(:inet.ntoa(track.ip))}}
 
     conn
