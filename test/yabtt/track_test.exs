@@ -5,4 +5,5 @@ defmodule YaBTT.TrackTest do
   doctest YaBTT.Tracked
   doctest YaBTT.Track
   doctest YaBTT.Track.Map
+  doctest YaBTT.Track.YaBTT.Tracked
 end
