@@ -1,4 +1,4 @@
-defprotocol YaBTT.Norm do
+defprotocol YaBTT.Proto.Norm do
   @moduledoc """
   Protocol and implementations to normalize the unnormalized map to a normalized map.
   """
@@ -16,7 +16,7 @@ defprotocol YaBTT.Norm do
 
   ## Example
 
-      iex> YaBTT.Norm.normalize(%{
+      iex> YaBTT.Proto.Norm.normalize(%{
       ...>   "info_hash" => "info_hash",
       ...>   "peer_id" => "peer_id",
       ...>   "left" => "0",
@@ -34,19 +34,19 @@ defprotocol YaBTT.Norm do
         }
       }
 
-      iex> YaBTT.Norm.normalize(%{})
+      iex> YaBTT.Proto.Norm.normalize(%{})
       :error
   """
   @spec normalize(unnormalized) :: t
   def normalize(value)
 end
 
-defimpl YaBTT.Norm, for: Map do
+defimpl YaBTT.Proto.Norm, for: Map do
   @moduledoc """
-  Implementation of `YaBTT.Norm` for `Map`.
+  Implementation of `YaBTT.Proto.Norm` for `Map`.
   """
 
-  alias YaBTT.Norm
+  alias YaBTT.Proto.Norm
 
   # The keys that must be contained in the unnormalized map.
   @enforce_keys ["info_hash", "peer_id", "left", "downloaded", "uploaded", "port"]

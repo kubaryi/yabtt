@@ -11,8 +11,8 @@ defmodule YaBTT.Application do
     children = [
       # Starts a worker by calling: YaBTT.Worker.start_link(arg)
       # {YaBTT.Worker, arg}
-      {Plug.Cowboy, scheme: :http, plug: Tracker.Router, options: [port: cowboy_port()]},
-      Bucket.Cache.child_spec([])
+      {Plug.Cowboy, scheme: :http, plug: YaBTT.Server.Router, options: [port: cowboy_port()]},
+      YaBTT.Bucket.Cache.child_spec([])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

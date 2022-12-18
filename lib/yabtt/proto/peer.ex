@@ -1,4 +1,4 @@
-defmodule YaBTT.Peered do
+defmodule YaBTT.Proto.Peered do
   @moduledoc """
   Represents a peer in the BitTorrent.
 
@@ -6,7 +6,7 @@ defmodule YaBTT.Peered do
   of peers to the client, and the client connects to them to download the file.
 
   ## Example
-      iex> %YaBTT.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}
+      iex> %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}
   """
 
   @enforce_keys [:peer_id, :port]
@@ -17,13 +17,13 @@ defmodule YaBTT.Peered do
   @type t :: %__MODULE__{peer_id: String.t(), ip: ip_addr(), port: port_num()}
 end
 
-defprotocol YaBTT.Peer do
+defprotocol YaBTT.Proto.Peer do
   @moduledoc """
-  Protocol and implementations to convert the peerable to `YaBTT.Peered.t()`.
+  Protocol and implementations to convert the peerable to `YaBTT.Proto.Peered.t()`.
   """
 
-  alias YaBTT.Peered
-  alias YaBTT.Norm
+  alias YaBTT.Proto.Peered
+  alias YaBTT.Proto.Norm
 
   @type peerable :: Norm.normalized()
   @type peer :: Peered.t()
@@ -44,20 +44,20 @@ defprotocol YaBTT.Peer do
   string.
 
       iex> %{info_hash: "info_hash", peer_id: "peer_id", ip: "1.2.3.4", port: 6881}
-      ...> |> YaBTT.Peer.convert({1, 2, 3, 5})
-      {"info_hash", %YaBTT.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}}
+      ...> |> YaBTT.Proto.Peer.convert({1, 2, 3, 5})
+      {"info_hash", %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}}
   """
   @spec convert(peerable(), Peered.ip_addr()) :: t()
   def convert(value, ip)
 end
 
-defimpl YaBTT.Peer, for: Map do
+defimpl YaBTT.Proto.Peer, for: Map do
   @moduledoc """
-  Implementation of `YaBTT.Peer` for `Map`.
+  Implementation of `YaBTT.Proto.Peer` for `Map`.
   """
 
-  alias YaBTT.Peered
-  alias YaBTT.Peer
+  alias YaBTT.Proto.Peered
+  alias YaBTT.Proto.Peer
 
   @doc """
   Convert the normalized map to a peer.
@@ -70,11 +70,11 @@ defimpl YaBTT.Peer, for: Map do
   ## Example
 
       iex> %{info_hash: "info_hash", peer_id: "peer_id", port: 6881}
-      ...> |> YaBTT.Peer.convert({1, 2, 3, 5})
-      {"info_hash", %YaBTT.Peered{peer_id: "peer_id", ip: {1, 2, 3, 5}, port: 6881}}
+      ...> |> YaBTT.Proto.Peer.convert({1, 2, 3, 5})
+      {"info_hash", %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 5}, port: 6881}}
 
-      iex> YaBTT.Peer.convert(%{}, {1, 2, 3, 5})
-      {nil, %YaBTT.Peered{peer_id: nil, ip: {1, 2, 3, 5}, port: nil}}
+      iex> YaBTT.Proto.Peer.convert(%{}, {1, 2, 3, 5})
+      {nil, %YaBTT.Proto.Peered{peer_id: nil, ip: {1, 2, 3, 5}, port: nil}}
   """
   @spec convert(Peer.peerable(), YaBTT.ip_addr()) :: Peer.t()
   def convert(normalized_map, ip) do

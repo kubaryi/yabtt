@@ -5,9 +5,9 @@ defmodule YaBTT do
   Yet another BitTorrent tracker. It is a BitTorrent Tracker written in Elixir.
   """
 
-  alias YaBTT.Norm
-  alias YaBTT.State
-  alias YaBTT.Peer
+  alias YaBTT.Proto.Norm
+  alias YaBTT.Proto.State
+  alias YaBTT.Proto.Peer
 
   @type ip_addr :: :inet.ip_address()
 
@@ -81,7 +81,7 @@ defmodule YaBTT do
   end
 
   @doc """
-  Convert the normalized map to a `YaBTT.Peered` struct.
+  Convert the normalized map to a `YaBTT.Proto.Peered` struct.
 
   ## Parameters
 
@@ -94,19 +94,19 @@ defmodule YaBTT do
 
       iex> %{info_hash: "info_hash", peer_id: "peer_id", ip: "1.2.3.4", port: 6881}
       ...> |> YaBTT.convert_peer({1, 2, 3, 5})
-      {"info_hash", %YaBTT.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}}
+      {"info_hash", %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}}
 
   Otherwise, if the `:ip` in the normalized map is a `nil`, it will use the `ip` passed by parameters.
 
       iex> %{info_hash: "info_hash", peer_id: "peer_id", port: 6881}
       ...> |> YaBTT.convert_peer({1, 2, 3, 5})
-      {"info_hash", %YaBTT.Peered{peer_id: "peer_id", ip: {1, 2, 3, 5}, port: 6881}}
+      {"info_hash", %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 5}, port: 6881}}
   """
   @spec convert_peer(Norm.normalized(), ip_addr()) :: Peer.t()
   def convert_peer(normalized, ip), do: Peer.convert(normalized, ip)
 
   @doc """
-  Convert the normalized map to a `YaBTT.State.t()`.
+  Convert the normalized map to a `YaBTT.Proto.State.t()`.
 
   ## Parameters
 

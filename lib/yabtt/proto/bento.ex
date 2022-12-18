@@ -1,25 +1,25 @@
-defimpl Bento.Encoder, for: YaBTT.Peered do
+defimpl Bento.Encoder, for: YaBTT.Proto.Peered do
   @moduledoc """
-  Implementation of `Bento.Encoder` protocol for `YaBTT.Peered` struct.
+  Implementation of `Bento.Encoder` protocol for `YaBTT.Proto.Peered` struct.
   """
 
   alias Bento.Encoder
-  alias YaBTT.Peered
+  alias YaBTT.Proto.Peered
   use Bento.Encode
 
   @doc """
   Encode the Peered struct into its Bencoding form.
 
   ## Parameters
-    - peer: The `YaBTT.Peered` struct to be encoded.
+    - peer: The `YaBTT.Proto.Peered` struct to be encoded.
 
   ## Example
-      iex> struct(YaBTT.Peered, %{})
+      iex> struct(YaBTT.Proto.Peered, %{})
       ...> |> Bento.Encoder.encode()
       ...> |> IO.iodata_to_binary()
       "d2:ip4:null7:peer_id4:null4:port4:nulle"
 
-      iex> struct(YaBTT.Peered, %{peer_id: "peer_id"})
+      iex> struct(YaBTT.Proto.Peered, %{peer_id: "peer_id"})
       ...> |> Bento.Encoder.encode()
       ...> |> IO.iodata_to_binary()
       "d2:ip4:null7:peer_id7:peer_id4:port4:nulle"

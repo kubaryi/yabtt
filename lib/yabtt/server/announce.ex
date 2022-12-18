@@ -1,4 +1,4 @@
-defmodule Tracker.Announce do
+defmodule YaBTT.Server.Announce do
   @moduledoc false
 
   @behaviour Plug
@@ -69,7 +69,7 @@ defmodule Tracker.Announce do
 
       iex> conn = %Plug.Conn{}
       iex> msg = {:ok, %{"interval" => 1800, "min interval" => 1800, "peers" => []}}
-      iex> Tracker.Announce.put_resp_msg(conn, msg)
+      iex> YaBTT.Server.Announce.put_resp_msg(conn, msg)
 
   """
   @spec put_resp_msg(Plug.Conn.t(), {:ok, Bento.Encoder.t()} | :error) :: Plug.Conn.t()

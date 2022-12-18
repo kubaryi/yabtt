@@ -1,4 +1,4 @@
-defmodule Bucket.Cache do
+defmodule YaBTT.Bucket.Cache do
   @moduledoc false
 
   use GenServer

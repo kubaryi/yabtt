@@ -1,9 +1,9 @@
-defprotocol YaBTT.State do
+defprotocol YaBTT.Proto.State do
   @moduledoc """
   Protocol for converting normalized data to state.
   """
 
-  alias YaBTT.Norm
+  alias YaBTT.Proto.Norm
 
   @type statable :: Norm.normalized()
   @type event :: String.t() | nil
@@ -17,23 +17,23 @@ defprotocol YaBTT.State do
   ## Examples
 
       iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0, event: "started"}
-      ...> |> YaBTT.State.convert()
+      ...> |> YaBTT.Proto.State.convert()
       {"peer_id", {100, 20, 0}, "started"}
 
       iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0}
-      ...> |> YaBTT.State.convert()
+      ...> |> YaBTT.Proto.State.convert()
       {"peer_id", {100, 20, 0}, nil}
   """
   @spec convert(statable()) :: t()
   def convert(value)
 end
 
-defimpl YaBTT.State, for: Map do
+defimpl YaBTT.Proto.State, for: Map do
   @moduledoc """
-  Implementation of `YaBTT.State` protocol for `Map`.
+  Implementation of `YaBTT.Proto.State` protocol for `Map`.
   """
 
-  alias YaBTT.State
+  alias YaBTT.Proto.State
 
   @available_event ["started", "stopped", "completed", nil]
 

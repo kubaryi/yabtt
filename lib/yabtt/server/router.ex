@@ -1,4 +1,4 @@
-defmodule Tracker.Router do
+defmodule YaBTT.Server.Router do
   @moduledoc """
   Plug router for the Tracker application.
 
@@ -36,7 +36,7 @@ defmodule Tracker.Router do
     |> send_resp(200, resp_msg)
   end
 
-  forward("/announce", to: Tracker.Announce)
+  forward("/announce", to: YaBTT.Server.Announce)
 
   match _ do
     resp_msg = Jason.encode!(%{message: "Not Found"})
