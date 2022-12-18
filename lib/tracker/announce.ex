@@ -41,7 +41,12 @@ defmodule Tracker.Announce do
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
     # TODO: Implement the announce logic
-    resp_msg = YaBTT.Track.track(conn.params, conn.remote_ip)
+    resp_msg =
+      with {:ok, normalized} <- YaBTT.Norm.normalize(conn.params),
+           {info_hash, peer} <- YaBTT.Peer.to_peer(normalized, conn.remote_ip),
+           {peer_id, state, event} <- YaBTT.State.to_state(normalized) do
+        {:ok, {info_hash, peer, peer_id, state, event}}
+      end
 
     conn
     |> put_resp_content_type("plain/text")

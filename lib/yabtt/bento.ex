@@ -1,25 +1,32 @@
-defimpl Bento.Encoder, for: YaBTT.Tracked do
+defimpl Bento.Encoder, for: YaBTT.Peered do
   @moduledoc """
-  Implementation of `Bento.Encoder` protocol for `YaBTT.Tracked` struct.
+  Implementation of `Bento.Encoder` protocol for `YaBTT.Peered` struct.
   """
 
   alias Bento.Encoder
+  alias YaBTT.Peered
   use Bento.Encode
 
   @doc """
-  Encode the Tracked struct into its Bencoding form.
+  Encode the Peered struct into its Bencoding form.
 
   ## Parameters
-    - track: The `YaBTT.Tracked` struct to be encoded.
+    - peer: The `YaBTT.Peered` struct to be encoded.
 
   ## Example
-      iex> struct(YaBTT.Tracked, %{})
+      iex> struct(YaBTT.Peered, %{})
       ...> |> Bento.Encoder.encode()
       ...> |> IO.iodata_to_binary()
-      "d10:downloaded4:null5:event4:null9:info_hash4:null2:ip4:null4:left4:null7:peer_id4:null4:port4:null8:uploaded4:nulle"
+      "d2:ip4:null7:peer_id4:null4:port4:nulle"
+
+      iex> struct(YaBTT.Peered, %{peer_id: "peer_id"})
+      ...> |> Bento.Encoder.encode()
+      ...> |> IO.iodata_to_binary()
+      "d2:ip4:null7:peer_id7:peer_id4:port4:nulle"
+
   """
-  @spec encode(YaBTT.Tracked.t()) :: Bento.Encoder.t()
-  def encode(track), do: Map.from_struct(track) |> Encoder.Map.encode()
+  @spec encode(Peered.t()) :: Encoder.t()
+  def encode(peer), do: Map.from_struct(peer) |> Encoder.Map.encode()
 end
 
 defimpl Bento.Encoder, for: Tuple do
@@ -40,6 +47,6 @@ defimpl Bento.Encoder, for: Tuple do
       iex> {1, 2, 3, 4} |> Bento.Encoder.encode() |> IO.iodata_to_binary()
       "li1ei2ei3ei4ee"
   """
-  @spec encode(Tuple.t()) :: Bento.Encoder.t()
+  @spec encode(Tuple.t()) :: Encoder.t()
   def encode(tuple), do: Tuple.to_list(tuple) |> Encoder.List.encode()
 end
