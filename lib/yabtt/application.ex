@@ -21,5 +21,5 @@ defmodule YaBTT.Application do
     Supervisor.start_link(children, opts)
   end
 
-  defp cowboy_port, do: Application.get_env(:yabtt, :cowboy_port)
+  defp cowboy_port, do: Application.get_env(:yabtt, :port)
 end
