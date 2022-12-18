@@ -17,15 +17,15 @@ defprotocol YaBTT.State do
   ## Examples
 
       iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0, event: "started"}
-      ...> |> YaBTT.State.to_state()
+      ...> |> YaBTT.State.convert_state()
       {"peer_id", {100, 20, 0}, "started"}
 
       iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0}
-      ...> |> YaBTT.State.to_state()
+      ...> |> YaBTT.State.convert_state()
       {"peer_id", {100, 20, 0}, nil}
   """
-  @spec to_state(statable()) :: t()
-  def to_state(value)
+  @spec convert_state(statable()) :: t()
+  def convert_state(value)
 end
 
 defimpl YaBTT.State, for: Map do
@@ -40,8 +40,8 @@ defimpl YaBTT.State, for: Map do
   @doc """
   Converts normalized data to state.
   """
-  @spec to_state(map) :: State.t()
-  def to_state(normalized_map) do
+  @spec convert_state(map) :: State.t()
+  def convert_state(normalized_map) do
     state = {normalized_map[:downloaded], normalized_map[:uploaded], normalized_map[:left]}
 
     with {:ok, event} <- Map.fetch(normalized_map, :event),
