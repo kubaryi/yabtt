@@ -8,6 +8,7 @@ defmodule YaBTT do
   alias YaBTT.Proto.Norm
   alias YaBTT.Proto.State
   alias YaBTT.Proto.Peer
+  alias YaBTT.Server.Resp
 
   @type ip_addr :: :inet.ip_address()
 
@@ -124,4 +125,9 @@ defmodule YaBTT do
   """
   @spec convert_state(Norm.normalized()) :: State.t()
   def convert_state(normalized), do: State.convert(normalized)
+
+  @spec update_and_get(atom(), Peer.info_hash(), Peer.peer()) :: Resp.t()
+  def update_and_get(db, info_hash, peer) do
+    db.update(info_hash, peer) |> Resp.new()
+  end
 end
