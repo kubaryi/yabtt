@@ -128,6 +128,6 @@ defmodule YaBTT do
 
   @spec update_and_get(atom(), Peer.info_hash(), Peer.peer()) :: Resp.t()
   def update_and_get(db, info_hash, peer) do
-    db.update(info_hash, peer) |> Resp.new()
+    db.update_and_get(info_hash, peer) |> Resp.new()
   end
 end
