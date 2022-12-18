@@ -17,16 +17,21 @@ defimpl Bento.Encoder, for: YaBTT.Proto.Peered do
       iex> struct(YaBTT.Proto.Peered, %{})
       ...> |> Bento.Encoder.encode()
       ...> |> IO.iodata_to_binary()
-      "d2:ip4:null7:peer_id4:null4:port4:nulle"
+      "d2:ip4:null4:port4:null7:peer id4:nulle"
 
       iex> struct(YaBTT.Proto.Peered, %{peer_id: "peer_id"})
       ...> |> Bento.Encoder.encode()
       ...> |> IO.iodata_to_binary()
-      "d2:ip4:null7:peer_id7:peer_id4:port4:nulle"
+      "d2:ip4:null4:port4:null7:peer id7:peer_ide"
 
   """
   @spec encode(Peered.t()) :: Encoder.t()
-  def encode(peer), do: Map.from_struct(peer) |> Encoder.Map.encode()
+  def encode(peer) do
+    Map.from_struct(peer)
+    |> Map.put("peer id", peer.peer_id)
+    |> Map.delete(:peer_id)
+    |> Encoder.Map.encode()
+  end
 end
 
 defimpl Bento.Encoder, for: Tuple do
