@@ -13,7 +13,8 @@ defmodule YaBTT.Peered do
   defstruct [:peer_id, :ip, :port]
 
   @type ip_addr :: :inet.ip_address()
-  @type t :: %__MODULE__{peer_id: String.t(), ip: ip_addr, port: non_neg_integer()}
+  @type port_num :: :inet.port_number()
+  @type t :: %__MODULE__{peer_id: String.t(), ip: ip_addr(), port: port_num()}
 end
 
 defprotocol YaBTT.Peer do
@@ -43,11 +44,11 @@ defprotocol YaBTT.Peer do
   string.
 
       iex> %{info_hash: "info_hash", peer_id: "peer_id", ip: "1.2.3.4", port: 6881}
-      ...> |> YaBTT.Peer.convert_peer({1, 2, 3, 5})
+      ...> |> YaBTT.Peer.convert({1, 2, 3, 5})
       {"info_hash", %YaBTT.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}}
   """
-  @spec convert_peer(peerable(), Peered.ip_addr()) :: t()
-  def convert_peer(value, ip)
+  @spec convert(peerable(), Peered.ip_addr()) :: t()
+  def convert(value, ip)
 end
 
 defimpl YaBTT.Peer, for: Map do
@@ -69,14 +70,14 @@ defimpl YaBTT.Peer, for: Map do
   ## Example
 
       iex> %{info_hash: "info_hash", peer_id: "peer_id", port: 6881}
-      ...> |> YaBTT.Peer.convert_peer({1, 2, 3, 5})
+      ...> |> YaBTT.Peer.convert({1, 2, 3, 5})
       {"info_hash", %YaBTT.Peered{peer_id: "peer_id", ip: {1, 2, 3, 5}, port: 6881}}
 
-      iex> YaBTT.Peer.convert_peer(%{}, {1, 2, 3, 5})
+      iex> YaBTT.Peer.convert(%{}, {1, 2, 3, 5})
       {nil, %YaBTT.Peered{peer_id: nil, ip: {1, 2, 3, 5}, port: nil}}
   """
-  @spec convert_peer(Peer.peerable(), Peered.ip_addr()) :: Peer.t()
-  def convert_peer(normalized_map, ip) do
+  @spec convert(Peer.peerable(), YaBTT.ip_addr()) :: Peer.t()
+  def convert(normalized_map, ip) do
     peer = struct(Peered, normalized_map) |> handle_ip(ip)
 
     {normalized_map[:info_hash], peer}

@@ -40,11 +40,13 @@ defmodule Tracker.Announce do
   """
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
-    # TODO: Implement the announce logic
+    import YaBTT
+
     resp_msg =
-      with {:ok, normalized} <- YaBTT.Norm.normalize(conn.params),
-           {info_hash, peer} <- YaBTT.Peer.convert_peer(normalized, conn.remote_ip),
-           {peer_id, state, event} <- YaBTT.State.convert_state(normalized) do
+      with {:ok, normalized} <- normalize_map(conn.params),
+           {info_hash, peer} <- convert_peer(normalized, conn.remote_ip),
+           {peer_id, state, event} <- convert_state(normalized) do
+        # TODO: Implement the cache logic
         {:ok, {info_hash, peer, peer_id, state, event}}
       end
 
