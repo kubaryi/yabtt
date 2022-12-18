@@ -38,15 +38,25 @@ defimpl Bento.Encoder, for: Tuple do
   use Bento.Encode
 
   @doc """
-  Encode the Tuple into its Bencoding form.
+  Encode the Tuple into its Bencoding form. If the tuple is an IP address,
+  it will be encoded as a BitString.
 
   ## Parameters
     - tuple: The `Tuple` to be encoded.
 
   ## Example
       iex> {1, 2, 3, 4} |> Bento.Encoder.encode() |> IO.iodata_to_binary()
-      "li1ei2ei3ei4ee"
+      "7:1.2.3.4"
+
+      iex> {:a, :b, :c, :d} |> Bento.Encoder.encode() |> IO.iodata_to_binary()
+      "l1:a1:b1:c1:de"
   """
   @spec encode(Tuple.t()) :: Encoder.t()
-  def encode(tuple), do: Tuple.to_list(tuple) |> Encoder.List.encode()
+  def encode(tuple) do
+    if :inet.is_ip_address(tuple) do
+      :inet.ntoa(tuple) |> to_string() |> Encoder.BitString.encode()
+    else
+      Tuple.to_list(tuple) |> Encoder.List.encode()
+    end
+  end
 end
