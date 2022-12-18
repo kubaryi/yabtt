@@ -1,4 +1,4 @@
-defmodule Yabtt.NormTest do
+defmodule YaBTT.NormTest do
   use ExUnit.Case, async: true
 
   doctest YaBTT.Norm
