@@ -1,8 +1,5 @@
 defmodule YaBTTTest do
-  use ExUnit.Case
-  doctest YaBTT
+  use ExUnit.Case, async: true
 
-  test "greets the world" do
-    assert YaBTT.hello() == :world
-  end
+  doctest YaBTT
 end

@@ -6,10 +6,13 @@ defmodule YaBTT.Application do
   use Application
 
   @impl true
+  @spec start(any, any) :: {:error, any} | {:ok, pid}
   def start(_type, _args) do
     children = [
       # Starts a worker by calling: YaBTT.Worker.start_link(arg)
       # {YaBTT.Worker, arg}
+      {Plug.Cowboy, scheme: :http, plug: YaBTT.Server.Router, options: [port: cowboy_port()]},
+      YaBTT.Bucket.Cache.child_spec([])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -17,4 +20,6 @@ defmodule YaBTT.Application do
     opts = [strategy: :one_for_one, name: YaBTT.Supervisor]
     Supervisor.start_link(children, opts)
   end
+
+  defp cowboy_port, do: Application.get_env(:yabtt, :cowboy_port)
 end
