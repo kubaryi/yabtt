@@ -34,6 +34,8 @@ RUN apk add --no-cache openssl libstdc++ ncurses-libs
 # Copy the release from the builder
 COPY --from=builder /app/_build/prod/rel/yabtt .
 
+EXPOSE 8080 8080/udp
+
 # Run the application
 ENTRYPOINT ["/app/bin/yabtt"]
 CMD ["start"]
