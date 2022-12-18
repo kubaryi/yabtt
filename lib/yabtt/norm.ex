@@ -48,6 +48,9 @@ defimpl YaBTT.Norm, for: Map do
 
   alias YaBTT.Norm
 
+  # The keys that must be contained in the unnormalized map.
+  @enforce_keys ["info_hash", "peer_id", "left", "downloaded", "uploaded", "port"]
+
   @doc """
   Normalize the unnormalized map to a normalized map.
 
@@ -72,7 +75,6 @@ defimpl YaBTT.Norm, for: Map do
 
   @spec contains_enforce_keys([String.t()]) :: boolean()
   defp contains_enforce_keys(keys) do
-    enforce_keys = ["info_hash", "peer_id", "left", "downloaded", "uploaded", "port"]
-    Enum.all?(enforce_keys, &(&1 in keys))
+    Enum.all?(@enforce_keys, &(&1 in keys))
   end
 end
