@@ -70,6 +70,7 @@ defimpl YaBTT.Proto.Parser, for: Map do
     end
   end
 
+  @compile {:inline, do_parse: 1}
   @spec do_parse(Parser.unparsed()) :: Parser.parsed()
   defp do_parse(map_with_string_keys) do
     for {k, v} <- map_with_string_keys, into: %{} do
@@ -81,6 +82,7 @@ defimpl YaBTT.Proto.Parser, for: Map do
     end
   end
 
+  @compile {:inline, contains_enforce_keys: 1}
   @spec contains_enforce_keys([String.t()]) :: boolean()
   defp contains_enforce_keys(keys) do
     Enum.all?(@enforce_keys, &(&1 in keys))
