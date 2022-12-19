@@ -12,7 +12,7 @@ config :yabtt,
 config :logger,
   # Set the log level, default to :info.
   # See: https://hexdocs.pm/logger/Logger.html#module-levels
-  level: get_env("YABTT_LOG_LEVEL", "info") |> to_atom(),
+  level: get_env("YABTT_LOG_LEVEL", "info") |> to_atom()
 
 if config_env() == :test do
   # Set the log level to :notice in test environment.
