@@ -11,7 +11,11 @@ defmodule YaBTT.Application do
     children = [
       # Starts a worker by calling: YaBTT.Worker.start_link(arg)
       # {YaBTT.Worker, arg}
-      {Plug.Cowboy, scheme: :http, plug: YaBTT.Server.Router, options: [port: cowboy_port()]},
+      Plug.Cowboy.child_spec(
+        scheme: :http,
+        plug: YaBTT.Server.Router,
+        port: Application.get_env(:yabtt, :port, 8080)
+      ),
       YaBTT.Database.Cache.child_spec([])
     ]
 
@@ -20,6 +24,4 @@ defmodule YaBTT.Application do
     opts = [strategy: :one_for_one, name: YaBTT.Supervisor]
     Supervisor.start_link(children, opts)
   end
-
-  defp cowboy_port, do: Application.get_env(:yabtt, :port, 8080)
 end
