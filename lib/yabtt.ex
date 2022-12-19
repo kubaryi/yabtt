@@ -25,17 +25,17 @@ defmodule YaBTT do
       ...>   "info_hash" => "info_hash",
       ...>   "peer_id" => "peer_id",
       ...>   "left" => "0",
-      ...>   "downloaded" => "0",
+      ...>   "downloaded" => "100",
       ...>   "uploaded" => "0",
       ...>   "port" => "6881"
       ...> })
       {:ok,
         %{info_hash: "info_hash",
           peer_id: "peer_id",
-          left: "0",
-          downloaded: "0",
-          uploaded: "0",
-          port: "6881"
+          left: 0,
+          downloaded: 100,
+          uploaded: 0,
+          port: 6881
         }
       }
 
@@ -58,16 +58,16 @@ defmodule YaBTT do
       ...>   "info_hash" => "info_hash",
       ...>   "peer_id" => "peer_id",
       ...>   "left" => "0",
-      ...>   "downloaded" => "0",
+      ...>   "downloaded" => "100",
       ...>   "uploaded" => "0",
       ...>   "port" => "6881"
       ...> })
       %{info_hash: "info_hash",
         peer_id: "peer_id",
-        left: "0",
-        downloaded: "0",
-        uploaded: "0",
-        port: "6881"
+        left: 0,
+        downloaded: 100,
+        uploaded: 0,
+        port: 6881
       }
 
       iex> YaBTT.normalize_map!(%{})
