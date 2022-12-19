@@ -1,11 +1,45 @@
+defimpl Bento.Encoder, for: Tuple do
+  @moduledoc """
+  Implementation of `Bento.Encoder` protocol for `Tuple` struct.
+  """
+
+  use Bento.Encode
+
+  alias Bento.Encoder
+
+  @doc """
+  Encode the Tuple into its Bencoding form. If the tuple is an IP address,
+  it will be encoded as a BitString.
+
+  ## Parameters
+    - tuple: The `Tuple` to be encoded.
+
+  ## Example
+      iex> {1, 2, 3, 4} |> Bento.Encoder.Tuple.encode() |> IO.iodata_to_binary()
+      "7:1.2.3.4"
+
+      iex> {:a, :b, :c, :d} |> Bento.Encoder.Tuple.encode() |> IO.iodata_to_binary()
+      "l1:a1:b1:c1:de"
+  """
+  @spec encode(Tuple.t()) :: Encoder.t()
+  def encode(tuple) do
+    if :inet.is_ip_address(tuple) do
+      :inet.ntoa(tuple) |> to_string() |> Encoder.BitString.encode()
+    else
+      Tuple.to_list(tuple) |> Encoder.List.encode()
+    end
+  end
+end
+
 defimpl Bento.Encoder, for: YaBTT.Proto.Peered do
   @moduledoc """
   Implementation of `Bento.Encoder` protocol for `YaBTT.Proto.Peered` struct.
   """
 
+  use Bento.Encode
+
   alias Bento.Encoder
   alias YaBTT.Proto.Peered
-  use Bento.Encode
 
   @doc """
   Encode the Peered struct into its Bencoding form.
@@ -38,9 +72,10 @@ defimpl Bento.Encoder, for: YaBTT.Proto.Response do
   Implementation of `Bento.Encoder` protocol for `YaBTT.Proto.Response` struct.
   """
 
+  use Bento.Encode
+
   alias Bento.Encoder
   alias YaBTT.Proto.Resp
-  use Bento.Encode
 
   @doc """
   Encode the Resp struct into its Bencoding form.
@@ -66,34 +101,46 @@ defimpl Bento.Encoder, for: YaBTT.Proto.Response do
   def encode(resp), do: Map.from_struct(resp) |> Encoder.Map.encode()
 end
 
-defimpl Bento.Encoder, for: Tuple do
+alias YaBTT.Errors.InvalidRequeste
+alias YaBTT.Errors.Refused
+alias YaBTT.Errors.Timeout
+
+defimpl Bento.Encoder, for: [InvalidRequeste, Refused, Timeout] do
   @moduledoc """
-  Implementation of `Bento.Encoder` protocol for `Tuple` struct.
+  Implementation of `Bento.Encoder` protocol for Exception structs.
   """
 
-  alias Bento.Encoder
   use Bento.Encode
 
+  alias Bento.Encoder
+
+  @type error :: InvalidRequeste.t() | Refused.t() | Timeout.t()
+
   @doc """
-  Encode the Tuple into its Bencoding form. If the tuple is an IP address,
-  it will be encoded as a BitString.
+  Encode the Exception into its Bencoding form.
 
   ## Parameters
-    - tuple: The `Tuple` to be encoded.
+    - err: The Exception struct to be encoded.
 
   ## Example
-      iex> {1, 2, 3, 4} |> Bento.Encoder.Tuple.encode() |> IO.iodata_to_binary()
-      "7:1.2.3.4"
 
-      iex> {:a, :b, :c, :d} |> Bento.Encoder.Tuple.encode() |> IO.iodata_to_binary()
-      "l1:a1:b1:c1:de"
+      iex> %YaBTT.Errors.InvalidRequeste{}
+      ...> |> Bento.Encoder.YaBTT.Errors.InvalidRequeste.encode()
+      ...> |> IO.iodata_to_binary()
+      "d14:failure reason15:invalid requeste"
+
+      iex> %YaBTT.Errors.Refused{}
+      ...> |> Bento.Encoder.YaBTT.Errors.Refused.encode()
+      ...> |> IO.iodata_to_binary()
+      "d14:failure reason18:connection refusede"
+
+      iex> %YaBTT.Errors.Timeout{}
+      ...> |> Bento.Encoder.YaBTT.Errors.Timeout.encode()
+      ...> |> IO.iodata_to_binary()
+      "d14:failure reason19:operation timed oute"
   """
-  @spec encode(Tuple.t()) :: Encoder.t()
-  def encode(tuple) do
-    if :inet.is_ip_address(tuple) do
-      :inet.ntoa(tuple) |> to_string() |> Encoder.BitString.encode()
-    else
-      Tuple.to_list(tuple) |> Encoder.List.encode()
-    end
+  @spec encode(Error.t()) :: Encoder.t()
+  def encode(err) do
+    %{"failure reason" => err.message} |> Encoder.Map.encode()
   end
 end
