@@ -1,4 +1,4 @@
-defmodule Yabtt.Proto.RespTest do
+defmodule YaBTT.Proto.RespTest do
   use ExUnit.Case, async: true
 
   doctest YaBTT.Proto.Resp

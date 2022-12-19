@@ -15,3 +15,8 @@ config :logger,
   level: get_env("YABTT_LOG_LEVEL", "info") |> to_atom(),
   # Print the UTC time in the log, default to true.
   utc_log: get_env("YABTT_UTC_LOG", "true") |> to_existing_atom()
+
+if config_env() == :test do
+  # Disable the logger in test environment.
+  config :logger, level: :none, utc_log: false
+end
