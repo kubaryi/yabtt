@@ -23,7 +23,6 @@ defimpl Bento.Encoder, for: YaBTT.Proto.Peered do
       ...> |> Bento.Encoder.YaBTT.Proto.Peered.encode()
       ...> |> IO.iodata_to_binary()
       "d2:ip4:null4:port4:null7:peer id7:peer_ide"
-
   """
   @spec encode(Peered.t()) :: Encoder.t()
   def encode(peer) do
@@ -34,33 +33,33 @@ defimpl Bento.Encoder, for: YaBTT.Proto.Peered do
   end
 end
 
-defimpl Bento.Encoder, for: YaBTT.Server.Resp do
+defimpl Bento.Encoder, for: YaBTT.Proto.Response do
   @moduledoc """
-  Implementation of `Bento.Encoder` protocol for `YaBTT.Server.Resp` struct.
+  Implementation of `Bento.Encoder` protocol for `YaBTT.Proto.Response` struct.
   """
 
   alias Bento.Encoder
-  alias YaBTT.Server.Resp
+  alias YaBTT.Proto.Resp
   use Bento.Encode
 
   @doc """
   Encode the Resp struct into its Bencoding form.
 
   ## Parameters
-    - resp: The `YaBTT.Server.Resp` struct to be encoded.
+    - resp: The `YaBTT.Proto.Response` struct to be encoded.
 
   ## Example
-      iex> struct(YaBTT.Server.Resp, %{})
-      ...> |> Bento.Encoder.YaBTT.Server.Resp.encode()
+      iex> struct(YaBTT.Proto.Response, %{})
+      ...> |> Bento.Encoder.YaBTT.Proto.Response.encode()
       ...> |> IO.iodata_to_binary()
       "d8:intervali3600e5:peerslee"
 
-      iex> %YaBTT.Server.Resp{
+      iex> %YaBTT.Proto.Response{
       ...>   interval: 3600,
       ...>   peers: [
       ...>     %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}
       ...>   ]
-      ...> } |> Bento.Encoder.YaBTT.Server.Resp.encode() |> IO.iodata_to_binary()
+      ...> } |> Bento.Encoder.YaBTT.Proto.Response.encode() |> IO.iodata_to_binary()
       "d8:intervali3600e5:peersld2:ip7:1.2.3.44:porti6881e7:peer id7:peer_ideee"
   """
   @spec encode(Resp.t()) :: Encoder.t()
