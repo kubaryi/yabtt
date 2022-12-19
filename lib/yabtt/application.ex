@@ -12,7 +12,7 @@ defmodule YaBTT.Application do
       # Starts a worker by calling: YaBTT.Worker.start_link(arg)
       # {YaBTT.Worker, arg}
       {Plug.Cowboy, scheme: :http, plug: YaBTT.Server.Router, options: [port: cowboy_port()]},
-      YaBTT.Bucket.Cache.child_spec([])
+      YaBTT.Database.Cache.child_spec([])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -21,5 +21,5 @@ defmodule YaBTT.Application do
     Supervisor.start_link(children, opts)
   end
 
-  defp cowboy_port, do: Application.get_env(:yabtt, :cowboy_port)
+  defp cowboy_port, do: Application.get_env(:yabtt, :port, 8080)
 end

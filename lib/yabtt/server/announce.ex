@@ -44,10 +44,8 @@ defmodule YaBTT.Server.Announce do
 
     resp_msg =
       with {:ok, normalized} <- normalize_map(conn.params),
-           {info_hash, peer} <- convert_peer(normalized, conn.remote_ip),
-           {peer_id, state, event} <- convert_state(normalized) do
-        # TODO: Implement the cache logic
-        {:ok, {info_hash, peer, peer_id, state, event}}
+           {info_hash, peer} <- convert_peer(normalized, conn.remote_ip) do
+        {:ok, update_and_get(YaBTT.Database.Cache, info_hash, peer)}
       end
 
     conn

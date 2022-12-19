@@ -8,6 +8,7 @@ defmodule YaBTT do
   alias YaBTT.Proto.Norm
   alias YaBTT.Proto.State
   alias YaBTT.Proto.Peer
+  alias YaBTT.Proto.Resp
 
   @type ip_addr :: :inet.ip_address()
 
@@ -124,4 +125,35 @@ defmodule YaBTT do
   """
   @spec convert_state(Norm.normalized()) :: State.t()
   def convert_state(normalized), do: State.convert(normalized)
+
+  @doc """
+  Update the peer list and get the response.
+
+  ## Parameters
+
+  - db: The storage endpoint (module).
+  - info_hash: The info_hash of the torrent.
+  - peer: The peer to be updated.
+
+  ## Example
+
+      iex> db = YaBTT.Database.Cache
+      iex> info_hash = "info_hash"
+      iex> peer = %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}
+      iex> YaBTT.update_and_get(db, info_hash, peer)
+      %YaBTT.Proto.Response{
+        interval: 3600,
+        peers: [
+          %YaBTT.Proto.Peered{
+            peer_id: "peer_id",
+            ip: {1, 2, 3, 4},
+            port: 6881
+          }
+        ]
+      }
+  """
+  @spec update_and_get(atom(), Peer.info_hash(), Peer.peer()) :: Resp.t()
+  def update_and_get(db, info_hash, peer) do
+    db.update_and_get(info_hash, peer) |> Resp.new()
+  end
 end
