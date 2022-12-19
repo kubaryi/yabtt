@@ -5,4 +5,6 @@ defmodule YaBTT.Proto.BentoTest do
   doctest Bento.Encoder.YaBTT.Proto.Response
   doctest Bento.Encoder.YaBTT.Proto.Peered
   doctest Bento.Encoder.YaBTT.Errors.InvalidRequeste
+  doctest Bento.Encoder.YaBTT.Errors.Timeout
+  doctest Bento.Encoder.YaBTT.Errors.Refused
 end

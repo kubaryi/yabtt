@@ -15,6 +15,7 @@ defimpl Bento.Encoder, for: Tuple do
     - tuple: The `Tuple` to be encoded.
 
   ## Example
+
       iex> {1, 2, 3, 4} |> Bento.Encoder.Tuple.encode() |> IO.iodata_to_binary()
       "7:1.2.3.4"
 
@@ -31,59 +32,39 @@ defimpl Bento.Encoder, for: Tuple do
   end
 end
 
-defimpl Bento.Encoder, for: YaBTT.Proto.Peered do
+alias YaBTT.Proto.Peered
+alias YaBTT.Proto.Response
+
+defimpl Bento.Encoder, for: [Peered, Response] do
   @moduledoc """
-  Implementation of `Bento.Encoder` protocol for `YaBTT.Proto.Peered` struct.
+  Implementation of `Bento.Encoder` protocol for `YaBTT.Proto.Peered` and `YaBTT.Proto.Response`.
   """
 
   use Bento.Encode
 
   alias Bento.Encoder
-  alias YaBTT.Proto.Peered
+  alias YaBTT.Proto.Parser
+
+  @type encodable :: Peered.t() | Response.t()
 
   @doc """
   Encode the Peered struct into its Bencoding form.
 
   ## Parameters
-    - peer: The `YaBTT.Proto.Peered` struct to be encoded.
+    - peer: The `YaBTT.Proto.Peered` or `YaBTT.Proto.Response` to be encoded.
 
   ## Example
+
       iex> struct(YaBTT.Proto.Peered, %{})
       ...> |> Bento.Encoder.YaBTT.Proto.Peered.encode()
       ...> |> IO.iodata_to_binary()
-      "d2:ip4:null4:port4:null7:peer id4:nulle"
+      "d2:ip4:null7:peer id4:null4:port4:nulle"
 
       iex> struct(YaBTT.Proto.Peered, %{peer_id: "peer_id"})
       ...> |> Bento.Encoder.YaBTT.Proto.Peered.encode()
       ...> |> IO.iodata_to_binary()
-      "d2:ip4:null4:port4:null7:peer id7:peer_ide"
-  """
-  @spec encode(Peered.t()) :: Encoder.t()
-  def encode(peer) do
-    Map.from_struct(peer)
-    |> Map.put("peer id", peer.peer_id)
-    |> Map.delete(:peer_id)
-    |> Encoder.Map.encode()
-  end
-end
+      "d2:ip4:null7:peer id7:peer_id4:port4:nulle"
 
-defimpl Bento.Encoder, for: YaBTT.Proto.Response do
-  @moduledoc """
-  Implementation of `Bento.Encoder` protocol for `YaBTT.Proto.Response` struct.
-  """
-
-  use Bento.Encode
-
-  alias Bento.Encoder
-  alias YaBTT.Proto.Resp
-
-  @doc """
-  Encode the Resp struct into its Bencoding form.
-
-  ## Parameters
-    - resp: The `YaBTT.Proto.Response` struct to be encoded.
-
-  ## Example
       iex> struct(YaBTT.Proto.Response, %{})
       ...> |> Bento.Encoder.YaBTT.Proto.Response.encode()
       ...> |> IO.iodata_to_binary()
@@ -95,10 +76,13 @@ defimpl Bento.Encoder, for: YaBTT.Proto.Response do
       ...>     %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}
       ...>   ]
       ...> } |> Bento.Encoder.YaBTT.Proto.Response.encode() |> IO.iodata_to_binary()
-      "d8:intervali3600e5:peersld2:ip7:1.2.3.44:porti6881e7:peer id7:peer_ideee"
+      "d8:intervali3600e5:peersld2:ip7:1.2.3.47:peer id7:peer_id4:porti6881eeee"
   """
-  @spec encode(Resp.t()) :: Encoder.t()
-  def encode(resp), do: Map.from_struct(resp) |> Encoder.Map.encode()
+  @spec encode(encodable()) :: Encoder.t()
+  def encode(encodable) do
+    Parser.parse(encodable)
+    |> Encoder.Map.encode()
+  end
 end
 
 alias YaBTT.Errors.InvalidRequeste

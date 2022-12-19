@@ -5,14 +5,14 @@ defprotocol YaBTT.Proto.Parser do
 
   @type unparsed :: %{String.t() => String.t()}
   @type parsed :: %{atom() => String.t()}
-  @type t :: {:ok, parsed()} | :error
+  @type t :: {:ok, parsed()} | :error | unparsed()
 
   @doc """
-  Parse the unparsed map to a parsed map.
+  Parse the unparsed map to a parsed map. Parse the struct to an unparsed map.
 
   ## Parameters
 
-  - value: The unparsed map to be parsed.
+  - value: The unparsed map or struct to be parsed.
 
   ## Example
 
@@ -34,10 +34,22 @@ defprotocol YaBTT.Proto.Parser do
         }
       }
 
+  If the unparsed map does not contain the keys that must be contained, it will return `:error`.
+
       iex> YaBTT.Proto.Parser.parse(%{})
       :error
+
+  If the struct is passed, it will return an unparsed map.
+
+      iex> %YaBTT.Proto.Peered{peer_id: "peer_id",ip: {1, 2, 3, 4}, port: 6881}
+      ...> |> YaBTT.Proto.Parser.parse()
+      %{"port" => 6881, "ip" => {1, 2, 3, 4}, "peer id" => "peer_id"}
+
+      iex> %YaBTT.Proto.Response{interval: 1800, peers: []}
+      ...> |> YaBTT.Proto.Parser.parse()
+      %{"interval" => 1800, "peers" => []}
   """
-  @spec parse(unparsed) :: t
+  @spec parse(unparsed() | struct()) :: t()
   def parse(value)
 end
 
@@ -86,5 +98,47 @@ defimpl YaBTT.Proto.Parser, for: Map do
   @spec contains_enforce_keys([String.t()]) :: boolean()
   defp contains_enforce_keys(keys) do
     Enum.all?(@enforce_keys, &(&1 in keys))
+  end
+end
+
+defimpl YaBTT.Proto.Parser, for: [YaBTT.Proto.Peered, YaBTT.Proto.Response] do
+  @moduledoc """
+  Implementation of `YaBTT.Proto.Parser` for `YaBTT.Proto.Peered` and `YaBTT.Proto.Response`.
+  """
+
+  alias YaBTT.Proto.Parser
+  alias YaBTT.Proto.Peered
+  alias YaBTT.Proto.Response
+
+  @type parsable :: Peered.t() | Response.t()
+
+  @doc """
+  Parse the struct to an unparsed map.
+
+  ## Parameters
+
+  - parsable: The struct to be parsed.
+
+  ## Example
+
+      iex> %YaBTT.Proto.Peered{peer_id: "peer_id",ip: {1, 2, 3, 4}, port: 6881}
+      ...> |> YaBTT.Proto.Parser.parse()
+      %{"port" => 6881, "ip" => {1, 2, 3, 4}, "peer id" => "peer_id"}
+
+      iex> %YaBTT.Proto.Response{interval: 1800, peers: []}
+      ...> |> YaBTT.Proto.Parser.parse()
+      %{"interval" => 1800, "peers" => []}
+  """
+  @spec parse(parsable()) :: Parser.unparsed()
+  def parse(parsable) do
+    Map.from_struct(parsable) |> do_parse()
+  end
+
+  @compile {:inline, do_parse: 1}
+  @spec do_parse(Parser.parsed()) :: Parser.unparsed()
+  defp do_parse(map_with_atom_keys) do
+    for {k, v} <- map_with_atom_keys, into: %{} do
+      {Atom.to_string(k) |> String.replace("_", " "), v}
+    end
   end
 end

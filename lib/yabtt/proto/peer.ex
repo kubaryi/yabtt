@@ -6,6 +6,7 @@ defmodule YaBTT.Proto.Peered do
   of peers to the client, and the client connects to them to download the file.
 
   ## Example
+
       iex> %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}
   """
 
