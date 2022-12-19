@@ -13,10 +13,8 @@ config :logger,
   # Set the log level, default to :info.
   # See: https://hexdocs.pm/logger/Logger.html#module-levels
   level: get_env("YABTT_LOG_LEVEL", "info") |> to_atom(),
-  # Print the UTC time in the log, default to true.
-  utc_log: get_env("YABTT_UTC_LOG", "true") |> to_existing_atom()
 
 if config_env() == :test do
-  # Disable the logger in test environment.
-  config :logger, level: :none, utc_log: false
+  # Set the log level to :notice in test environment.
+  config :logger, level: :notice
 end
