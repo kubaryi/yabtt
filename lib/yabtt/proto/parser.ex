@@ -1,22 +1,22 @@
-defprotocol YaBTT.Proto.Norm do
+defprotocol YaBTT.Proto.Parser do
   @moduledoc """
-  Protocol and implementations to normalize the unnormalized map to a normalized map.
+  Protocol and implementations to parse the unparsed map to a parsed map.
   """
 
-  @type unnormalized :: %{String.t() => String.t()}
-  @type normalized :: %{atom() => String.t()}
-  @type t :: {:ok, normalized()} | :error
+  @type unparsed :: %{String.t() => String.t()}
+  @type parsed :: %{atom() => String.t()}
+  @type t :: {:ok, parsed()} | :error
 
   @doc """
-  Normalize the unnormalized map to a normalized map.
+  Parse the unparsed map to a parsed map.
 
   ## Parameters
 
-  - value: The unnormalized map to be normalized.
+  - value: The unparsed map to be parsed.
 
   ## Example
 
-      iex> YaBTT.Proto.Norm.normalize(%{
+      iex> YaBTT.Proto.Parser.parse(%{
       ...>   "info_hash" => "info_hash",
       ...>   "peer_id" => "peer_id",
       ...>   "left" => "0",
@@ -34,44 +34,44 @@ defprotocol YaBTT.Proto.Norm do
         }
       }
 
-      iex> YaBTT.Proto.Norm.normalize(%{})
+      iex> YaBTT.Proto.Parser.parse(%{})
       :error
   """
-  @spec normalize(unnormalized) :: t
-  def normalize(value)
+  @spec parse(unparsed) :: t
+  def parse(value)
 end
 
-defimpl YaBTT.Proto.Norm, for: Map do
+defimpl YaBTT.Proto.Parser, for: Map do
   @moduledoc """
-  Implementation of `YaBTT.Proto.Norm` for `Map`.
+  Implementation of `YaBTT.Proto.Parser` for `Map`.
   """
 
-  alias YaBTT.Proto.Norm
+  alias YaBTT.Proto.Parser
 
   # The keys that must be integerized.
   @enforce_integerized ["left", "downloaded", "uploaded", "port"]
-  # The keys that must be contained in the unnormalized map.
+  # The keys that must be contained in the unparsed map.
   @enforce_keys ["info_hash", "peer_id" | @enforce_integerized]
 
   @doc """
-  Normalize the unnormalized map to a normalized map.
+  Parse the unparsed map to a parsed map.
 
   ## Parameters
 
-  - value: The unnormalized map to be normalized.
+  - value: The unparsed map to be parsed.
 
   """
-  @spec normalize(Norm.unnormalized()) :: Norm.t()
-  def normalize(value) do
+  @spec parse(Parser.unparsed()) :: Parser.t()
+  def parse(value) do
     if contains_enforce_keys(Map.keys(value)) do
-      {:ok, do_normalize(value)}
+      {:ok, do_parse(value)}
     else
       :error
     end
   end
 
-  @spec do_normalize(Norm.unnormalized()) :: Norm.normalized()
-  defp do_normalize(map_with_string_keys) do
+  @spec do_parse(Parser.unparsed()) :: Parser.parsed()
+  defp do_parse(map_with_string_keys) do
     for {k, v} <- map_with_string_keys, into: %{} do
       if k in @enforce_integerized do
         {String.to_atom(k), String.to_integer(v)}
