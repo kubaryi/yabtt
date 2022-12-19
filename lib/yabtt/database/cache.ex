@@ -11,7 +11,7 @@ defmodule YaBTT.Database.Cache do
 
   alias YaBTT.Proto.Peer
 
-  @type opts :: [ets_name: atom(), ets_opts: :ets.options()]
+  @type opts :: [enable: boolean(), ets_name: atom(), ets_opts: :ets.options()]
   @type state :: [ets_name: atom()]
 
   @doc """
@@ -51,7 +51,8 @@ defmodule YaBTT.Database.Cache do
   @impl true
   @spec init(opts()) :: {:ok, state()} | :ignore
   def init(opts) do
-    with {:ok, name} <- Keyword.fetch(opts, :ets_name),
+    with {:ok, true} <- Keyword.fetch(opts, :enable),
+         {:ok, name} <- Keyword.fetch(opts, :ets_name),
          {:ok, ets_opts} <- Keyword.fetch(opts, :ets_opts) do
       {:ok, [ets_name: :ets.new(name, ets_opts)]}
     else
