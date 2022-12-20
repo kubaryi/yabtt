@@ -1,14 +1,30 @@
 use Plug.Test
 
-alias YaBTT.Server.Announce
+alias YaBTT.Server.Router
 
-branch = System.get_env("BENCHMARK_BRANCH", "dev")
-opts = Announce.init([])
-event_list = ["started", "stopped", "completed", nil]
+# Environment variables
+tag = System.get_env("BENCHMARK_BRANCH", nil)
+save_dir = System.get_env("BENCHMARK_SAVE_DIR", "./benchmark/.benchee")
+report_dir = System.get_env("BENCHMARK_REPORT_DIR", "./benchmark/report")
 
-gen_random_string = fn len -> for _ <- 1..len, into: "", do: <<Enum.random('0123456789abcdef')>> end
+branch =
+  with {b, 0} <- System.cmd("git", ["branch", "--show-current"]) do
+    tag || b |> String.trim()
+  else
+    _ -> tag
+  end
+
+Enum.map([save_dir, report_dir], &File.mkdir_p(&1))
+opts = Router.init([])
+
+# Benchmark helper functions
+gen_random_string = fn len ->
+  for _ <- 1..len, into: "", do: <<Enum.random('0123456789abcdef')>>
+end
+
 gen_info_hash_list = fn len -> for _ <- 1..len, do: gen_random_string.(40) end
 gen_peer_id_list = fn len -> for _ <- 1..len, do: gen_random_string.(20) end
+
 gen_faker_header = fn info_hash_list, peer_id_list ->
   %{
     "info_hash" => Enum.random(info_hash_list),
@@ -17,22 +33,36 @@ gen_faker_header = fn info_hash_list, peer_id_list ->
     "uploaded" => Enum.random(0..100),
     "downloaded" => Enum.random(0..100),
     "left" => Enum.random(0..100_000),
-    "event" => Enum.random(event_list)
+    "event" => Enum.random(["started", "stopped", "completed", nil])
   }
 end
 
+call_announce = fn i, l2 ->
+  conn(:get, "/announce", gen_faker_header.(i, l2)) |> Router.call(opts)
+end
+
+# Benchmark Data
+peer_id_list_1 = gen_peer_id_list.(100)
+peer_id_list_2 = gen_peer_id_list.(1_000)
+peer_id_list_3 = gen_peer_id_list.(10_000)
+
+# Benchmark
 Benchee.run(
   %{
-    "/announce" => fn {l1, l2} -> conn(:get, "/announce", gen_faker_header.(l1, l2)) |> Announce.call(opts) end,
-    "/" => fn _ -> conn(:get, "/", %{}) |> Announce.call(opts) end
+    "small number of users" => fn i -> call_announce.(i, peer_id_list_1) end,
+    "moderate number of users" => fn i -> call_announce.(i, peer_id_list_2) end,
+    "large number of users" => fn i -> call_announce.(i, peer_id_list_3) end
   },
   inputs: %{
-    "small info_hash list" => {gen_info_hash_list.(30), gen_peer_id_list.(50)},
-    "medium info_hash list" => {gen_info_hash_list.(50), gen_peer_id_list.(50)},
-    "large info_hash list" => {gen_info_hash_list.(100), gen_peer_id_list.(50)},
+    "small amount of BitTorrent" => gen_info_hash_list.(100),
+    "medium number of BitTorrent" => gen_info_hash_list.(1_000),
+    "large number of BitTorrent" => gen_info_hash_list.(10_000)
   },
-  save: [path: "./benchmark/.benchee/benchmark.#{branch}.benchee", tag: branch],
-  parallel: 4,
+  save: [path: "#{save_dir}/benchmark.#{branch}.benchee", tag: branch],
+  formatters: [
+    {Benchee.Formatters.HTML, file: "#{report_dir}/index.html"},
+    Benchee.Formatters.Console
+  ]
 )
 
-Benchee.run(%{}, load: "./benchmark/.benchee/*.benchee")
+Benchee.run(%{}, load: "#{save_dir}/*.benchee")
