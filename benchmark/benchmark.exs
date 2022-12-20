@@ -3,7 +3,7 @@ use Plug.Test
 alias YaBTT.Server.Router
 
 # Environment variables
-tag = System.get_env("BENCHMARK_BRANCH", nil)
+tag = System.get_env("BENCHMARK_TAG", nil)
 save_dir = System.get_env("BENCHMARK_SAVE_DIR", "./benchmark/.benchee")
 report_dir = System.get_env("BENCHMARK_REPORT_DIR", "./benchmark/report")
 
@@ -15,6 +15,7 @@ branch =
   end
 
 Enum.map([save_dir, report_dir], &File.mkdir_p(&1))
+utc = DateTime.utc_now() |> DateTime.to_string()
 opts = Router.init([])
 
 # Benchmark helper functions
@@ -58,7 +59,7 @@ Benchee.run(
     "medium number of BitTorrent" => gen_info_hash_list.(1_000),
     "large number of BitTorrent" => gen_info_hash_list.(10_000)
   },
-  save: [path: "#{save_dir}/benchmark.#{branch}.benchee", tag: branch],
+  save: [path: "#{save_dir}/#{branch}.#{utc}.benchee", tag: branch],
   formatters: [
     {Benchee.Formatters.HTML, file: "#{report_dir}/index.html"},
     Benchee.Formatters.Console
