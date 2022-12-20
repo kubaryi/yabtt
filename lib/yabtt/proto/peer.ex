@@ -23,8 +23,7 @@ defprotocol YaBTT.Proto.Peer do
   Protocol and implementations to convert the peerable to `YaBTT.Proto.Peered.t()`.
   """
 
-  alias YaBTT.Proto.Peered
-  alias YaBTT.Proto.Parser
+  alias YaBTT.Proto.{Peered, Parser}
 
   @type peerable :: Parser.parsed()
   @type peer :: Peered.t()
@@ -57,8 +56,7 @@ defimpl YaBTT.Proto.Peer, for: Map do
   Implementation of `YaBTT.Proto.Peer` for `Map`.
   """
 
-  alias YaBTT.Proto.Peered
-  alias YaBTT.Proto.Peer
+  alias YaBTT.Proto.{Peered, Peer}
 
   @doc """
   Convert the parsed map to a peer.

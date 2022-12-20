@@ -106,9 +106,7 @@ defimpl YaBTT.Proto.Parser, for: [YaBTT.Proto.Peered, YaBTT.Proto.Response] do
   Implementation of `YaBTT.Proto.Parser` for `YaBTT.Proto.Peered` and `YaBTT.Proto.Response`.
   """
 
-  alias YaBTT.Proto.Parser
-  alias YaBTT.Proto.Peered
-  alias YaBTT.Proto.Response
+  alias YaBTT.Proto.{Parser, Peered, Response}
 
   @type parsable :: Peered.t() | Response.t()
 

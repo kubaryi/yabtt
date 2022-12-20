@@ -1,6 +1,4 @@
-import System, only: [get_env: 1, get_env: 2]
-import String, only: [to_integer: 1, to_atom: 1, to_existing_atom: 1]
-import Config
+import Elixir.{Config, System, String}
 
 config :yabtt,
   # Set the interval in seconds between each scrape, default to 3600.

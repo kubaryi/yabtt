@@ -32,8 +32,7 @@ defimpl Bento.Encoder, for: Tuple do
   end
 end
 
-alias YaBTT.Proto.Peered
-alias YaBTT.Proto.Response
+alias YaBTT.Proto.{Peered, Response}
 
 defimpl Bento.Encoder, for: [Peered, Response] do
   @moduledoc """
@@ -85,9 +84,7 @@ defimpl Bento.Encoder, for: [Peered, Response] do
   end
 end
 
-alias YaBTT.Errors.InvalidRequeste
-alias YaBTT.Errors.Refused
-alias YaBTT.Errors.Timeout
+alias YaBTT.Errors.{InvalidRequeste, Refused, Timeout}
 
 defimpl Bento.Encoder, for: [InvalidRequeste, Refused, Timeout] do
   @moduledoc """

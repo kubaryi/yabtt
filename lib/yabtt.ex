@@ -5,10 +5,7 @@ defmodule YaBTT do
   Yet another BitTorrent tracker. It is a BitTorrent Tracker written in Elixir.
   """
 
-  alias YaBTT.Proto.Parser
-  alias YaBTT.Proto.State
-  alias YaBTT.Proto.Peer
-  alias YaBTT.Proto.Resp
+  alias YaBTT.Proto.{Parser, State, Peer, Resp}
 
   @type ip_addr :: :inet.ip_address()
 
