@@ -54,6 +54,8 @@ defmodule YaBTT.Server.Announce do
     |> send_resp()
   end
 
+  @type resp_msg :: {:ok, Bento.Encoder.t()} | {:error, String.t()} | any()
+
   @doc """
   Bind the response message to the connection struct. All the message will be encoded as
   [bencoding](http://www.bittorrent.org/beps/bep_0003.html#bencoding) with `Bento.encode/2`.
@@ -70,7 +72,7 @@ defmodule YaBTT.Server.Announce do
       iex> YaBTT.Server.Announce.put_resp_msg(conn, msg)
 
   """
-  @spec put_resp_msg(Plug.Conn.t(), {:ok, Bento.Encoder.t()} | :error) :: Plug.Conn.t()
+  @spec put_resp_msg(Plug.Conn.t(), resp_msg()) :: Plug.Conn.t()
   def put_resp_msg(conn, {:ok, data}) do
     case Bento.encode(data) do
       {:ok, msg} -> resp(conn, 200, msg)
@@ -78,7 +80,16 @@ defmodule YaBTT.Server.Announce do
     end
   end
 
-  def put_resp_msg(conn, :error) do
-    resp(conn, 400, "d14:failure reason15:invalid requeste")
+  def put_resp_msg(conn, {:error, err_msg}) do
+    # The `Bento.encode/2` has a bug that it will raise an exception when the
+    # input is a map. So we have to use `Bento.Encoder.encode/` instead.
+    # See: https://github.com/folz/bento/pull/13
+    Bento.Encoder.encode(%{"failure reason" => err_msg})
+    |> IO.iodata_to_binary()
+    |> (&resp(conn, 400, &1)).()
+  end
+
+  def put_resp_msg(conn, _) do
+    resp(conn, 500, "d14:failure reason22:unknown internal errore")
   end
 end

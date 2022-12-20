@@ -22,6 +22,9 @@ defmodule YaBTT.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:benchee, "~> 1.1.0", only: :dev},
+      {:benchee_markdown, "~> 0.3", only: :dev},
+      {:benchee_html, "~> 1.0", only: :dev},
       {:plug_cowboy, "~> 2.6.0"},
       {:bento, "~> 0.9"},
       {:jason, "~> 1.4"}

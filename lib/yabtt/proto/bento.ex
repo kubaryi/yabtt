@@ -78,50 +78,5 @@ defimpl Bento.Encoder, for: [Peered, Response] do
       "d8:intervali3600e5:peersld2:ip7:1.2.3.47:peer id7:peer_id4:porti6881eeee"
   """
   @spec encode(encodable()) :: Encoder.t()
-  def encode(encodable) do
-    Parser.parse(encodable)
-    |> Encoder.Map.encode()
-  end
-end
-
-alias YaBTT.Errors.{InvalidRequeste, Refused, Timeout}
-
-defimpl Bento.Encoder, for: [InvalidRequeste, Refused, Timeout] do
-  @moduledoc """
-  Implementation of `Bento.Encoder` protocol for Exception structs.
-  """
-
-  use Bento.Encode
-
-  alias Bento.Encoder
-
-  @type error :: InvalidRequeste.t() | Refused.t() | Timeout.t()
-
-  @doc """
-  Encode the Exception into its Bencoding form.
-
-  ## Parameters
-    - err: The Exception struct to be encoded.
-
-  ## Example
-
-      iex> %YaBTT.Errors.InvalidRequeste{}
-      ...> |> Bento.Encoder.YaBTT.Errors.InvalidRequeste.encode()
-      ...> |> IO.iodata_to_binary()
-      "d14:failure reason15:invalid requeste"
-
-      iex> %YaBTT.Errors.Refused{}
-      ...> |> Bento.Encoder.YaBTT.Errors.Refused.encode()
-      ...> |> IO.iodata_to_binary()
-      "d14:failure reason18:connection refusede"
-
-      iex> %YaBTT.Errors.Timeout{}
-      ...> |> Bento.Encoder.YaBTT.Errors.Timeout.encode()
-      ...> |> IO.iodata_to_binary()
-      "d14:failure reason19:operation timed oute"
-  """
-  @spec encode(Error.t()) :: Encoder.t()
-  def encode(err) do
-    %{"failure reason" => err.message} |> Encoder.Map.encode()
-  end
+  def encode(encodable), do: Parser.parse(encodable) |> Encoder.Map.encode()
 end
