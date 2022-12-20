@@ -6,6 +6,7 @@ defmodule YaBTT.Proto.Peered do
   of peers to the client, and the client connects to them to download the file.
 
   ## Example
+
       iex> %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}
   """
 
@@ -22,10 +23,9 @@ defprotocol YaBTT.Proto.Peer do
   Protocol and implementations to convert the peerable to `YaBTT.Proto.Peered.t()`.
   """
 
-  alias YaBTT.Proto.Peered
-  alias YaBTT.Proto.Norm
+  alias YaBTT.Proto.{Peered, Parser}
 
-  @type peerable :: Norm.normalized()
+  @type peerable :: Parser.parsed()
   @type peer :: Peered.t()
   @type info_hash :: String.t()
   @type t :: {info_hash(), peer()}
@@ -56,15 +56,14 @@ defimpl YaBTT.Proto.Peer, for: Map do
   Implementation of `YaBTT.Proto.Peer` for `Map`.
   """
 
-  alias YaBTT.Proto.Peered
-  alias YaBTT.Proto.Peer
+  alias YaBTT.Proto.{Peered, Peer}
 
   @doc """
-  Convert the normalized map to a peer.
+  Convert the parsed map to a peer.
 
   ## Parameters
 
-  - value: The normalized map to be converted.
+  - value: The parsed map to be converted.
   - ip: The IP address of the peer.
 
   ## Example
@@ -77,10 +76,10 @@ defimpl YaBTT.Proto.Peer, for: Map do
       {nil, %YaBTT.Proto.Peered{peer_id: nil, ip: {1, 2, 3, 5}, port: nil}}
   """
   @spec convert(Peer.peerable(), YaBTT.ip_addr()) :: Peer.t()
-  def convert(normalized_map, ip) do
-    peer = struct(Peered, normalized_map) |> handle_ip(ip)
+  def convert(parsed_map, ip) do
+    peer = struct(Peered, parsed_map) |> handle_ip(ip)
 
-    {normalized_map[:info_hash], peer}
+    {parsed_map[:info_hash], peer}
   end
 
   @spec handle_ip(Peered.t(), Peered.ip_addr()) :: Peered.t()

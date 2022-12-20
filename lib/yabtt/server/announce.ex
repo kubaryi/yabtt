@@ -43,8 +43,8 @@ defmodule YaBTT.Server.Announce do
     import YaBTT
 
     resp_msg =
-      with {:ok, normalized} <- normalize_map(conn.params),
-           {info_hash, peer} <- convert_peer(normalized, conn.remote_ip) do
+      with {:ok, parsed} <- parse_params(conn.params),
+           {info_hash, peer} <- convert_peer(parsed, conn.remote_ip) do
         {:ok, update_and_get(YaBTT.Database.Cache, info_hash, peer)}
       end
 

@@ -5,23 +5,20 @@ defmodule YaBTT do
   Yet another BitTorrent tracker. It is a BitTorrent Tracker written in Elixir.
   """
 
-  alias YaBTT.Proto.Norm
-  alias YaBTT.Proto.State
-  alias YaBTT.Proto.Peer
-  alias YaBTT.Proto.Resp
+  alias YaBTT.Proto.{Parser, State, Peer, Resp}
 
   @type ip_addr :: :inet.ip_address()
 
   @doc """
-  Normalize the map.
+  Parse the map.
 
   ## Parameters
 
-  - value: The map to be normalized.
+  - value: The map to be parsed.
 
   ## Example
 
-      iex> YaBTT.normalize_map(%{
+      iex> YaBTT.parse_params(%{
       ...>   "info_hash" => "info_hash",
       ...>   "peer_id" => "peer_id",
       ...>   "left" => "0",
@@ -39,22 +36,22 @@ defmodule YaBTT do
         }
       }
 
-      iex> YaBTT.normalize_map(%{})
+      iex> YaBTT.parse_params(%{})
       :error
   """
-  @spec normalize_map(Norm.unnormalized()) :: {:ok, Norm.normalized()} | :error
-  def normalize_map(value), do: Norm.normalize(value)
+  @spec parse_params(Parser.unparsed()) :: {:ok, Parser.parsed()} | :error
+  def parse_params(value), do: Parser.parse(value)
 
   @doc """
-  Normalize the map.
+  Parse the map.
 
   ## Parameters
 
-  - value: The map to be normalized.
+  - value: The map to be parsed.
 
   ## Example
 
-      iex> YaBTT.normalize_map!(%{
+      iex> YaBTT.parse_params!(%{
       ...>   "info_hash" => "info_hash",
       ...>   "peer_id" => "peer_id",
       ...>   "left" => "0",
@@ -70,48 +67,48 @@ defmodule YaBTT do
         port: 6881
       }
 
-      iex> YaBTT.normalize_map!(%{})
+      iex> YaBTT.parse_params!(%{})
       ** (RuntimeError) invalid Map
   """
-  @spec normalize_map!(Norm.unnormalized()) :: Norm.normalized()
-  def normalize_map!(value) do
-    case Norm.normalize(value) do
-      {:ok, normalized} -> normalized
+  @spec parse_params!(Parser.unparsed()) :: Parser.parsed()
+  def parse_params!(value) do
+    case Parser.parse(value) do
+      {:ok, parsed} -> parsed
       :error -> raise "invalid Map"
     end
   end
 
   @doc """
-  Convert the normalized map to a `YaBTT.Proto.Peered` struct.
+  Convert the parsed map to a `YaBTT.Proto.Peered` struct.
 
   ## Parameters
 
-  - normalized: The normalized map.
+  - parsed: The parsed map.
   - ip: The IP address of the peer.
 
   ## Example
 
-  If it is a string, it will automatically convert ':ip' in the normalized map to `:inet.ip_address()`.
+  If it is a string, it will automatically convert ':ip' in the parsed map to `:inet.ip_address()`.
 
       iex> %{info_hash: "info_hash", peer_id: "peer_id", ip: "1.2.3.4", port: 6881}
       ...> |> YaBTT.convert_peer({1, 2, 3, 5})
       {"info_hash", %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}}
 
-  Otherwise, if the `:ip` in the normalized map is a `nil`, it will use the `ip` passed by parameters.
+  Otherwise, if the `:ip` in the parsed map is a `nil`, it will use the `ip` passed by parameters.
 
       iex> %{info_hash: "info_hash", peer_id: "peer_id", port: 6881}
       ...> |> YaBTT.convert_peer({1, 2, 3, 5})
       {"info_hash", %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 5}, port: 6881}}
   """
-  @spec convert_peer(Norm.normalized(), ip_addr()) :: Peer.t()
-  def convert_peer(normalized, ip), do: Peer.convert(normalized, ip)
+  @spec convert_peer(Parser.parsed(), ip_addr()) :: Peer.t()
+  def convert_peer(parsed, ip), do: Peer.convert(parsed, ip)
 
   @doc """
-  Convert the normalized map to a `YaBTT.Proto.State.t()`.
+  Convert the parsed map to a `YaBTT.Proto.State.t()`.
 
   ## Parameters
 
-  - normalized: The normalized map.
+  - parsed: The parsed map.
 
   ## Example
 
@@ -123,8 +120,8 @@ defmodule YaBTT do
       ...> |> YaBTT.convert_state()
       {"peer_id", {100, 20, 0}, nil}
   """
-  @spec convert_state(Norm.normalized()) :: State.t()
-  def convert_state(normalized), do: State.convert(normalized)
+  @spec convert_state(Parser.parsed()) :: State.t()
+  def convert_state(parsed), do: State.convert(parsed)
 
   @doc """
   Update the peer list and get the response.
