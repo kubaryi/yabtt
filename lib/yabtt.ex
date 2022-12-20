@@ -68,13 +68,13 @@ defmodule YaBTT do
       }
 
       iex> YaBTT.parse_params!(%{})
-      ** (RuntimeError) invalid requeste
+      ** (Plug.BadRequestError) could not process the request due to client error
   """
   @spec parse_params!(Parser.unparsed()) :: Parser.parsed()
   def parse_params!(value) do
     case Parser.parse(value) do
       {:ok, parsed} -> parsed
-      {:error, msg} -> raise msg
+      {:error, _} -> raise Plug.BadRequestError
     end
   end
 
