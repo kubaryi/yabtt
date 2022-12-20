@@ -78,8 +78,5 @@ defimpl Bento.Encoder, for: [Peered, Response] do
       "d8:intervali3600e5:peersld2:ip7:1.2.3.47:peer id7:peer_id4:porti6881eeee"
   """
   @spec encode(encodable()) :: Encoder.t()
-  def encode(encodable) do
-    Parser.parse(encodable)
-    |> Encoder.Map.encode()
-  end
+  def encode(encodable), do: Parser.parse(encodable) |> Encoder.Map.encode()
 end

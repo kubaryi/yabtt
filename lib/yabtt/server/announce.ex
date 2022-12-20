@@ -90,6 +90,6 @@ defmodule YaBTT.Server.Announce do
   end
 
   def put_resp_msg(conn, _) do
-    resp(conn, 500, "d14:failure reason15:unknown mistake")
+    resp(conn, 500, "d14:failure reason22:unknown internal errore")
   end
 end
