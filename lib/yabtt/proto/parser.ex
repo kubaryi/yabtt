@@ -5,7 +5,8 @@ defprotocol YaBTT.Proto.Parser do
 
   @type unparsed :: %{String.t() => String.t()}
   @type parsed :: %{atom() => String.t()}
-  @type t :: {:ok, parsed()} | :error | unparsed()
+  @type error :: {:error, Strinh.t()}
+  @type t :: {:ok, parsed()} | error() | unparsed()
 
   @doc """
   Parse the unparsed map to a parsed map. Parse the struct to an unparsed map.
@@ -34,10 +35,11 @@ defprotocol YaBTT.Proto.Parser do
         }
       }
 
-  If the unparsed map does not contain the keys that must be contained, it will return `:error`.
+  If the unparsed map does not contain the keys that must be contained,
+  it will return an `{:error, _}`.
 
       iex> YaBTT.Proto.Parser.parse(%{})
-      :error
+      {:error, "invalid requeste"}
 
   If the struct is passed, it will return an unparsed map.
 
@@ -78,7 +80,7 @@ defimpl YaBTT.Proto.Parser, for: Map do
     if contains_enforce_keys(Map.keys(value)) do
       {:ok, do_parse(value)}
     else
-      :error
+      {:error, "invalid requeste"}
     end
   end
 

@@ -37,9 +37,9 @@ defmodule YaBTT do
       }
 
       iex> YaBTT.parse_params(%{})
-      :error
+      {:error, "invalid requeste"}
   """
-  @spec parse_params(Parser.unparsed()) :: {:ok, Parser.parsed()} | :error
+  @spec parse_params(Parser.unparsed()) :: Parser.t()
   def parse_params(value), do: Parser.parse(value)
 
   @doc """
@@ -68,13 +68,13 @@ defmodule YaBTT do
       }
 
       iex> YaBTT.parse_params!(%{})
-      ** (RuntimeError) invalid Map
+      ** (RuntimeError) invalid requeste
   """
   @spec parse_params!(Parser.unparsed()) :: Parser.parsed()
   def parse_params!(value) do
     case Parser.parse(value) do
       {:ok, parsed} -> parsed
-      :error -> raise "invalid Map"
+      {:error, msg} -> raise msg
     end
   end
 
