@@ -23,26 +23,26 @@ defmodule YaBTT.Server.Router do
   import Plug.Conn
 
   plug(Plug.Logger)
-  plug(Plug.Parsers, parsers: [:urlencoded, :json], json_decoder: Jason)
+  plug(Plug.Parsers, parsers: [:urlencoded])
   plug(:match)
   plug(:dispatch)
 
   get "/" do
     [host_url | _tail] = get_req_header(conn, "host")
-    resp_msg = Jason.encode!(%{message: "#{conn.scheme}://#{host_url}/announce"})
+    resp_msg = "#{conn.scheme}://#{host_url}/announce"
 
     conn
-    |> put_resp_content_type("application/json")
+    |> put_resp_content_type("text/plain")
     |> send_resp(200, resp_msg)
   end
 
   forward("/announce", to: YaBTT.Server.Announce)
 
   match _ do
-    resp_msg = Jason.encode!(%{message: "Not Found"})
+    not_found = "d14:failure reason9:not founde"
 
     conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(404, resp_msg)
+    |> put_resp_content_type("text/plain")
+    |> send_resp(404, not_found)
   end
 end
