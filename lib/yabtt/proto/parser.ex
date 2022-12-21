@@ -24,7 +24,8 @@ defprotocol YaBTT.Proto.Parser do
       ...>   "downloaded" => "100",
       ...>   "uploaded" => "0",
       ...>   "port" => "6881",
-      ...>   "event" => "started"
+      ...>   "event" => "started",
+      ...>   "mischief-maker" => "I shouldn't be here"
       ...> })
       {:ok,
         %{info_hash: "info_hash",
@@ -64,18 +65,14 @@ defimpl YaBTT.Proto.Parser, for: Map do
 
   alias YaBTT.Proto.Parser
 
-  # Preload all available `atoms()` for use by `String.to_existing_atom/1`
-  # to avoid the  `atom()` has not been loaded yet.
-  # See: https://hexdocs.pm/elixir/String.html#to_existing_atom/1
-
   # The keys that must be integerized.
-  @need_integerized [:left, :downloaded, :uploaded, :port] |> Enum.map(&to_string/1)
+  @need_integerized ["left", "downloaded", "uploaded", "port"]
   # The keys that must be contained in the unparsed map.
-  @enforce_keys [:info_hash, :peer_id | @need_integerized] |> Enum.map(&to_string/1)
+  @enforce_keys ["info_hash", "peer_id" | @need_integerized]
   # All the keys that the unparsed map can allow.
-  @exhaustive_keys [:ip | @enforce_keys] |> Enum.map(&to_string/1)
+  @exhaustive ["ip", "event" | @enforce_keys]
   # The events that must be contained in the unparsed map.
-  @events [:started, :stopped, :completed] |> Enum.map(&to_string/1)
+  @events ["started", "stopped", "completed"]
 
   @doc """
   Parse the unparsed map to a parsed map.
@@ -98,7 +95,8 @@ defimpl YaBTT.Proto.Parser, for: Map do
 
   @compile {:inline, do_parse: 2}
   @spec do_parse(String.t(), String.t()) :: {atom(), parsed_value()}
-  defp do_parse(k, v), do: {String.to_existing_atom(k), handle_value(k, v)}
+  defp do_parse(k, v) when k in @exhaustive, do: {String.to_atom(k), handle_value(k, v)}
+  defp do_parse(k, v), do: {k, v}
 
   @compile {:inline, handle_value: 2}
   @spec handle_value(String.t(), String.t()) :: parsed_value()
