@@ -23,7 +23,8 @@ defprotocol YaBTT.Proto.Parser do
       ...>   "left" => "0",
       ...>   "downloaded" => "100",
       ...>   "uploaded" => "0",
-      ...>   "port" => "6881"
+      ...>   "port" => "6881",
+      ...>   "event" => "started"
       ...> })
       {:ok,
         %{info_hash: "info_hash",
@@ -31,7 +32,8 @@ defprotocol YaBTT.Proto.Parser do
           left: 0,
           downloaded: 100,
           uploaded: 0,
-          port: 6881
+          port: 6881,
+          event: :started
         }
       }
 
@@ -78,23 +80,23 @@ defimpl YaBTT.Proto.Parser, for: Map do
   @spec parse(Parser.unparsed()) :: Parser.t()
   def parse(value) do
     if contains_enforce_keys(Map.keys(value)) do
-      {:ok, do_parse(value)}
+      {:ok, for({k, v} <- value, into: %{}, do: do_parse(k, v))}
     else
       {:error, "invalid requeste"}
     end
   end
 
-  @compile {:inline, do_parse: 1}
-  @spec do_parse(Parser.unparsed()) :: Parser.parsed()
-  defp do_parse(map_with_string_keys) do
-    for {k, v} <- map_with_string_keys, into: %{} do
-      if k in @enforce_integerized do
-        {String.to_atom(k), String.to_integer(v)}
-      else
-        {String.to_atom(k), v}
-      end
-    end
+  @compile {:inline, do_parse: 2}
+  @spec do_parse(String.t(), String.t()) :: {atom(), String.t() | integer()}
+  defp do_parse(k, v) when k in @enforce_integerized do
+    {String.to_atom(k), String.to_integer(v)}
   end
+
+  defp do_parse(k, v) when k === "event" do
+    {String.to_atom(k), String.to_existing_atom(v)}
+  end
+
+  defp do_parse(k, v), do: {String.to_atom(k), v}
 
   @compile {:inline, contains_enforce_keys: 1}
   @spec contains_enforce_keys([String.t()]) :: boolean()

@@ -16,9 +16,9 @@ defprotocol YaBTT.Proto.State do
 
   ## Examples
 
-      iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0, event: "started"}
+      iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0, event: :started}
       ...> |> YaBTT.Proto.State.convert()
-      {"peer_id", {100, 20, 0}, "started"}
+      {"peer_id", {100, 20, 0}, :started}
 
       iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0}
       ...> |> YaBTT.Proto.State.convert()
@@ -35,7 +35,7 @@ defimpl YaBTT.Proto.State, for: Map do
 
   alias YaBTT.Proto.State
 
-  @available_event ["started", "stopped", "completed", nil]
+  @available_event [:started, :stopped, :completed, nil]
 
   @doc """
   Converts parsed data to state.

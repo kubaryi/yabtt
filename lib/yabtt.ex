@@ -112,9 +112,9 @@ defmodule YaBTT do
 
   ## Example
 
-      iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0, event: "started"}
+      iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0, event: :started}
       ...> |> YaBTT.convert_state()
-      {"peer_id", {100, 20, 0}, "started"}
+      {"peer_id", {100, 20, 0}, :started}
 
       iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0}
       ...> |> YaBTT.convert_state()
