@@ -114,11 +114,11 @@ defmodule YaBTT do
 
       iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0, event: :started}
       ...> |> YaBTT.convert_state()
-      {"peer_id", {100, 20, 0}, :started}
+      {"peer_id", %Yabtt.Proto.Stated{downloaded: 100, uploaded: 20, left: 0}, :started}
 
       iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0}
       ...> |> YaBTT.convert_state()
-      {"peer_id", {100, 20, 0}, nil}
+      {"peer_id", %Yabtt.Proto.Stated{downloaded: 100, uploaded: 20, left: 0}, nil}
   """
   @spec convert_state(Parser.parsed()) :: State.t()
   def convert_state(parsed), do: State.convert(parsed)

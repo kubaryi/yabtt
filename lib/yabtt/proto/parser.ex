@@ -5,7 +5,7 @@ defprotocol YaBTT.Proto.Parser do
 
   @type unparsed :: %{String.t() => String.t()}
   @type parsed :: %{atom() => String.t()}
-  @type error :: {:error, Strinh.t()}
+  @type error :: {:error, String.t()}
   @type t :: {:ok, parsed()} | error() | unparsed()
 
   @doc """
@@ -64,10 +64,18 @@ defimpl YaBTT.Proto.Parser, for: Map do
 
   alias YaBTT.Proto.Parser
 
+  # Preload all available `atoms()` for use by `String.to_existing_atom/1`
+  # to avoid the  `atom()` has not been loaded yet.
+  # See: https://hexdocs.pm/elixir/String.html#to_existing_atom/1
+
   # The keys that must be integerized.
-  @enforce_integerized ["left", "downloaded", "uploaded", "port"]
+  @need_integerized [:left, :downloaded, :uploaded, :port] |> Enum.map(&to_string/1)
   # The keys that must be contained in the unparsed map.
-  @enforce_keys ["info_hash", "peer_id" | @enforce_integerized]
+  @enforce_keys [:info_hash, :peer_id | @need_integerized] |> Enum.map(&to_string/1)
+  # All the keys that the unparsed map can allow.
+  @exhaustive_keys [:ip | @enforce_keys] |> Enum.map(&to_string/1)
+  # The events that must be contained in the unparsed map.
+  @events [:started, :stopped, :completed] |> Enum.map(&to_string/1)
 
   @doc """
   Parse the unparsed map to a parsed map.
@@ -86,17 +94,18 @@ defimpl YaBTT.Proto.Parser, for: Map do
     end
   end
 
+  @type parsed_value :: String.t() | integer() | atom()
+
   @compile {:inline, do_parse: 2}
-  @spec do_parse(String.t(), String.t()) :: {atom(), String.t() | integer()}
-  defp do_parse(k, v) when k in @enforce_integerized do
-    {String.to_atom(k), String.to_integer(v)}
-  end
+  @spec do_parse(String.t(), String.t()) :: {atom(), parsed_value()}
+  defp do_parse(k, v), do: {String.to_existing_atom(k), handle_value(k, v)}
 
-  defp do_parse(k, v) when k === "event" do
-    {String.to_atom(k), String.to_existing_atom(v)}
-  end
-
-  defp do_parse(k, v), do: {String.to_atom(k), v}
+  @compile {:inline, handle_value: 2}
+  @spec handle_value(String.t(), String.t()) :: parsed_value()
+  defp handle_value(k, v) when k in @need_integerized, do: String.to_integer(v)
+  defp handle_value(k, v) when k === "event" and v in @events, do: String.to_atom(v)
+  defp handle_value(k, _) when k === "event", do: nil
+  defp handle_value(_, v), do: v
 
   @compile {:inline, contains_enforce_keys: 1}
   @spec contains_enforce_keys([String.t()]) :: boolean()
