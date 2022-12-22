@@ -25,8 +25,8 @@ defmodule YaBTT.MixProject do
       {:benchee, "~> 1.1.0", only: :dev},
       {:benchee_html, "~> 1.0", only: :dev},
       {:plug_cowboy, "~> 2.6.0"},
-      {:ecto_sql, "~> 3.0"},
-      {:postgrex, "~> 0.16"},
+      {:ecto_sql, "~> 3.8"},
+      {:ecto_sqlite3, "~> 0.8"},
       {:bento, "~> 0.9"}
     ]
   end
