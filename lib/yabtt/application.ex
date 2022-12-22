@@ -11,6 +11,7 @@ defmodule YaBTT.Application do
     children = [
       # Starts a worker by calling: YaBTT.Worker.start_link(arg)
       # {YaBTT.Worker, arg}
+      YaBTT.Repo.child_spec([]),
       Plug.Cowboy.child_spec(
         scheme: :http,
         plug: YaBTT.Server.Router,

@@ -1,5 +1,7 @@
 import Config
 
+config :yabtt, ecto_repos: [YaBTT.Repo]
+
 config :yabtt, YaBTT.Database.Cache,
   # Enable the cache, default to true
   # This is our only database endpoint at present, so don't disable it.
