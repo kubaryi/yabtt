@@ -5,10 +5,9 @@ config :yabtt, ecto_repos: [YaBTT.Repo]
 # Set the location of the database, default to `/var/lib/sqlite3/yabtt.db`.
 config :yabtt, YaBTT.Repo, database: "/var/lib/sqlite3/yabtt.db"
 
-if config_env() in [:test, :dev] do
-  # Set the database to memory mode in test and dev environment.
-  # See: https://hexdocs.pm/ecto_sqlite3/Ecto.Adapters.SQLite3.html#module-provided-options
-  config :yabtt, YaBTT.Repo, database: ":memory:"
+if config_env() == :dev do
+  # Set the location of the database in dev environment.
+  config :yabtt, YaBTT.Repo, database: "./_build/data/yabtt.db"
 end
 
 config :yabtt, YaBTT.Database.Cache,
