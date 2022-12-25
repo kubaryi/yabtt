@@ -43,7 +43,8 @@ defmodule YaBTT.MixProject do
 
   defp test_coverage do
     [
-      ignore_modules: [YaBBT.Application, YaBTT.Repo]
+      ignore_modules: [YaBBT.Application, YaBTT.Repo],
+      summary: [threshold: 85]
     ]
   end
 end
