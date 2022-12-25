@@ -14,7 +14,15 @@ defmodule YaBTT do
   @typep changeset_t :: Ecto.Changeset.t()
   @typep multi_name :: Ecto.Multi.name()
 
-  @doc false
+  @doc """
+  A transaction that inserts or updates a torrent and a peer.
+
+  ## Examples
+
+      iex> params = %{"info_hash" => "info_hash", "peer_id" => "peer_id", "port" => "6810"}
+      iex> conn = %Plug.Conn{params: params, remote_ip: {127, 0, 0, 1}}
+      iex> YaBTT.insert_or_update(conn)
+  """
   @spec insert_or_update(Plug.Conn.t()) ::
           {:ok, map()}
           | {:error, changeset_t()}
