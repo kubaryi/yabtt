@@ -19,7 +19,15 @@ defmodule YaBTT do
 
   ## Examples
 
-      iex> params = %{"info_hash" => "info_hash", "peer_id" => "peer_id", "port" => "6810"}
+      iex> params = %{
+      ...>   "info_hash" => "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e8",
+      ...>   "peer_id" => "-TR14276775888084598",
+      ...>   "port" => "6881",
+      ...>   "uploaded" => "121",
+      ...>   "downloaded" => "41421",
+      ...>   "left" => "0",
+      ...>   "event" => "completed"
+      ...> }
       iex> conn = %Plug.Conn{params: params, remote_ip: {127, 0, 0, 1}}
       iex> YaBTT.insert_or_update(conn)
   """

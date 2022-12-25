@@ -61,6 +61,20 @@ defmodule YaBTT.Schema.Params do
     struct
     |> cast(params, [:info_hash, :peer_id, :ip, :port, :uploaded, :downloaded, :left, :event])
     |> validate_required([:info_hash, :peer_id, :port, :uploaded, :downloaded, :left])
+    |> validate_event()
+  end
+
+  alias YaBTT.{Schema.Peer, Repo}
+
+  @spec validate_event(changeset_t()) :: changeset_t()
+  defp validate_event(changeset) do
+    with {:data, nil} <- fetch_field(changeset, :event),
+         {:ok, peer_id} <- fetch_change(changeset, :peer_id),
+         nil <- Repo.get_by(Peer, peer_id: peer_id) do
+      add_error(changeset, :event, "can't be blank for new peers", validation: :event)
+    else
+      _ -> changeset
+    end
   end
 
   @doc """
@@ -72,7 +86,7 @@ defmodule YaBTT.Schema.Params do
 
   ## Examples
 
-      iex> params = %{
+      iex> %{
       ...>   "info_hash" => "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e8",
       ...>   "peer_id" => "-TR14276775888084598",
       ...>   "ip" => "127.0.0.1",
