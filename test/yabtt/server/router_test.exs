@@ -1,5 +1,5 @@
 defmodule YaBTT.Server.RouterTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   use Plug.Test
 
   alias YaBTT.Server.Router

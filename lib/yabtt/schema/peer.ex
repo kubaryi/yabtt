@@ -56,29 +56,12 @@ defmodule YaBTT.Schema.Peer do
 
       iex> alias YaBTT.Schema.Peer
       iex> params = %{"peer_id" => "-TR14276775888084598", "port" => "6881", "ip" => "1.2.3.5"}
-      iex> conn = %Plug.Conn{params: params, remote_ip: {1, 2, 3, 4}}
-      iex> Peer.changeset(%Peer{}, conn)
-      #Ecto.Changeset<
-        action: nil,
-        changes: %{ip: "1.2.3.5", peer_id: "-TR14276775888084598", port: 6881},
-        errors: [],
-        data: #YaBTT.Schema.Peer<>,
-        valid?: true
-      >
+      iex> Peer.changeset(%Peer{}, params, {1, 2, 3, 4})
+      #Ecto.Changeset<action: nil, changes: %{ip: \"1.2.3.5\", peer_id: \"-TR14276775888084598\", port: 6881}, errors: [], data: #YaBTT.Schema.Peer<>, valid?: true>
 
-      iex> alis YaBTT.Schema.Peer
-      iex> conn = %Plug.Conn{params: %{}, remote_ip: {1, 2, 3, 4}}
-      iex> Peer.changeset(%Peer{}, conn)
-      #Ecto.Changeset<
-        action: nil,
-        changes: %{ip: "1.2.3.4"},
-        errors: [
-          peer_id: {"can't be blank", [validation: :required]},
-          port: {"can't be blank", [validation: :required]}
-        ],
-        data: #YaBTT.Schema.Peer<>,
-        valid?: false
-      >
+      iex> alias YaBTT.Schema.Peer
+      iex> Peer.changeset(%Peer{}, %{}, {1, 2, 3, 4})
+      #Ecto.Changeset<action: nil, changes: %{ip: \"1.2.3.4\"}, errors: [peer_id: {\"can't be blank\", [validation: :required]}, port: {\"can't be blank\", [validation: :required]}], data: #YaBTT.Schema.Peer<>, valid?: false>
   """
   @spec changeset(changeset_t() | t(), params(), ip_addr()) :: changeset_t()
   def changeset(peer, params, ip) do
@@ -100,14 +83,26 @@ defmodule YaBTT.Schema.Peer do
   end
 
   defimpl Bento.Encoder do
-    @moduledoc false
+    @moduledoc """
+    Implements the `Bento.Encoder` protocol for `YaBTT.Schema.Peer`.
+    """
 
     use Bento.Encode
 
     alias YaBTT.Schema.Peer
     alias Bento.Encoder
 
-    @doc false
+    @doc """
+    To encode a peer, we take the `peer_id`, `ip`, and `port` into a map and
+    encode it by calling `Bento.Encoder.encode/1` on the map.
+
+    ## Examples
+
+        iex> alias YaBTT.Schema.Peer
+        iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "1.2.3.5"}
+        iex> Bento.Encoder.encode(peer) |> IO.iodata_to_binary
+        "d2:ip7:1.2.3.57:peer_id20:-TR142767758880845984:porti6881ee"
+    """
     @spec encode(Peer.t()) :: Encoder.t()
     def encode(%{id: _} = peer) do
       peer

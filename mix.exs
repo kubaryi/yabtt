@@ -7,6 +7,7 @@ defmodule YaBTT.MixProject do
       version: "0.0.1-beta",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
       deps: deps()
     ]
   end
@@ -28,6 +29,14 @@ defmodule YaBTT.MixProject do
       {:ecto_sql, "~> 3.8"},
       {:ecto_sqlite3, "~> 0.8"},
       {:bento, "~> 0.9"}
+    ]
+  end
+
+  defp aliases do
+    [
+      "ecto.setup": ["ecto.create", "ecto.migrate"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
 end
