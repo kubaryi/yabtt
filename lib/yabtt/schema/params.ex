@@ -48,8 +48,7 @@ defmodule YaBTT.Schema.Params do
       ...>   "port" => "6881",
       ...>   "uploaded" => "121",
       ...>   "downloaded" => "41421",
-      ...>   "left" => "0",
-      ...>   "event" => "completed"
+      ...>   "left" => "0"
       ...> }
       iex> YaBTT.Schema.Params.changeset(%YaBTT.Schema.Params{}, params)
 

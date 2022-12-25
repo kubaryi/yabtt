@@ -7,6 +7,7 @@ defmodule YaBTT.MixProject do
       version: "0.0.1-beta",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
+      test_coverage: test_coverage(),
       aliases: aliases(),
       deps: deps()
     ]
@@ -37,6 +38,12 @@ defmodule YaBTT.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"]
+    ]
+  end
+
+  defp test_coverage do
+    [
+      ignore_modules: [YaBBT.Application, YaBTT.Repo]
     ]
   end
 end
