@@ -42,7 +42,7 @@ defmodule YaBTT.Server.Announce do
   def call(conn, _opts) do
     resp_msg =
       with {:ok, m} <- YaBTT.insert_or_update(conn) do
-        {:ok, YaBTT.Repo.preload(m.torrent, :peers)}
+        YaBTT.query(m.torrent)
       end
 
     conn

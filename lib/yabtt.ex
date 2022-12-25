@@ -40,6 +40,15 @@ defmodule YaBTT do
     end
   end
 
+  @doc false
+  @spec query(Torrent.t()) :: {:ok, Torrent.t()} | :error
+  def query(torrent) when is_struct(torrent, Torrent) do
+    case YaBTT.Repo.preload(torrent, :peers) do
+      nil -> :error
+      torrent -> {:ok, torrent}
+    end
+  end
+
   @spec insert_or_update_torrent(Ecto.Multi.t(), params()) :: Ecto.Multi.t()
   defp insert_or_update_torrent(multi, params) do
     Ecto.Multi.insert_or_update(multi, :torrent, fn %{torrent_repo: repo} ->
