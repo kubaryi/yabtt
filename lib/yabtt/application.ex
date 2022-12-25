@@ -16,8 +16,7 @@ defmodule YaBTT.Application do
         scheme: :http,
         plug: YaBTT.Server.Router,
         port: Application.get_env(:yabtt, :port, 8080)
-      ),
-      YaBTT.Database.Cache.child_spec([])
+      )
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
