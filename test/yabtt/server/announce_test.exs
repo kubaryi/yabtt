@@ -15,7 +15,7 @@ defmodule YaBTT.Server.AnnounceTest do
     "event" => "started",
     "port" => "6881"
   }
-  @default_resp_body "d8:intervali3600e5:peersld2:ip9:127.0.0.17:peer_id20:-TR142767758880845984:porti6881eeee"
+  @default_resp_body "d8:intervali3600e5:peersld2:ip9:127.0.0.17:peer id20:-TR142767758880845984:porti6881eeee"
 
   setup_all do
     {:ok, Announce.init([])}
