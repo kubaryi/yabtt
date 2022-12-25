@@ -20,7 +20,6 @@ defmodule YaBTT.Schema.Torrent do
   import Ecto.Changeset
 
   alias YaBTT.Schema.{TorrentPeer, Peer}
-  alias YaBTT.Repo
 
   @primary_key {:id, :id, autogenerate: true}
   schema "torrents" do
@@ -45,12 +44,15 @@ defmodule YaBTT.Schema.Torrent do
     |> validate_required([:info_hash])
   end
 
+  @type multi :: Ecto.Multi.t()
+  @type info_hash :: binary()
+
   @doc false
-  @spec multi_insert_or_update(Ecto.Multi.t(), String.t(), params()) :: Ecto.Multi.t()
-  def multi_insert_or_update(multi, info_hash, params) do
+  @spec insert_or_update_after_get(multi(), info_hash(), params()) :: multi()
+  def insert_or_update_after_get(multi, info_hash, params) do
     multi
     |> Ecto.Multi.run(:torrent_repo, fn _repo, _changes ->
-      {:ok, Repo.get_by(__MODULE__, info_hash: info_hash) || %__MODULE__{}}
+      {:ok, YaBTT.Repo.get_by(__MODULE__, info_hash: info_hash) || %__MODULE__{}}
     end)
     |> Ecto.Multi.insert_or_update(:torrent, fn %{torrent_repo: repo} ->
       repo |> changeset(params)

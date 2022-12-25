@@ -27,7 +27,6 @@ defmodule YaBTT.Schema.Peer do
   import Ecto.Changeset
 
   alias YaBTT.Schema.{Torrent, TorrentPeer}
-  alias YaBTT.Repo
 
   schema "peers" do
     field(:peer_id, :binary_id)
@@ -100,24 +99,15 @@ defmodule YaBTT.Schema.Peer do
     |> (&put_change(changeset, :ip, &1)).()
   end
 
-  @spec insert_or_update_changeset(params(), ip_addr()) :: changeset_t()
-  def insert_or_update_changeset(params, ip) do
-    changeset = changeset(%__MODULE__{}, params, ip)
-
-    with {:ok, peer_id} <- fetch_change(changeset, :peer_id),
-         %{id: _} = data <- Repo.get_by(__MODULE__, peer_id: peer_id) do
-      data |> changeset(params, ip)
-    else
-      _ -> changeset
-    end
-  end
+  @type multi :: Ecto.Multi.t()
+  @type peer_id :: binary()
 
   @doc false
-  @spec multi_insert_or_update(Ecto.Multi.t(), String.t(), params(), ip_addr()) :: Ecto.Multi.t()
-  def multi_insert_or_update(multi, peer_id, params, ip) do
+  @spec insert_or_update_after_get(multi(), peer_id(), params(), ip_addr()) :: multi()
+  def insert_or_update_after_get(multi, peer_id, params, ip) do
     multi
-    |> Ecto.Multi.run(:peer_repo, fn _, _ ->
-      {:ok, Repo.get_by(__MODULE__, peer_id: peer_id) || %__MODULE__{}}
+    |> Ecto.Multi.run(:peer_repo, fn _repo, _changes ->
+      {:ok, YaBTT.Repo.get_by(__MODULE__, peer_id: peer_id) || %__MODULE__{}}
     end)
     |> Ecto.Multi.insert_or_update(:peer, fn %{peer_repo: repo} ->
       repo |> changeset(params, ip)

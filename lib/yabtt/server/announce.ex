@@ -40,13 +40,7 @@ defmodule YaBTT.Server.Announce do
   """
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
-    import YaBTT
-
-    resp_msg =
-      with {:ok, parsed} <- parse_params(conn.params),
-           {info_hash, peer} <- convert_peer(parsed, conn.remote_ip) do
-        {:ok, update_and_get(YaBTT.Database.Cache, info_hash, peer)}
-      end
+    resp_msg = {:ok, "hello world"}
 
     conn
     |> put_resp_content_type("plain/text")
