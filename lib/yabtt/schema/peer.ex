@@ -98,19 +98,4 @@ defmodule YaBTT.Schema.Peer do
     end
     |> (&put_change(changeset, :ip, &1)).()
   end
-
-  @type multi :: Ecto.Multi.t()
-  @type peer_id :: binary()
-
-  @doc false
-  @spec insert_or_update_after_get(multi(), peer_id(), params(), ip_addr()) :: multi()
-  def insert_or_update_after_get(multi, peer_id, params, ip) do
-    multi
-    |> Ecto.Multi.run(:peer_repo, fn _repo, _changes ->
-      {:ok, YaBTT.Repo.get_by(__MODULE__, peer_id: peer_id) || %__MODULE__{}}
-    end)
-    |> Ecto.Multi.insert_or_update(:peer, fn %{peer_repo: repo} ->
-      repo |> changeset(params, ip)
-    end)
-  end
 end

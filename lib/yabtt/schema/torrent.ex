@@ -43,19 +43,4 @@ defmodule YaBTT.Schema.Torrent do
     |> cast(params, [:info_hash])
     |> validate_required([:info_hash])
   end
-
-  @type multi :: Ecto.Multi.t()
-  @type info_hash :: binary()
-
-  @doc false
-  @spec insert_or_update_after_get(multi(), info_hash(), params()) :: multi()
-  def insert_or_update_after_get(multi, info_hash, params) do
-    multi
-    |> Ecto.Multi.run(:torrent_repo, fn _repo, _changes ->
-      {:ok, YaBTT.Repo.get_by(__MODULE__, info_hash: info_hash) || %__MODULE__{}}
-    end)
-    |> Ecto.Multi.insert_or_update(:torrent, fn %{torrent_repo: repo} ->
-      repo |> changeset(params)
-    end)
-  end
 end
