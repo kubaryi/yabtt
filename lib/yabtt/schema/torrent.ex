@@ -46,15 +46,14 @@ defmodule YaBTT.Schema.Torrent do
   end
 
   @doc false
-  @spec insert_or_update_changeset(params()) :: changeset_t()
-  def insert_or_update_changeset(params) do
-    changeset = changeset(%__MODULE__{}, params)
-
-    with {:ok, info_hash} <- fetch_change(changeset, :info_hash),
-         %{id: _} = data <- Repo.get_by(__MODULE__, info_hash: info_hash) do
-      data |> changeset(params)
-    else
-      _ -> changeset
-    end
+  @spec multi_insert_or_update(Ecto.Multi.t(), String.t(), params()) :: Ecto.Multi.t()
+  def multi_insert_or_update(multi, info_hash, params) do
+    multi
+    |> Ecto.Multi.run(:torrent_repo, fn _repo, _changes ->
+      {:ok, Repo.get_by(__MODULE__, info_hash: info_hash) || %__MODULE__{}}
+    end)
+    |> Ecto.Multi.insert_or_update(:torrent, fn %{torrent_repo: repo} ->
+      repo |> changeset(params)
+    end)
   end
 end

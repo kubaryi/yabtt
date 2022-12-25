@@ -111,4 +111,16 @@ defmodule YaBTT.Schema.Peer do
       _ -> changeset
     end
   end
+
+  @doc false
+  @spec multi_insert_or_update(Ecto.Multi.t(), String.t(), params(), ip_addr()) :: Ecto.Multi.t()
+  def multi_insert_or_update(multi, peer_id, params, ip) do
+    multi
+    |> Ecto.Multi.run(:peer_repo, fn _, _ ->
+      {:ok, Repo.get_by(__MODULE__, peer_id: peer_id) || %__MODULE__{}}
+    end)
+    |> Ecto.Multi.insert_or_update(:peer, fn %{peer_repo: repo} ->
+      repo |> changeset(params, ip)
+    end)
+  end
 end
