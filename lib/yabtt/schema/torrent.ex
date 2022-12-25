@@ -36,6 +36,21 @@ defmodule YaBTT.Schema.Torrent do
   @doc """
   A torrent can be created or updated with a changeset. The changeset requires
   the info_hash to be present.
+
+  ## Parameters
+
+    * `torrent` - The torrent to validate.
+    * `params` - The parameters to validate.
+
+  ## Examples
+
+      iex> alias YaBTT.Schema.Torrent
+      iex> Torrent.changeset(%Torrent{}, %{info_hash: "info_hash"})
+      #Ecto.Changeset<action: nil, changes: %{info_hash: "info_hash"}, errors: [], data: #YaBTT.Schema.Torrent<>, valid?: true>
+
+      iex> alias YaBTT.Schema.Torrent
+      iex> Torrent.changeset(%Torrent{}, %{})
+      #Ecto.Changeset<action: nil, changes: %{}, errors: [info_hash: {"can't be blank", [validation: :required]}], data: #YaBTT.Schema.Torrent<>, valid?: false>
   """
   @spec changeset(changeset_t() | t(), params()) :: changeset_t()
   def changeset(torrent, params) do
@@ -45,14 +60,29 @@ defmodule YaBTT.Schema.Torrent do
   end
 
   defimpl Bento.Encoder do
-    @moduledoc false
+    @moduledoc """
+    Implements the `Bento.Encoder` protocol for `YaBTT.Schema.Torrent`.
+    """
 
     use Bento.Encode
 
     alias YaBTT.Schema.Torrent
     alias Bento.Encoder
 
-    @doc false
+    @doc """
+    Encodes a `YaBTT.Schema.Torrent` into a `Bento.Encoder.t()`.
+
+    ## Parameters
+
+      * `torrent` - The `YaBTT.Schema.Torrent` to encode.
+
+    ## Examples
+
+        iex> alias YaBTT.Schema.Torrent
+        iex> torrent = %Torrent{id: 1, peers: [%{id: 1}]}
+        iex> Bento.Encoder.encode(torrent) |> IO.iodata_to_binary()
+        "d8:intervali3600e5:peersld2:idi1eeee"
+    """
     @spec encode(Torrent.t()) :: Encoder.t()
     def encode(%{id: _} = torrent) do
       torrent
