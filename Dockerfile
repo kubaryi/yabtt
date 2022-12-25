@@ -10,14 +10,22 @@ ENV MIX_ENV=${MIX_ENV}
 
 WORKDIR /app
 
+# Install build dependencies
+RUN apk add --no-cache build-base
+
 # Setup hex and rebar
 RUN mix local.hex --force && \
     mix local.rebar --force
 
 COPY . .
 
-# Install dependencies and build release
-RUN mix do deps.get, deps.compile, compile, release
+# Install elixir dependencies
+RUN mix do deps.get, deps.compile
+
+# Create and migrate the database
+RUN mix do ecto.create, ecto.migrate
+# Compile the application
+RUN mix do compile, release
 
 
 # ==== Runtime ====
@@ -33,6 +41,7 @@ RUN apk add --no-cache openssl libstdc++ ncurses-libs
 
 # Copy the release from the builder
 COPY --from=builder /app/_build/prod/rel/yabtt .
+COPY --from=builder /var/lib/sqlite3 /var/lib/sqlite3
 
 EXPOSE 8080 8080/udp
 
