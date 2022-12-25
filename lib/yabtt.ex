@@ -5,152 +5,101 @@ defmodule YaBTT do
   Yet another BitTorrent tracker. It is a BitTorrent Tracker written in Elixir.
   """
 
-  alias YaBTT.Proto.{Parser, State, Peer, Resp}
+  alias YaBTT.Schema.{Peer, Torrent, TorrentPeer, Params}
 
-  @type ip_addr :: :inet.ip_address()
+  @type info_hash :: binary()
+  @type peer_id :: binary()
+  @type params :: map()
 
-  @doc """
-  Parse the map.
-
-  ## Parameters
-
-  - value: The map to be parsed.
-
-  ## Example
-
-      iex> YaBTT.parse_params(%{
-      ...>   "info_hash" => "info_hash",
-      ...>   "peer_id" => "peer_id",
-      ...>   "left" => "0",
-      ...>   "downloaded" => "100",
-      ...>   "uploaded" => "0",
-      ...>   "port" => "6881"
-      ...> })
-      {:ok,
-        %{info_hash: "info_hash",
-          peer_id: "peer_id",
-          left: 0,
-          downloaded: 100,
-          uploaded: 0,
-          port: 6881
-        }
-      }
-
-      iex> YaBTT.parse_params(%{})
-      {:error, "invalid requeste"}
-  """
-  @spec parse_params(Parser.unparsed()) :: Parser.t()
-  def parse_params(value), do: Parser.parse(value)
+  @typep changeset_t :: Ecto.Changeset.t()
+  @typep multi_name :: Ecto.Multi.name()
 
   @doc """
-  Parse the map.
+  A transaction that inserts or updates a torrent and a peer.
 
-  ## Parameters
+  ## Examples
 
-  - value: The map to be parsed.
-
-  ## Example
-
-      iex> YaBTT.parse_params!(%{
-      ...>   "info_hash" => "info_hash",
-      ...>   "peer_id" => "peer_id",
-      ...>   "left" => "0",
-      ...>   "downloaded" => "100",
-      ...>   "uploaded" => "0",
-      ...>   "port" => "6881"
-      ...> })
-      %{info_hash: "info_hash",
-        peer_id: "peer_id",
-        left: 0,
-        downloaded: 100,
-        uploaded: 0,
-        port: 6881
-      }
-
-      iex> YaBTT.parse_params!(%{})
-      ** (RuntimeError) invalid requeste
+      iex> params = %{"info_hash" => "info_hash", "peer_id" => "peer_id", "port" => "6810"}
+      iex> conn = %Plug.Conn{params: params, remote_ip: {127, 0, 0, 1}}
+      iex> YaBTT.insert_or_update(conn)
   """
-  @spec parse_params!(Parser.unparsed()) :: Parser.parsed()
-  def parse_params!(value) do
-    case Parser.parse(value) do
-      {:ok, parsed} -> parsed
-      {:error, msg} -> raise msg
+  @spec insert_or_update(Plug.Conn.t()) ::
+          {:ok, map()}
+          | {:error, changeset_t()}
+          | {:error, multi_name(), changeset_t(), Ecto.Multi.t()}
+  def(insert_or_update(conn)) do
+    with {:ok, %{info_hash: info_hash, peer_id: peer_id}} <- Params.apply(conn.params) do
+      Ecto.Multi.new()
+      |> get_torrents(info_hash)
+      |> insert_or_update_torrent(conn.params)
+      |> get_peers(peer_id)
+      |> insert_or_update_peer(conn.params, conn.remote_ip)
+      |> get_torrents_peers()
+      |> link_torrents_and_peers()
+      |> YaBTT.Repo.transaction()
     end
   end
 
   @doc """
-  Convert the parsed map to a `YaBTT.Proto.Peered` struct.
+  Query the torrent and its peers.
 
-  ## Parameters
+  ## Examples
 
-  - parsed: The parsed map.
-  - ip: The IP address of the peer.
+      iex> torrent = %YaBTT.Schema.Torrent{id: 1}
+      iex> YaBTT.query(torrent)
 
-  ## Example
-
-  If it is a string, it will automatically convert ':ip' in the parsed map to `:inet.ip_address()`.
-
-      iex> %{info_hash: "info_hash", peer_id: "peer_id", ip: "1.2.3.4", port: 6881}
-      ...> |> YaBTT.convert_peer({1, 2, 3, 5})
-      {"info_hash", %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}}
-
-  Otherwise, if the `:ip` in the parsed map is a `nil`, it will use the `ip` passed by parameters.
-
-      iex> %{info_hash: "info_hash", peer_id: "peer_id", port: 6881}
-      ...> |> YaBTT.convert_peer({1, 2, 3, 5})
-      {"info_hash", %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 5}, port: 6881}}
+      iex> torrent = %YaBTT.Schema.Torrent{id: 10000}
+      iex> YaBTT.query(torrent)
   """
-  @spec convert_peer(Parser.parsed(), ip_addr()) :: Peer.t()
-  def convert_peer(parsed, ip), do: Peer.convert(parsed, ip)
+  @spec query(Torrent.t()) :: {:ok, Torrent.t()} | :error
+  def query(torrent) when is_struct(torrent, Torrent) do
+    case YaBTT.Repo.preload(torrent, :peers) do
+      nil -> :error
+      torrent -> {:ok, torrent}
+    end
+  end
 
-  @doc """
-  Convert the parsed map to a `YaBTT.Proto.State.t()`.
+  @spec insert_or_update_torrent(Ecto.Multi.t(), params()) :: Ecto.Multi.t()
+  defp insert_or_update_torrent(multi, params) do
+    Ecto.Multi.insert_or_update(multi, :torrent, fn %{torrent_repo: repo} ->
+      repo |> Torrent.changeset(params)
+    end)
+  end
 
-  ## Parameters
+  @spec get_torrents(Ecto.Multi.t(), info_hash()) :: Ecto.Multi.t()
+  defp get_torrents(multi, info_hash) do
+    Ecto.Multi.run(multi, :torrent_repo, fn _repo, _changes ->
+      {:ok, YaBTT.Repo.get_by(Torrent, info_hash: info_hash) || %Torrent{}}
+    end)
+  end
 
-  - parsed: The parsed map.
+  @spec insert_or_update_peer(Ecto.Multi.t(), params(), ip_addr()) :: Ecto.Multi.t()
+  defp insert_or_update_peer(multi, params, ip) do
+    Ecto.Multi.insert_or_update(multi, :peer, fn %{peer_repo: repo} ->
+      repo |> Peer.changeset(params, ip)
+    end)
+  end
 
-  ## Example
+  @typep ip_addr :: YaBTT.Schema.Peer.ip_addr()
 
-      iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0, event: "started"}
-      ...> |> YaBTT.convert_state()
-      {"peer_id", {100, 20, 0}, "started"}
+  @spec get_peers(Ecto.Multi.t(), peer_id()) :: Ecto.Multi.t()
+  defp get_peers(multi, peer_id) do
+    Ecto.Multi.run(multi, :peer_repo, fn _repo, _changes ->
+      {:ok, YaBTT.Repo.get_by(Peer, peer_id: peer_id) || %Peer{}}
+    end)
+  end
 
-      iex> %{peer_id: "peer_id", downloaded: 100, uploaded: 20, left: 0}
-      ...> |> YaBTT.convert_state()
-      {"peer_id", {100, 20, 0}, nil}
-  """
-  @spec convert_state(Parser.parsed()) :: State.t()
-  def convert_state(parsed), do: State.convert(parsed)
+  @spec link_torrents_and_peers(Ecto.Multi.t()) :: Ecto.Multi.t()
+  defp link_torrents_and_peers(multi) do
+    Ecto.Multi.insert_or_update(multi, :torrent_peer, fn %{torrent: t, peer: p} = changes ->
+      changes.torrent_peer_repo |> TorrentPeer.changeset(%{torrent_id: t.id, peer_id: p.id})
+    end)
+  end
 
-  @doc """
-  Update the peer list and get the response.
-
-  ## Parameters
-
-  - db: The storage endpoint (module).
-  - info_hash: The info_hash of the torrent.
-  - peer: The peer to be updated.
-
-  ## Example
-
-      iex> db = YaBTT.Database.Cache
-      iex> info_hash = "info_hash"
-      iex> peer = %YaBTT.Proto.Peered{peer_id: "peer_id", ip: {1, 2, 3, 4}, port: 6881}
-      iex> YaBTT.update_and_get(db, info_hash, peer)
-      %YaBTT.Proto.Response{
-        interval: 3600,
-        peers: [
-          %YaBTT.Proto.Peered{
-            peer_id: "peer_id",
-            ip: {1, 2, 3, 4},
-            port: 6881
-          }
-        ]
-      }
-  """
-  @spec update_and_get(atom(), Peer.info_hash(), Peer.peer()) :: Resp.t()
-  def update_and_get(db, info_hash, peer) do
-    db.update_and_get(info_hash, peer) |> Resp.new()
+  @spec get_torrents_peers(Ecto.Multi.t()) :: Ecto.Multi.t()
+  defp get_torrents_peers(multi) do
+    Ecto.Multi.run(multi, :torrent_peer_repo, fn _repo, %{torrent: t, peer: p} ->
+      {:ok, YaBTT.Repo.get_by(TorrentPeer, torrent_id: t.id, peer_id: p.id) || %TorrentPeer{}}
+    end)
   end
 end

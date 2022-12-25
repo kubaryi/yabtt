@@ -1,5 +1,5 @@
 defmodule YaBTT.Server.AnnounceTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   use Plug.Test
 
   doctest YaBTT.Server.Announce

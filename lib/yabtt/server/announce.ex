@@ -40,12 +40,9 @@ defmodule YaBTT.Server.Announce do
   """
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
-    import YaBTT
-
     resp_msg =
-      with {:ok, parsed} <- parse_params(conn.params),
-           {info_hash, peer} <- convert_peer(parsed, conn.remote_ip) do
-        {:ok, update_and_get(YaBTT.Database.Cache, info_hash, peer)}
+      with {:ok, m} <- YaBTT.insert_or_update(conn) do
+        YaBTT.query(m.torrent)
       end
 
     conn
@@ -54,7 +51,11 @@ defmodule YaBTT.Server.Announce do
     |> send_resp()
   end
 
-  @type resp_msg :: {:ok, Bento.Encoder.t()} | {:error, String.t()} | any()
+  @type resp_msg :: {:ok, Bento.Encoder.t()} | resp_err() | any()
+  @type resp_err ::
+          :error
+          | {:error, Ecto.Changeset.t()}
+          | {:error, Ecto.Multi.name(), Ecto.Changeset.t(), Ecto.Multi.t()}
 
   @doc """
   Bind the response message to the connection struct. All the message will be encoded as
@@ -71,6 +72,18 @@ defmodule YaBTT.Server.Announce do
       iex> msg = {:ok, %{"interval" => 1800, "min interval" => 1800, "peers" => []}}
       iex> YaBTT.Server.Announce.put_resp_msg(conn, msg)
 
+      iex> conn = %Plug.Conn{}
+      iex> msg = {:error, %Ecto.Changeset{errors: [ip: {"can't be blank", [validation: :required]}]}}
+      iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, msg)
+      iex> conn.resp_body
+      "d14:failure reasonll2:ipl14:can't be blankll10:validation8:requiredeeeeee"
+
+      iex> conn = %Plug.Conn{}
+      iex> changeset = %Ecto.Changeset{errors: [ip: {"can't be blank", [validation: :required]}]}
+      iex> msg = {:error, :multi_error, changeset, %Ecto.Multi{}}
+      iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, msg)
+      iex> conn.resp_body
+      "d14:failure reasonll2:ipl14:can't be blankll10:validation8:requiredeeeeee"
   """
   @spec put_resp_msg(Plug.Conn.t(), resp_msg()) :: Plug.Conn.t()
   def put_resp_msg(conn, {:ok, data}) do
@@ -80,13 +93,17 @@ defmodule YaBTT.Server.Announce do
     end
   end
 
-  def put_resp_msg(conn, {:error, err_msg}) do
+  def put_resp_msg(conn, {:error, changeset}) do
     # The `Bento.encode/2` has a bug that it will raise an exception when the
     # input is a map. So we have to use `Bento.Encoder.encode/` instead.
     # See: https://github.com/folz/bento/pull/13
-    Bento.Encoder.encode(%{"failure reason" => err_msg})
+    Bento.Encoder.encode(%{"failure reason" => changeset.errors})
     |> IO.iodata_to_binary()
     |> (&resp(conn, 400, &1)).()
+  end
+
+  def put_resp_msg(conn, {:error, _name, changeset, _multi}) do
+    put_resp_msg(conn, {:error, changeset})
   end
 
   def put_resp_msg(conn, _) do
