@@ -1,7 +1,13 @@
 defmodule YaBTT.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
-  @moduledoc false
+  @moduledoc """
+  The YaBTT application. This module is responsible for starting the
+  application and supervising the application's processes.
+
+  ## References
+
+  * OTP Applications - https://hexdocs.pm/elixir/Application.html
+  * Supervisor - https://hexdocs.pm/elixir/Supervisor.html
+  """
 
   use Application
 
@@ -9,8 +15,6 @@ defmodule YaBTT.Application do
   @spec start(any, any) :: {:error, any} | {:ok, pid}
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: YaBTT.Worker.start_link(arg)
-      # {YaBTT.Worker, arg}
       YaBTT.Repo.child_spec([]),
       Plug.Cowboy.child_spec(
         scheme: :http,
@@ -19,8 +23,6 @@ defmodule YaBTT.Application do
       )
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: YaBTT.Supervisor]
     Supervisor.start_link(children, opts)
   end
