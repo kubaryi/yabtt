@@ -98,4 +98,21 @@ defmodule YaBTT.Schema.Peer do
     end
     |> (&put_change(changeset, :ip, &1)).()
   end
+
+  defimpl Bento.Encoder do
+    @moduledoc false
+
+    use Bento.Encode
+
+    alias YaBTT.Schema.Peer
+    alias Bento.Encoder
+
+    @doc false
+    @spec encode(Peer.t()) :: Encoder.t()
+    def encode(%{id: _} = peer) do
+      peer
+      |> Map.take([:peer_id, :ip, :port])
+      |> Encoder.encode()
+    end
+  end
 end

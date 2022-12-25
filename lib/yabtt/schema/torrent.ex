@@ -43,4 +43,22 @@ defmodule YaBTT.Schema.Torrent do
     |> cast(params, [:info_hash])
     |> validate_required([:info_hash])
   end
+
+  defimpl Bento.Encoder do
+    @moduledoc false
+
+    use Bento.Encode
+
+    alias YaBTT.Schema.Torrent
+    alias Bento.Encoder
+
+    @doc false
+    @spec encode(Torrent.t()) :: Encoder.t()
+    def encode(%{id: _} = torrent) do
+      torrent
+      |> Map.take([:peers])
+      |> Map.put(:interval, 3600)
+      |> Encoder.encode()
+    end
+  end
 end

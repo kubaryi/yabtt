@@ -40,7 +40,10 @@ defmodule YaBTT.Server.Announce do
   """
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
-    resp_msg = {:ok, "hello world"}
+    resp_msg =
+      with {:ok, m} <- YaBTT.insert_or_update(conn) do
+        {:ok, YaBTT.Repo.preload(m.torrent, :peers)}
+      end
 
     conn
     |> put_resp_content_type("plain/text")
