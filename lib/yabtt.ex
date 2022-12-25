@@ -40,7 +40,17 @@ defmodule YaBTT do
     end
   end
 
-  @doc false
+  @doc """
+  Query the torrent and its peers.
+
+  ## Examples
+
+      iex> torrent = %YaBTT.Schema.Torrent{id: 1}
+      iex> YaBTT.query(torrent)
+
+      iex> torrent = %YaBTT.Schema.Torrent{id: 10000}
+      iex> YaBTT.query(torrent)
+  """
   @spec query(Torrent.t()) :: {:ok, Torrent.t()} | :error
   def query(torrent) when is_struct(torrent, Torrent) do
     case YaBTT.Repo.preload(torrent, :peers) do
