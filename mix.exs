@@ -4,7 +4,7 @@ defmodule YaBTT.MixProject do
   def project do
     [
       app: :yabtt,
-      version: "0.0.1-beta",
+      version: "0.0.1",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       test_coverage: test_coverage(),
