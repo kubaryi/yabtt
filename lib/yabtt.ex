@@ -5,7 +5,7 @@ defmodule YaBTT do
   Yet another BitTorrent tracker. It is a BitTorrent Tracker written in Elixir.
   """
 
-  alias YaBTT.Schema.{Peer, Torrent, TorrentPeer, Params}
+  alias YaBTT.Schema.{Peer, Torrent, Params, Connection}
 
   @type info_hash :: binary()
   @type peer_id :: binary()
@@ -50,8 +50,8 @@ defmodule YaBTT do
       end)
       # link the `torrent` and the `peer`. If the link already exists, update it.
       |> Ecto.Multi.insert_or_update(:torrent_peer, fn %{torrent: t, peer: p} ->
-        (get_by(TorrentPeer, torrent_id: t.id, peer_id: p.id) || %TorrentPeer{})
-        |> TorrentPeer.changeset(%{torrent_id: t.id, peer_id: p.id})
+        (get_by(Connection, torrent_id: t.id, peer_id: p.id) || %Connection{})
+        |> Connection.changeset(conn.params, {t.id, p.id})
       end)
       |> transaction()
     end
