@@ -1,5 +1,14 @@
 defmodule YaBTT.Schema.Connection do
-  @moduledoc false
+  @moduledoc """
+  The schema for the `connections` table.
+
+  A torrent can have many peers, and a peer can be connected to many torrents.
+  This schema is used to store the primary keys as a foreign key from the
+  torrents and peers tables.
+
+  At the same time, this table is also responsible for maintaining the status
+  of the link. Including `uploaded', `downloaded', `left` and `event`.
+  """
 
   use Ecto.Schema
   import Ecto.Changeset
@@ -21,7 +30,33 @@ defmodule YaBTT.Schema.Connection do
   @type connect :: {term(), term()}
   @type params :: map()
 
-  @doc false
+  @doc """
+  A changeset to validate if the status of the connection is valid. This
+  `torrent_id` and `peer_id` are used to connect with the `torrents` and
+  `peers` tables.
+
+  ## Parameters
+
+  - `connection`: the changeset or `YaBTT.Schema.Connection`
+  - `params`: the request parameters
+  - `connect`: the `torrent_id` and `peer_id` to connect with the `torrents` and `peers` tables
+
+  ## Examples
+
+      iex> alias YaBTT.Schema.Connection
+      iex> params = %{
+      ...>   "uploaded" => "121",
+      ...>   "downloaded" => "41421",
+      ...>   "left" => "0",
+      ...>   "event" => "started"
+      ...> }
+      iex> Connection.changeset(%Connection{}, params, {1, 1})
+
+      iex> alias YaBTT.Schema.Connection
+      iex> params = %{"uploaded" => "121", "downloaded" => "41421", "left" => "0"}
+      iex> Connection.changeset(%Connection{}, params, {1, 1})
+
+  """
   @spec changeset(changeset_t() | t(), params(), connect()) :: changeset_t()
   def changeset(connection, params, {torrent_id, peer_id}) do
     connection
