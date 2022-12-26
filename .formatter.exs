@@ -3,7 +3,7 @@
   inputs: [
     "{mix,.formatter}.exs",
     "{config,lib,test}/**/*.{ex,exs}",
-    "{benchmark,bench}/**/*.{ex,exs}",
+    "bench{mark,}/**/*.{ex,exs}",
     "priv/repo/migrations/*.{ex,exs}"
   ]
 ]
