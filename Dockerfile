@@ -10,17 +10,18 @@ ENV MIX_ENV=${MIX_ENV}
 
 WORKDIR /app
 
-# Install build dependencies
-RUN apk add --no-cache build-base
-
 # Setup hex and rebar
 RUN mix local.hex --force && \
     mix local.rebar --force
 
 COPY . .
 
-# Install elixir dependencies
-RUN mix do deps.get, deps.compile
+# Install dependencies for build sqlite3
+RUN apk add --no-cache build-base
+
+# Install & compile the dependencies of Elixir
+RUN mix deps.get --only ${MIX_ENV} && \
+    mix deps.compile --force
 
 # Create and migrate the database
 RUN mix do ecto.create, ecto.migrate
