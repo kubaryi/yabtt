@@ -8,9 +8,7 @@ This is a high-performance BitTorrent Tracker written with [Elixir](https://elix
 
 ## Usage
 
-> **WARNING**
->
-> Not ready for production.
+> **Warning** **Not ready for production!**
 
 Our philosophy is to make everything as simple as possible. So we chose [SQLite3](https://www.sqlite.org) as the database, which means that you don't need to deploy the database separately.
 
