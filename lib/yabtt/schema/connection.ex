@@ -29,5 +29,15 @@ defmodule YaBTT.Schema.Connection do
     |> validate_required([:uploaded, :downloaded, :left])
     |> put_change(:torrent_id, torrent_id)
     |> put_change(:peer_id, peer_id)
+    |> validate_event()
+  end
+
+  @spec validate_event(changeset_t()) :: changeset_t()
+  defp validate_event(changeset) do
+    with {:data, nil} <- fetch_field(changeset, :event) do
+      add_error(changeset, :event, "can't be blank for new peers", validation: :event)
+    else
+      _ -> changeset
+    end
   end
 end
