@@ -28,6 +28,7 @@ defmodule YaBTT.Schema.Peer do
 
   alias YaBTT.Schema.{Torrent, TorrentPeer}
 
+  @primary_key {:id, :id, autogenerate: true}
   schema "peers" do
     field(:peer_id, :binary_id)
     field(:ip, :binary)
