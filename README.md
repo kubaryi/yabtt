@@ -12,13 +12,13 @@ This is a high-performance BitTorrent Tracker written with [Elixir](https://elix
 
 Our philosophy is to make everything as simple as possible. So we chose [SQLite3](https://www.sqlite.org) as the database, which means that you don't need to deploy the database separately.
 
-Moreover, we provide [Docker Container](https://www.docker.com/resources/what-container), which is also our most recommended deployment method:
+Moreover, we provide [Docker](https://www.docker.com/resources/what-container) Container, which is also our most recommended deployment method:
 
 ```shell
 docker run -d --name yabtt -p 8080:8080 ghcr.io/mogeko/yabtt
 ```
 
-Or run with [docker-compose](https://docs.docker.com/compose):
+Or run with [Docker Compose](https://docs.docker.com/compose):
 
 ```yml
 ---
@@ -37,11 +37,11 @@ You can configure the server by the `YABTT_*` environment variables (the `-e` op
 
 Here are the environment variables we support:
 
-| Environment       | Default | Describe                                                                                        |
-| ----------------- | ------- | ----------------------------------------------------------------------------------------------- |
-| `YABTT_INTERVAL`  | 3600    | Interval in seconds that the client should wait between sending regular requests to the tracker |
-| `YABTT_PORT`      | 8080    | The port of server monitoring                                                                   |
-| `YABTT_LOG_LEVEL` | `info`  | The [log level](https://hexdocs.pm/logger/Logger.html#module-levels) printed on TTY             |
+| Environment       | Default | Describe                                                                                         |
+| ----------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| `YABTT_INTERVAL`  | 3600    | Interval in seconds that the client should wait between sending regular requests to the tracker. |
+| `YABTT_PORT`      | 8080    | The port of server monitoring.                                                                   |
+| `YABTT_LOG_LEVEL` | `info`  | The [log level](https://hexdocs.pm/logger/Logger.html#module-levels) printed on TTY.             |
 
 ## Build
 
