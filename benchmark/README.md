@@ -6,11 +6,11 @@ We used [Benchee](https://github.com/bencheeorg/benchee) as a framework to write
 
 We pair **_`100` users_**, **_`1,000` users_** and **_`10,000` users_** with **_`100` BitTorrents_**, **_`1,000` BitTorrents_** and **_`10,000` BitTorrents_** one by one to form a **`3` &#215; `3` matrix**, and obtained a total of `9` groups of cases. Then use functions to randomly generate `Request` based on cases in each run to **imitate the performance of users of different sizes in accessing the server in different numbers of BitTorrents lists**.
 
-```txt
-      BitTorrent    BitTorrent     BitTorrent
-User (100,   100)  (100,   1000)  (100,   10000)      Randomly generate `Request`
-User (1000,  100)  (1000,  1000)  (1000,  10000)   -------------------------------->   &Benchee.run/2
-User (10000, 100)  (10000, 1000)  (10000, 10000)
+```plaintext
+     BitTorrent   BitTorrent    BitTorrent
+User (100, 100)   (1000, 100)   (10000, 100)       Randomly generate `Request`
+User (100, 1000)  (1000, 1000)  (10000, 1000)   -------------------------------->   &Benchee.run/2
+User (100, 10000) (1000, 10000) (10000, 10000)
 ```
 
 ## Report
