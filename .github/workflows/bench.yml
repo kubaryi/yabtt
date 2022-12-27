@@ -34,5 +34,5 @@ jobs:
       - name: Upload benchmark report
         uses: actions/upload-artifact@v3
         with:
-          name: benchmark-report
+          name: benchmark-report-${{ matrix.limit }}
           path: ./benchmark/report/
