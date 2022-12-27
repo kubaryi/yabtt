@@ -11,6 +11,7 @@ defmodule YaBTT do
   is used to query the peers who hold the target torrent.
   """
 
+  import YaBTT.Repo, only: [get_by: 2, transaction: 1]
   import Ecto.Query
 
   alias YaBTT.Schema.{Peer, Torrent, Params, Connection}
@@ -44,25 +45,23 @@ defmodule YaBTT do
           | {:error, changeset_t()}
           | {:error, multi_name(), changeset_t(), Ecto.Multi.t()}
   def(insert_or_update(conn)) do
-    import YaBTT.Repo, only: [get_by: 2, transaction: 1]
-
-    with {:ok, %{info_hash: info_hash, peer_id: peer_id}} <- Params.apply(conn.params) do
-      Ecto.Multi.new()
-      # Get the `torrent` from database, or create a new one if it doesn't exist.
-      |> Ecto.Multi.insert_or_update(:torrent, fn _ ->
-        (get_by(Torrent, info_hash: info_hash) || %Torrent{}) |> Torrent.changeset(conn.params)
-      end)
-      # Get the `peer` from database, or create a new one if it doesn't exist.
-      |> Ecto.Multi.insert_or_update(:peer, fn _ ->
-        (get_by(Peer, peer_id: peer_id) || %Peer{}) |> Peer.changeset(conn.params, conn.remote_ip)
-      end)
-      # link the `torrent` and the `peer`. If the link already exists, update it.
-      |> Ecto.Multi.insert_or_update(:torrent_peer, fn %{torrent: t, peer: p} ->
-        (get_by(Connection, torrent_id: t.id, peer_id: p.id) || %Connection{})
-        |> Connection.changeset(conn.params, {t.id, p.id})
-      end)
-      |> transaction()
-    end
+    Ecto.Multi.new()
+    # Disinfect HTTP parameters, then extract `info_hash` and `peer_id`.
+    |> Ecto.Multi.run(:params, fn _, _ -> Params.apply(conn.params) end)
+    # Get the `torrent` from database, or create a new one if it doesn't exist.
+    |> Ecto.Multi.insert_or_update(:torrent, fn %{params: %{info_hash: info_hash}} ->
+      (get_by(Torrent, info_hash: info_hash) || %Torrent{}) |> Torrent.changeset(conn.params)
+    end)
+    # Get the `peer` from database, or create a new one if it doesn't exist.
+    |> Ecto.Multi.insert_or_update(:peer, fn %{params: %{peer_id: peer_id}} ->
+      (get_by(Peer, peer_id: peer_id) || %Peer{}) |> Peer.changeset(conn.params, conn.remote_ip)
+    end)
+    # link the `torrent` and the `peer`. If the link already exists, update it.
+    |> Ecto.Multi.insert_or_update(:torrent_peer, fn %{torrent: t, peer: p} ->
+      (get_by(Connection, torrent_id: t.id, peer_id: p.id) || %Connection{})
+      |> Connection.changeset(conn.params, {t.id, p.id})
+    end)
+    |> transaction()
   end
 
   @doc """
