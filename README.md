@@ -113,6 +113,15 @@ MIX_ENV=prod mix do compile, release
 
 The compiled files are located in the folder `_build/prod/rel/yabtt/`.
 
+## Reference
+
+This project refers to the following documents or specifications.
+
+- [BitTorrent Enhancement Proposals](http://bittorrent.org/beps/bep_0000.html)
+- [Bittorrent Protocol Specification v1.0](https://wiki.theory.org/BitTorrentSpecification)
+- [BitTorrent Wish List](https://wiki.theory.org/BitTorrentWishList)
+- [BitTorrent Tracker Protocol Extensions](https://wiki.theory.org/BitTorrentTrackerExtensions)
+
 ## License
 
 The code in this project is released under the [GPL-3.0 License](./LICENSE).
