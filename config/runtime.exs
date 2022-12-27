@@ -5,7 +5,12 @@ config :yabtt,
   # See: https://wiki.theory.org/BitTorrentSpecification#Tracker_Response
   interval: get_env("YABTT_INTERVAL", "3600") |> to_integer(),
   # Set the port to listen on, default to 8080.
-  port: get_env("YABTT_PORT", "8080") |> to_integer()
+  port: get_env("YABTT_PORT", "8080") |> to_integer(),
+  # How many peers can be returned in one query? default to 50, but we
+  # recommend you to set it smaller, like 30. Because this value is
+  # important to performance. Practice tells us that even 30 peers is plenty.
+  # See: https://wiki.theory.org/BitTorrentSpecification#Tracker_Response
+  query_limit: get_env("YABTT_QUERY_LIMIT", "50") |> to_integer()
 
 config :logger,
   # Set the log level, default to :info.

@@ -11,6 +11,8 @@ defmodule YaBTT do
   is used to query the peers who hold the target torrent.
   """
 
+  import Ecto.Query
+
   alias YaBTT.Schema.{Peer, Torrent, Params, Connection}
 
   @type info_hash :: binary()
@@ -66,6 +68,24 @@ defmodule YaBTT do
   @doc """
   Query the torrent and its peers.
 
+  You can use the [environment variable](./readme.html#configuration) `YABTT_QUERY_LIMIT` to
+  limit the number of peers returned per query. The value default to 50, but we recommend
+  you to set it smaller, like 30. Because this value is important to performance.
+
+  Practice tells us that even 30 peers is plenty.
+
+  > #### Implementer's Note {: .neutral}
+  >
+  > Even 30 peers is **plenty**, the official client version 3 in fact only actively
+  > forms new connections if it has less than 30 peers and will refuse connections if it has 55.
+  > **This value is important to performance.** When a new piece has completed download,
+  > HAVE messages (see below) will need to be sent to most active peers.
+  > As a result the cost of broadcast traffic grows in direct proportion to the number of peers. Above 25,
+  > new peers are highly unlikely to increase download speed. UI designers are strongly
+  > advised to make this obscure and hard to change as it is very rare to be useful to do so.
+  >
+  >  See: https://wiki.theory.org/BitTorrentSpecification#Tracker_Response
+
   ## Examples
 
       iex> torrent = %YaBTT.Schema.Torrent{id: 1}
@@ -76,7 +96,10 @@ defmodule YaBTT do
   """
   @spec query(Torrent.t()) :: {:ok, Torrent.t()} | :error
   def query(torrent) when is_struct(torrent, Torrent) do
-    case YaBTT.Repo.preload(torrent, :peers) do
+    query_limit = Application.get_env(:yabtt, :query_limit, 50)
+    query = from(p in Peer, order_by: [desc: p.updated_at], limit: ^query_limit)
+
+    case YaBTT.Repo.preload(torrent, peers: query) do
       nil -> :error
       torrent -> {:ok, torrent}
     end
