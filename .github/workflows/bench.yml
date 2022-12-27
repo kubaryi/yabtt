@@ -1,0 +1,38 @@
+name: Benchmark
+
+on:
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    name: Benchmark Elixir App
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        limit: [30, 50]
+    env:
+      YABTT_QUERY_LIMIT: ${{ matrix.limit }}
+      MIX_ENV: bench
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: 25
+          elixir-version: 1.14
+      - name: Install dependencies
+        run: |
+          mix deps.get --only ${MIX_ENV}
+          mix deps.compile --force
+      - name: Create and migrate the database
+        run: mix do ecto.create, ecto.migrate
+      - name: Compile app
+        run: mix compile
+      - name: Run benchmarks
+        run: mix run benchmark/bench.exs
+      - name: Upload benchmark report
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmark-report
+          path: ./benchmark/report/
