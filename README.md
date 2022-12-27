@@ -6,6 +6,8 @@ This is a high-performance BitTorrent Tracker written with [Elixir](https://elix
 
 > The tracker is an HTTP/HTTPS service which responds to HTTP GET requests. The requests include metrics from clients that help the tracker keep overall statistics about the torrent. The response includes a peer list that helps the client participate in the torrent.
 
+Read [our documents](http://mogeko.github.io/yabtt) to learn more.
+
 ## Usage
 
 > **Warning** **Not ready for production!**
