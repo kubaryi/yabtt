@@ -96,7 +96,9 @@ defmodule YaBTT do
   > new peers are highly unlikely to increase download speed. UI designers are strongly
   > advised to make this obscure and hard to change as it is very rare to be useful to do so.
   >
-  >  See: https://wiki.theory.org/BitTorrentSpecification#Tracker_Response
+  >  See: [Bittorrent Protocol Specification v1.0][specification]
+
+  As required by the [specification], the queried peers will be **random**.
 
   ## Examples
 
@@ -105,13 +107,17 @@ defmodule YaBTT do
 
       iex> torrent = %YaBTT.Schema.Torrent{id: 10000}
       iex> YaBTT.query(torrent)
+
+  <!-- links -->
+
+  [specification]: https://wiki.theory.org/BitTorrentSpecification#Tracker_Response
   """
   @spec query(Torrent.t()) :: {:ok, Torrent.t()} | :error
   def query(torrent) when is_struct(torrent, Torrent) do
     import Ecto.Query
 
     query_limit = Application.get_env(:yabtt, :query_limit, 50)
-    query = from(p in Peer, order_by: [desc: p.updated_at], limit: ^query_limit)
+    query = from(p in Peer, order_by: fragment("RANDOM()"), limit: ^query_limit)
 
     case YaBTT.Repo.preload(torrent, peers: query) do
       nil -> :error
