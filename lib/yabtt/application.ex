@@ -1,13 +1,9 @@
 defmodule YaBTT.Application do
-  @moduledoc """
-  The YaBTT application. This module is responsible for starting the
-  application and supervising the application's processes.
+  @moduledoc false
 
-  ## References
-
-  * OTP Applications - https://hexdocs.pm/elixir/Application.html
-  * Supervisor - https://hexdocs.pm/elixir/Supervisor.html
-  """
+  # References
+  #   - https://hexdocs.pm/elixir/OTP%20Applications.html
+  #   - https://hexdocs.pm/elixir/Supervisor.html
 
   use Application
 

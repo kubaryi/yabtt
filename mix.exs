@@ -1,18 +1,26 @@
 defmodule YaBTT.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/mogeko/yabtt"
+  @authors ["Mogeko"]
+  @version "0.0.1"
+
   def project do
     [
       app: :yabtt,
-      version: "0.0.1-beta",
+      version: @version,
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
+      deps: deps(),
+      test_coverage: test_coverage(),
       aliases: aliases(),
-      deps: deps()
+
+      # Documents
+      name: "YaBTT",
+      docs: docs()
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger],
@@ -20,15 +28,15 @@ defmodule YaBTT.MixProject do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:benchee, "~> 1.1.0", only: :dev},
       {:benchee_html, "~> 1.0", only: :dev},
-      {:plug_cowboy, "~> 2.6.0"},
+      {:bento, "~> 0.9"},
       {:ecto_sql, "~> 3.8"},
       {:ecto_sqlite3, "~> 0.8"},
-      {:bento, "~> 0.9"}
+      {:ex_doc, "~> 0.29", only: :dev, runtime: false},
+      {:plug_cowboy, "~> 2.6.0"}
     ]
   end
 
@@ -37,6 +45,37 @@ defmodule YaBTT.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"]
+    ]
+  end
+
+  defp test_coverage do
+    [
+      ignore_modules: [YaBBT.Application, YaBTT.Repo],
+      summary: [threshold: 85]
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md", "LICENSE"],
+      authors: @authors,
+      source_ref: "v#{@version}",
+      source_url: @source_url,
+      groups_for_modules: [
+        # YaBTT,
+        # YaBTT.Repo,
+        "Schema for Database": [
+          YaBTT.Schema.Connection,
+          YaBTT.Schema.Params,
+          YaBTT.Schema.Peer,
+          YaBTT.Schema.Torrent
+        ],
+        "HTTP routing": [
+          YaBTT.Server.Router,
+          YaBTT.Server.Announce
+        ]
+      ]
     ]
   end
 end

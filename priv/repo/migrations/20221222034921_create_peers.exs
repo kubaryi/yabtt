@@ -3,9 +3,9 @@ defmodule YaBTT.Repo.Migrations.CreatePeers do
 
   def change do
     create table(:peers) do
-      add :peer_id, :binary, null: false
-      add :ip, :binary, null: false
-      add :port, :integer, null: false
+      add(:peer_id, :binary, null: false)
+      add(:ip, :binary, null: false)
+      add(:port, :integer, null: false)
 
       timestamps()
     end

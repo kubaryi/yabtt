@@ -1,5 +1,7 @@
 defmodule YaBTT.Server.Announce do
-  @moduledoc false
+  @moduledoc """
+  The Announce controller for the YaBTT application.
+  """
 
   @behaviour Plug
   import Plug.Conn
@@ -84,6 +86,11 @@ defmodule YaBTT.Server.Announce do
       iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, msg)
       iex> conn.resp_body
       "d14:failure reasonll2:ipl14:can't be blankll10:validation8:requiredeeeeee"
+
+      iex> conn = %Plug.Conn{}
+      iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, :error)
+      iex> conn.resp_body
+      "d14:failure reason22:unknown internal errore"
   """
   @spec put_resp_msg(Plug.Conn.t(), resp_msg()) :: Plug.Conn.t()
   def put_resp_msg(conn, {:ok, data}) do

@@ -1,11 +1,17 @@
 defmodule YaBTT do
   @moduledoc """
-  # YaBTT
+  # Yet another BitTorrent Tracker
 
-  Yet another BitTorrent tracker. It is a BitTorrent Tracker written in Elixir.
+  This is the main entry point for the `YaBTT` as a **library**.
+
+  All the functions will be contained in this module.
+
+  Specifically, the `insert_or_update/1` function is used to insert or update a
+  torrent and a peer, and thier status and relationship. The `query/1` function
+  is used to query the peers who hold the target torrent.
   """
 
-  alias YaBTT.Schema.{Peer, Torrent, TorrentPeer, Params}
+  alias YaBTT.Schema.{Peer, Torrent, Params, Connection}
 
   @type info_hash :: binary()
   @type peer_id :: binary()
@@ -19,7 +25,15 @@ defmodule YaBTT do
 
   ## Examples
 
-      iex> params = %{"info_hash" => "info_hash", "peer_id" => "peer_id", "port" => "6810"}
+      iex> params = %{
+      ...>   "info_hash" => "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e8",
+      ...>   "peer_id" => "-TR14276775888084598",
+      ...>   "port" => "6881",
+      ...>   "uploaded" => "121",
+      ...>   "downloaded" => "41421",
+      ...>   "left" => "0",
+      ...>   "event" => "completed"
+      ...> }
       iex> conn = %Plug.Conn{params: params, remote_ip: {127, 0, 0, 1}}
       iex> YaBTT.insert_or_update(conn)
   """
@@ -28,15 +42,24 @@ defmodule YaBTT do
           | {:error, changeset_t()}
           | {:error, multi_name(), changeset_t(), Ecto.Multi.t()}
   def(insert_or_update(conn)) do
+    import YaBTT.Repo, only: [get_by: 2, transaction: 1]
+
     with {:ok, %{info_hash: info_hash, peer_id: peer_id}} <- Params.apply(conn.params) do
       Ecto.Multi.new()
-      |> get_torrents(info_hash)
-      |> insert_or_update_torrent(conn.params)
-      |> get_peers(peer_id)
-      |> insert_or_update_peer(conn.params, conn.remote_ip)
-      |> get_torrents_peers()
-      |> link_torrents_and_peers()
-      |> YaBTT.Repo.transaction()
+      # Get the `torrent` from database, or create a new one if it doesn't exist.
+      |> Ecto.Multi.insert_or_update(:torrent, fn _ ->
+        (get_by(Torrent, info_hash: info_hash) || %Torrent{}) |> Torrent.changeset(conn.params)
+      end)
+      # Get the `peer` from database, or create a new one if it doesn't exist.
+      |> Ecto.Multi.insert_or_update(:peer, fn _ ->
+        (get_by(Peer, peer_id: peer_id) || %Peer{}) |> Peer.changeset(conn.params, conn.remote_ip)
+      end)
+      # link the `torrent` and the `peer`. If the link already exists, update it.
+      |> Ecto.Multi.insert_or_update(:torrent_peer, fn %{torrent: t, peer: p} ->
+        (get_by(Connection, torrent_id: t.id, peer_id: p.id) || %Connection{})
+        |> Connection.changeset(conn.params, {t.id, p.id})
+      end)
+      |> transaction()
     end
   end
 
@@ -57,49 +80,5 @@ defmodule YaBTT do
       nil -> :error
       torrent -> {:ok, torrent}
     end
-  end
-
-  @spec insert_or_update_torrent(Ecto.Multi.t(), params()) :: Ecto.Multi.t()
-  defp insert_or_update_torrent(multi, params) do
-    Ecto.Multi.insert_or_update(multi, :torrent, fn %{torrent_repo: repo} ->
-      repo |> Torrent.changeset(params)
-    end)
-  end
-
-  @spec get_torrents(Ecto.Multi.t(), info_hash()) :: Ecto.Multi.t()
-  defp get_torrents(multi, info_hash) do
-    Ecto.Multi.run(multi, :torrent_repo, fn _repo, _changes ->
-      {:ok, YaBTT.Repo.get_by(Torrent, info_hash: info_hash) || %Torrent{}}
-    end)
-  end
-
-  @spec insert_or_update_peer(Ecto.Multi.t(), params(), ip_addr()) :: Ecto.Multi.t()
-  defp insert_or_update_peer(multi, params, ip) do
-    Ecto.Multi.insert_or_update(multi, :peer, fn %{peer_repo: repo} ->
-      repo |> Peer.changeset(params, ip)
-    end)
-  end
-
-  @typep ip_addr :: YaBTT.Schema.Peer.ip_addr()
-
-  @spec get_peers(Ecto.Multi.t(), peer_id()) :: Ecto.Multi.t()
-  defp get_peers(multi, peer_id) do
-    Ecto.Multi.run(multi, :peer_repo, fn _repo, _changes ->
-      {:ok, YaBTT.Repo.get_by(Peer, peer_id: peer_id) || %Peer{}}
-    end)
-  end
-
-  @spec link_torrents_and_peers(Ecto.Multi.t()) :: Ecto.Multi.t()
-  defp link_torrents_and_peers(multi) do
-    Ecto.Multi.insert_or_update(multi, :torrent_peer, fn %{torrent: t, peer: p} = changes ->
-      changes.torrent_peer_repo |> TorrentPeer.changeset(%{torrent_id: t.id, peer_id: p.id})
-    end)
-  end
-
-  @spec get_torrents_peers(Ecto.Multi.t()) :: Ecto.Multi.t()
-  defp get_torrents_peers(multi) do
-    Ecto.Multi.run(multi, :torrent_peer_repo, fn _repo, %{torrent: t, peer: p} ->
-      {:ok, YaBTT.Repo.get_by(TorrentPeer, torrent_id: t.id, peer_id: p.id) || %TorrentPeer{}}
-    end)
   end
 end

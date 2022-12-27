@@ -48,8 +48,7 @@ defmodule YaBTT.Schema.Params do
       ...>   "port" => "6881",
       ...>   "uploaded" => "121",
       ...>   "downloaded" => "41421",
-      ...>   "left" => "0",
-      ...>   "event" => "completed"
+      ...>   "left" => "0"
       ...> }
       iex> YaBTT.Schema.Params.changeset(%YaBTT.Schema.Params{}, params)
 
@@ -72,7 +71,7 @@ defmodule YaBTT.Schema.Params do
 
   ## Examples
 
-      iex> params = %{
+      iex> %{
       ...>   "info_hash" => "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e8",
       ...>   "peer_id" => "-TR14276775888084598",
       ...>   "ip" => "127.0.0.1",

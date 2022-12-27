@@ -3,7 +3,7 @@ defmodule YaBTT.Repo.Migrations.CreateTorrents do
 
   def change do
     create table(:torrents) do
-      add :info_hash, :binary, null: false
+      add(:info_hash, :binary, null: false)
 
       timestamps()
     end
