@@ -1,5 +1,7 @@
 defmodule YaBTT.Server.Announce do
-  @moduledoc false
+  @moduledoc """
+  The Announce controller for the YaBTT application.
+  """
 
   @behaviour Plug
   import Plug.Conn

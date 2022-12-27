@@ -1,8 +1,9 @@
 defmodule YaBTT.MixProject do
   use Mix.Project
 
-  @version "0.0.1"
   @source_url "https://github.com/mogeko/yabtt"
+  @authors ["Mogeko"]
+  @version "0.0.1"
 
   def project do
     [
@@ -14,7 +15,7 @@ defmodule YaBTT.MixProject do
       test_coverage: test_coverage(),
       aliases: aliases(),
 
-      # Docs
+      # Documents
       name: "YaBTT",
       docs: docs()
     ]
@@ -58,7 +59,23 @@ defmodule YaBTT.MixProject do
     [
       main: "readme",
       extras: ["README.md", "LICENSE"],
-      source_url: @source_url
+      authors: @authors,
+      source_ref: "v#{@version}",
+      source_url: @source_url,
+      groups_for_modules: [
+        # YaBTT,
+        # YaBTT.Repo,
+        "Schema for Database": [
+          YaBTT.Schema.Connection,
+          YaBTT.Schema.Params,
+          YaBTT.Schema.Peer,
+          YaBTT.Schema.Torrent
+        ],
+        "HTTP routing": [
+          YaBTT.Server.Router,
+          YaBTT.Server.Announce
+        ]
+      ]
     ]
   end
 end

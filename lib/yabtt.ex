@@ -1,8 +1,14 @@
 defmodule YaBTT do
   @moduledoc """
-  # YaBTT
+  # Yet another BitTorrent Tracker
 
-  Yet another BitTorrent tracker. It is a BitTorrent Tracker written in Elixir.
+  This is the main entry point for the `YaBTT` as a **library**.
+
+  All the functions will be contained in this module.
+
+  Specifically, the `insert_or_update/1` function is used to insert or update a
+  torrent and a peer, and thier status and relationship. The `query/1` function
+  is used to query the peers who hold the target torrent.
   """
 
   alias YaBTT.Schema.{Peer, Torrent, Params, Connection}
