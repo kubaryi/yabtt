@@ -61,7 +61,7 @@ Benchee.run(
   },
   save: [path: "#{save_dir}/#{branch}.#{utc}.benchee", tag: branch],
   formatters: [
-    {Benchee.Formatters.HTML, file: "#{report_dir}/index.html"},
+    {Benchee.Formatters.HTML, file: "#{report_dir}/index.html", auto_open: false},
     Benchee.Formatters.Console
   ]
 )

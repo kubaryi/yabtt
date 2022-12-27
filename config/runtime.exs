@@ -17,7 +17,7 @@ config :logger,
   # See: https://hexdocs.pm/logger/Logger.html#module-levels
   level: get_env("YABTT_LOG_LEVEL", "info") |> to_atom()
 
-if config_env() == :test do
-  # Set the log level to :notice in test environment.
+if config_env() in [:test, :bench] do
+  # Don't print any log in test and benchmark environment.
   config :logger, level: :notice
 end
