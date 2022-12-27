@@ -34,7 +34,7 @@ gen_faker_header = fn info_hash_list, peer_id_list ->
     "uploaded" => Enum.random(0..100),
     "downloaded" => Enum.random(0..100),
     "left" => Enum.random(0..100_000),
-    "event" => Enum.random(["started", "stopped", "completed", nil])
+    "event" => Enum.random(["started", "stopped", "completed"])
   }
 end
 

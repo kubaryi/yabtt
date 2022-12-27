@@ -23,6 +23,20 @@ defmodule YaBTT do
   @doc """
   A transaction that inserts or updates a torrent and a peer.
 
+  The main process of the transaction:
+
+  1. The transaction begins.
+  2. Read and disinfect the HTTP parameters.
+  3. Get the `torrent` from database, or create a new one if it doesn't exist.
+  4. Get the `peer` from database, or create a new one if it doesn't exist.
+  5. Create a `connection` between the `torrent` and the `peer`, and record
+     the status of the `connection`.
+  6. Commit the transaction.
+
+  ## Parameters
+
+  - `conn`: the `Plug.Conn` struct
+
   ## Examples
 
       iex> params = %{
@@ -44,27 +58,47 @@ defmodule YaBTT do
   def(insert_or_update(conn)) do
     import YaBTT.Repo, only: [get_by: 2, transaction: 1]
 
-    with {:ok, %{info_hash: info_hash, peer_id: peer_id}} <- Params.apply(conn.params) do
-      Ecto.Multi.new()
-      # Get the `torrent` from database, or create a new one if it doesn't exist.
-      |> Ecto.Multi.insert_or_update(:torrent, fn _ ->
-        (get_by(Torrent, info_hash: info_hash) || %Torrent{}) |> Torrent.changeset(conn.params)
-      end)
-      # Get the `peer` from database, or create a new one if it doesn't exist.
-      |> Ecto.Multi.insert_or_update(:peer, fn _ ->
-        (get_by(Peer, peer_id: peer_id) || %Peer{}) |> Peer.changeset(conn.params, conn.remote_ip)
-      end)
-      # link the `torrent` and the `peer`. If the link already exists, update it.
-      |> Ecto.Multi.insert_or_update(:torrent_peer, fn %{torrent: t, peer: p} ->
-        (get_by(Connection, torrent_id: t.id, peer_id: p.id) || %Connection{})
-        |> Connection.changeset(conn.params, {t.id, p.id})
-      end)
-      |> transaction()
-    end
+    Ecto.Multi.new()
+    # Disinfect HTTP parameters, then extract `info_hash` and `peer_id`.
+    |> Ecto.Multi.run(:params, fn _, _ -> Params.apply(conn.params) end)
+    # Get the `torrent` from database, or create a new one if it doesn't exist.
+    |> Ecto.Multi.insert_or_update(:torrent, fn %{params: %{info_hash: info_hash}} ->
+      (get_by(Torrent, info_hash: info_hash) || %Torrent{}) |> Torrent.changeset(conn.params)
+    end)
+    # Get the `peer` from database, or create a new one if it doesn't exist.
+    |> Ecto.Multi.insert_or_update(:peer, fn %{params: %{peer_id: peer_id}} ->
+      (get_by(Peer, peer_id: peer_id) || %Peer{}) |> Peer.changeset(conn.params, conn.remote_ip)
+    end)
+    # link the `torrent` and the `peer`. If the link already exists, update it.
+    |> Ecto.Multi.insert_or_update(:torrent_peer, fn %{torrent: t, peer: p} ->
+      (get_by(Connection, torrent_id: t.id, peer_id: p.id) || %Connection{})
+      |> Connection.changeset(conn.params, {t.id, p.id})
+    end)
+    |> transaction()
   end
 
   @doc """
   Query the torrent and its peers.
+
+  You can use the [environment variable](./readme.html#configuration) `YABTT_QUERY_LIMIT` to
+  limit the number of peers returned per query. The value default to 50, but we recommend
+  you to set it smaller, like 30. Because this value is important to performance.
+
+  Practice tells us that even 30 peers is plenty.
+
+  > #### Implementer's Note {: .neutral}
+  >
+  > Even 30 peers is **plenty**, the official client version 3 in fact only actively
+  > forms new connections if it has less than 30 peers and will refuse connections if it has 55.
+  > **This value is important to performance.** When a new piece has completed download,
+  > HAVE messages (see below) will need to be sent to most active peers.
+  > As a result the cost of broadcast traffic grows in direct proportion to the number of peers. Above 25,
+  > new peers are highly unlikely to increase download speed. UI designers are strongly
+  > advised to make this obscure and hard to change as it is very rare to be useful to do so.
+  >
+  >  See: [Bittorrent Protocol Specification v1.0][specification]
+
+  As required by the [specification], the queried peers will be **random**.
 
   ## Examples
 
@@ -73,10 +107,19 @@ defmodule YaBTT do
 
       iex> torrent = %YaBTT.Schema.Torrent{id: 10000}
       iex> YaBTT.query(torrent)
+
+  <!-- links -->
+
+  [specification]: https://wiki.theory.org/BitTorrentSpecification#Tracker_Response
   """
   @spec query(Torrent.t()) :: {:ok, Torrent.t()} | :error
   def query(torrent) when is_struct(torrent, Torrent) do
-    case YaBTT.Repo.preload(torrent, :peers) do
+    import Ecto.Query
+
+    query_limit = Application.get_env(:yabtt, :query_limit, 50)
+    query = from(p in Peer, order_by: fragment("RANDOM()"), limit: ^query_limit)
+
+    case YaBTT.Repo.preload(torrent, peers: query) do
       nil -> :error
       torrent -> {:ok, torrent}
     end

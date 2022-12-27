@@ -39,11 +39,12 @@ You can configure the server by the `YABTT_*` environment variables (the `-e` op
 
 Here are the environment variables we support:
 
-| Environment       | Default | Describe                                                                                         |
-| ----------------- | ------- | ------------------------------------------------------------------------------------------------ |
-| `YABTT_INTERVAL`  | 3600    | Interval in seconds that the client should wait between sending regular requests to the tracker. |
-| `YABTT_PORT`      | 8080    | The port of server monitoring.                                                                   |
-| `YABTT_LOG_LEVEL` | `info`  | The [log level](https://hexdocs.pm/logger/Logger.html#module-levels) printed on TTY.             |
+| Environment         | Default | Describe                                                                                         |
+| ------------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| `YABTT_INTERVAL`    | 3600    | Interval in seconds that the client should wait between sending regular requests to the tracker. |
+| `YABTT_PORT`        | 8080    | The port of server monitoring.                                                                   |
+| `YABTT_QUERY_LIMIT` | 50      | Limit the number of peers that the query can return.                                             |
+| `YABTT_LOG_LEVEL`   | `info`  | The [log level](https://hexdocs.pm/logger/Logger.html#module-levels) printed on TTY.             |
 
 ## Build
 
