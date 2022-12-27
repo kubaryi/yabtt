@@ -17,7 +17,7 @@ Our philosophy is to make everything as simple as possible. So we chose [SQLite3
 Moreover, we provide [Docker](https://www.docker.com/resources/what-container) Container, which is also our most recommended deployment method:
 
 ```shell
-docker run -d --name yabtt -p 8080:8080 ghcr.io/mogeko/yabtt
+docker run -d --name yabtt -p 8080:8080 ghcr.io/mogeko/yabtt:latest
 ```
 
 Or run with [Docker Compose](https://docs.docker.com/compose):
@@ -27,7 +27,7 @@ Or run with [Docker Compose](https://docs.docker.com/compose):
 version: 2.1
 services:
   yabtt:
-    image: ghcr.io/mogeko/yabtt
+    image: ghcr.io/mogeko/yabtt:latest
     container_name: yabtt
     ports:
       - 8080:8080
