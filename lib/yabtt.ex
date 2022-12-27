@@ -26,6 +26,20 @@ defmodule YaBTT do
   @doc """
   A transaction that inserts or updates a torrent and a peer.
 
+  The main process of the transaction:
+
+  1. The transaction begins.
+  2. Read and disinfect the HTTP parameters.
+  3. Get the `torrent` from database, or create a new one if it doesn't exist.
+  4. Get the `peer` from database, or create a new one if it doesn't exist.
+  5. Create a `connection` between the `torrent` and the `peer`, and record
+     the status of the `connection`.
+  6. Commit the transaction.
+
+  ## Parameters
+
+  - `conn`: the `Plug.Conn` struct
+
   ## Examples
 
       iex> params = %{
