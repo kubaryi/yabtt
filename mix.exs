@@ -30,8 +30,8 @@ defmodule YaBTT.MixProject do
 
   defp deps do
     [
-      {:benchee, "~> 1.1.0", only: :dev},
-      {:benchee_html, "~> 1.0", only: :dev},
+      {:benchee, "~> 1.1.0", only: [:dev, :bench]},
+      {:benchee_html, "~> 1.0", only: [:dev, :bench]},
       {:bento, "~> 0.9"},
       {:ecto_sql, "~> 3.8"},
       {:ecto_sqlite3, "~> 0.8"},
