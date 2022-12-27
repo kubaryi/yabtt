@@ -24,7 +24,7 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=schedule,pattern=nightly
-            type=ref,event=tag
+            type=semver,pattern={{version}}
             type=edge
             type=sha,format=long
             type=sha
