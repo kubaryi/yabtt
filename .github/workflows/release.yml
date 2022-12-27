@@ -26,6 +26,7 @@ jobs:
             type=schedule,pattern=nightly
             type=ref,event=tag
             type=edge
+            type=sha,format=long
             type=sha
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -33,7 +34,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push the Docker Container
+      - name: Build and push the Docker container
         uses: docker/build-push-action@v3
         with:
           push: true
