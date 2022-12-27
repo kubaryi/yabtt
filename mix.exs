@@ -60,7 +60,6 @@ defmodule YaBTT.MixProject do
       main: "readme",
       extras: ["README.md", "LICENSE"],
       authors: @authors,
-      source_ref: "v#{@version}",
       source_url: @source_url,
       groups_for_modules: [
         # YaBTT,
