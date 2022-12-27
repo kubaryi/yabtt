@@ -85,9 +85,11 @@ defmodule YaBTT.Schema.Torrent do
     """
     @spec encode(Torrent.t()) :: Encoder.t()
     def encode(%{id: _} = torrent) do
+      interval = Application.get_env(:yabtt, :interval, 3600)
+
       torrent
       |> Map.take([:peers])
-      |> Map.put(:interval, 3600)
+      |> Map.put(:interval, interval)
       |> Encoder.encode()
     end
   end
