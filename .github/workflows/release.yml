@@ -4,6 +4,8 @@ on:
   push:
     branches: [master]
     tags: ["v*"]
+  schedule:
+    - cron: "30 23 * * *"
   workflow_dispatch:
 
 jobs:
@@ -19,7 +21,7 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=schedule,pattern={{date 'YYYYMMDD'}}
+            type=schedule,pattern=nightly
             type=ref,event=tag
             type=edge
             type=sha
