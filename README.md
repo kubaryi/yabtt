@@ -46,6 +46,12 @@ Here are the environment variables we support:
 | `YABTT_QUERY_LIMIT` | 50      | Limit the number of peers that the query can return.                                             |
 | `YABTT_LOG_LEVEL`   | `info`  | The [log level](https://hexdocs.pm/logger/Logger.html#module-levels) printed on TTY.             |
 
+## Benchmark
+
+For reference, we have designed a simple benchmark to test the main version of the application. However, it should be noted that **the results can only be used as a reference and cannot represent the actual performance of the application in production**.
+
+You can check our report [here](https://github.com/mogeko/yabtt/tree/master/benchmark).
+
 ## Build
 
 If you want to compile it yourself, you can follow this guide.
