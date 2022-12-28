@@ -93,4 +93,23 @@ defmodule YaBTT.Schema.Torrent do
       |> Encoder.encode()
     end
   end
+
+  defimpl YaBTT.Response do
+    @moduledoc """
+    Implements the `YaBTT.Response` protocol for `YaBTT.Schema.Torrent`.
+    """
+
+    alias YaBTT.{Schema.Torrent, Response}
+
+    @doc """
+    Extracts a `YaBTT.Schema.Torrent` into a `map()`.
+    """
+    @spec extract(Torrent.t()) :: map()
+    def extract(torrent) do
+      %{
+        interval: Application.get_env(:yabtt, :interval, 3600),
+        peers: Stream.map(torrent.peers, &Response.extract/1)
+      }
+    end
+  end
 end

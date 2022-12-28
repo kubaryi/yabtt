@@ -118,4 +118,30 @@ defmodule YaBTT.Schema.Peer do
       end
     end
   end
+
+  defimpl YaBTT.Response do
+    @moduledoc """
+    Implements the `YaBTT.Response` protocol for `YaBTT.Schema.Peer`.
+    """
+
+    alias YaBTT.Schema.Peer
+
+    @doc """
+    Extracts the `peer_id`, `ip`, and `port` from a peer and returns a map
+    with the keys as strings.
+    """
+    @spec extract(Peer.t()) :: map()
+    def extract(peer) do
+      peer
+      |> Map.take([:peer_id, :ip, :port])
+      |> do_extract()
+    end
+
+    @spec do_extract(map()) :: map()
+    defp do_extract(map_with_atom_keys) do
+      for {k, v} <- map_with_atom_keys, into: %{} do
+        {Atom.to_string(k) |> String.replace("_", " "), v}
+      end
+    end
+  end
 end
