@@ -32,6 +32,6 @@ defprotocol YaBTT.Response do
   @doc """
   Extracts the `YaBBT.Schema.Torrent` or `YaBTT.Schema.Peer` into a `map()`.
   """
-  @spec extract(data(), opts()) :: map()
+  @spec extract(data(), opts()) :: map() | binary()
   def extract(data, opts \\ [compact: 0, no_peer_id: 0])
 end

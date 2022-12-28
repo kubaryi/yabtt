@@ -97,19 +97,22 @@ defmodule YaBTT.Schema.Peer do
     ## Examples
 
       iex> alias YaBTT.Schema.Peer
-      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "1.2.3.4"}
+      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 2001, ip: "192.168.24.52"}
       iex> YaBTT.Response.extract(peer, compact: 1, no_peer_id: 1)
-      %{"ip" => "1.2.3.4", "peer id" => "-TR14276775888084598", "port" => 6881}
+      <<192, 168, 24, 52, 7, 209>>
 
       iex> alias YaBTT.Schema.Peer
       iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "1.2.3.4"}
       iex> YaBTT.Response.extract(peer, compact: 0, no_peer_id: 1)
       %{ip: "1.2.3.4", port: 6881}
     """
-    @spec extract(Peer.t(), Response.opts()) :: map()
-    def extract(peer, compact: c) when c != 0 do
-      # TODO: Implement compact response
-      extract(peer, compact: 0, no_peer_id: 0)
+    @spec extract(Peer.t(), Response.opts()) :: map() | binary()
+    def extract(peer, compact: c, no_peer_id: _) when c != 0 do
+      with {:ok, ip} <- :inet.parse_address(to_charlist(peer.ip)) do
+        (Tuple.to_list(ip) |> :erlang.list_to_binary()) <> <<peer.port::16>>
+      else
+        _ -> peer |> Map.take([:ip, :port])
+      end
     end
 
     def extract(peer, compact: 0, no_peer_id: np) when np != 0 do
