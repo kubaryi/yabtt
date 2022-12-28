@@ -83,42 +83,6 @@ defmodule YaBTT.Schema.Peer do
     |> (&put_change(changeset, :ip, &1)).()
   end
 
-  defimpl Bento.Encoder do
-    @moduledoc """
-    Implements the `Bento.Encoder` protocol for `YaBTT.Schema.Peer`.
-    """
-
-    use Bento.Encode
-
-    alias YaBTT.Schema.Peer
-    alias Bento.Encoder
-
-    @doc """
-    To encode a peer, we take the `peer_id`, `ip`, and `port` into a map and
-    encode it by calling `Bento.Encoder.encode/1` on the map.
-
-    ## Examples
-
-        iex> alias YaBTT.Schema.Peer
-        iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "1.2.3.5"}
-        iex> Bento.Encoder.encode(peer) |> IO.iodata_to_binary()
-        "d2:ip7:1.2.3.57:peer id20:-TR142767758880845984:porti6881ee"
-    """
-    @spec encode(Peer.t()) :: Encoder.t()
-    def encode(%{id: _} = peer) do
-      peer
-      |> Map.take([:peer_id, :ip, :port])
-      |> do_encode()
-      |> Encoder.encode()
-    end
-
-    defp do_encode(map_with_atom_keys) do
-      for {k, v} <- map_with_atom_keys, into: %{} do
-        {Atom.to_string(k) |> String.replace("_", " "), v}
-      end
-    end
-  end
-
   defimpl YaBTT.Response do
     @moduledoc """
     Implements the `YaBTT.Response` protocol for `YaBTT.Schema.Peer`.

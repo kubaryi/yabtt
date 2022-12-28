@@ -118,14 +118,15 @@ defmodule YaBTT do
   """
   @spec query(t()) :: t(Torrent.t())
   def query({:ok, %{torrent: torrent}}) do
+    alias YaBTT.{Repo, Response}
     import Ecto.Query
 
     query_limit = Application.get_env(:yabtt, :query_limit, 50)
     query = from(p in Peer, order_by: fragment("RANDOM()"), limit: ^query_limit)
 
-    case YaBTT.Repo.preload(torrent, peers: query) do
+    case Repo.preload(torrent, peers: query) do
+      %{peers: _} = torrent -> {:ok, Response.extract(torrent)}
       nil -> :error
-      torrent -> {:ok, torrent}
     end
   end
 

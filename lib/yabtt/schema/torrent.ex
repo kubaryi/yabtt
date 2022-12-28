@@ -59,41 +59,6 @@ defmodule YaBTT.Schema.Torrent do
     |> validate_required([:info_hash])
   end
 
-  defimpl Bento.Encoder do
-    @moduledoc """
-    Implements the `Bento.Encoder` protocol for `YaBTT.Schema.Torrent`.
-    """
-
-    use Bento.Encode
-
-    alias YaBTT.Schema.Torrent
-    alias Bento.Encoder
-
-    @doc """
-    Encodes a `YaBTT.Schema.Torrent` into a `Bento.Encoder.t()`.
-
-    ## Parameters
-
-      * `torrent` - The `YaBTT.Schema.Torrent` to encode.
-
-    ## Examples
-
-        iex> alias YaBTT.Schema.Torrent
-        iex> torrent = %Torrent{id: 1, peers: [%{id: 1}]}
-        iex> Bento.Encoder.encode(torrent) |> IO.iodata_to_binary()
-        "d8:intervali3600e5:peersld2:idi1eeee"
-    """
-    @spec encode(Torrent.t()) :: Encoder.t()
-    def encode(%{id: _} = torrent) do
-      interval = Application.get_env(:yabtt, :interval, 3600)
-
-      torrent
-      |> Map.take([:peers])
-      |> Map.put(:interval, interval)
-      |> Encoder.encode()
-    end
-  end
-
   defimpl YaBTT.Response do
     @moduledoc """
     Implements the `YaBTT.Response` protocol for `YaBTT.Schema.Torrent`.
