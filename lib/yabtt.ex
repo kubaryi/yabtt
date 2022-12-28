@@ -103,10 +103,12 @@ defmodule YaBTT do
   ## Examples
 
       iex> torrent = %YaBTT.Schema.Torrent{id: 1}
-      iex> YaBTT.query({:ok, %{torrent: torrent}})
+      iex> opts = %{compact: 0, no_peer_id: 0}
+      iex> YaBTT.query({:ok, %{torrent: torrent, params: opts}})
 
       iex> torrent = %YaBTT.Schema.Torrent{id: 10000}
-      iex> YaBTT.query({:ok, %{torrent: torrent}})
+      iex> opts = %{compact: 1, no_peer_id: 1}
+      iex> YaBTT.query({:ok, %{torrent: torrent, params: opts}})
 
       iex> YaBTT.query({:error, :multi_name, %{}, %{}})
 
@@ -116,16 +118,17 @@ defmodule YaBTT do
 
   [specification]: https://wiki.theory.org/BitTorrentSpecification#Tracker_Response
   """
-  @spec query(t()) :: t(Torrent.t())
-  def query({:ok, %{torrent: torrent}}) do
+  @spec query(t()) :: t()
+  def query({:ok, %{torrent: torrent, params: %{compact: c, no_peer_id: np}}}) do
     alias YaBTT.{Repo, Response}
     import Ecto.Query
 
     query_limit = Application.get_env(:yabtt, :query_limit, 50)
     query = from(p in Peer, order_by: fragment("RANDOM()"), limit: ^query_limit)
 
-    case Repo.preload(torrent, peers: query) do
-      %{peers: _} = torrent -> {:ok, Response.extract(torrent)}
+    with %{peers: _} = torrent <- Repo.preload(torrent, peers: query) do
+      {:ok, Response.extract(torrent, compact: c, no_peer_id: np)}
+    else
       nil -> :error
     end
   end

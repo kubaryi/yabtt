@@ -88,14 +88,35 @@ defmodule YaBTT.Schema.Peer do
     Implements the `YaBTT.Response` protocol for `YaBTT.Schema.Peer`.
     """
 
-    alias YaBTT.Schema.Peer
+    alias YaBTT.{Schema.Peer, Response}
 
     @doc """
     Extracts the `peer_id`, `ip`, and `port` from a peer and returns a map
     with the keys as strings.
+
+    ## Examples
+
+      iex> alias YaBTT.Schema.Peer
+      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "1.2.3.4"}
+      iex> YaBTT.Response.extract(peer, compact: 1, no_peer_id: 1)
+      %{"ip" => "1.2.3.4", "peer id" => "-TR14276775888084598", "port" => 6881}
+
+      iex> alias YaBTT.Schema.Peer
+      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "1.2.3.4"}
+      iex> YaBTT.Response.extract(peer, compact: 0, no_peer_id: 1)
+      %{ip: "1.2.3.4", port: 6881}
     """
-    @spec extract(Peer.t()) :: map()
-    def extract(peer) do
+    @spec extract(Peer.t(), Response.opts()) :: map()
+    def extract(peer, compact: c) when c != 0 do
+      # TODO: Implement compact response
+      extract(peer, compact: 0, no_peer_id: 0)
+    end
+
+    def extract(peer, compact: 0, no_peer_id: np) when np != 0 do
+      peer |> Map.take([:ip, :port])
+    end
+
+    def extract(peer, _) do
       peer
       |> Map.take([:peer_id, :ip, :port])
       |> do_extract()

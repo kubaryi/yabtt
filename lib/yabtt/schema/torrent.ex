@@ -69,11 +69,11 @@ defmodule YaBTT.Schema.Torrent do
     @doc """
     Extracts a `YaBTT.Schema.Torrent` into a `map()`.
     """
-    @spec extract(Torrent.t()) :: map()
-    def extract(torrent) do
+    @spec extract(Torrent.t(), Response.opts()) :: map()
+    def extract(torrent, opts) do
       %{
         interval: Application.get_env(:yabtt, :interval, 3600),
-        peers: Stream.map(torrent.peers, &Response.extract/1)
+        peers: Stream.map(torrent.peers, &Response.extract(&1, opts))
       }
     end
   end

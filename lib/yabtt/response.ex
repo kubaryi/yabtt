@@ -26,11 +26,12 @@ defprotocol YaBTT.Response do
 
   alias YaBTT.Schema.{Torrent, Peer}
 
-  @type t :: Torrent.t() | Peer.t()
+  @type data :: Torrent.t() | Peer.t()
+  @type opts :: [compact: 0 | 1, no_peer_id: 0 | 1]
 
   @doc """
   Extracts the `YaBBT.Schema.Torrent` or `YaBTT.Schema.Peer` into a `map()`.
   """
-  @spec extract(t()) :: map()
-  def extract(data)
+  @spec extract(data(), opts()) :: map()
+  def extract(data, opts \\ [compact: 0, no_peer_id: 0])
 end
