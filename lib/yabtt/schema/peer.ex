@@ -83,36 +83,39 @@ defmodule YaBTT.Schema.Peer do
     |> (&put_change(changeset, :ip, &1)).()
   end
 
-  defimpl Bento.Encoder do
+  defimpl YaBTT.Response do
     @moduledoc """
-    Implements the `Bento.Encoder` protocol for `YaBTT.Schema.Peer`.
+    Implements the `YaBTT.Response` protocol for `YaBTT.Schema.Peer`.
     """
 
-    use Bento.Encode
-
-    alias YaBTT.Schema.Peer
-    alias Bento.Encoder
+    alias YaBTT.{Schema.Peer, Response}
 
     @doc """
-    To encode a peer, we take the `peer_id`, `ip`, and `port` into a map and
-    encode it by calling `Bento.Encoder.encode/1` on the map.
-
-    ## Examples
-
-        iex> alias YaBTT.Schema.Peer
-        iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "1.2.3.5"}
-        iex> Bento.Encoder.encode(peer) |> IO.iodata_to_binary()
-        "d2:ip7:1.2.3.57:peer id20:-TR142767758880845984:porti6881ee"
+    Extracts the `peer_id`, `ip`, and `port` from a peer and returns a map
+    with the keys as strings.
     """
-    @spec encode(Peer.t()) :: Encoder.t()
-    def encode(%{id: _} = peer) do
-      peer
-      |> Map.take([:peer_id, :ip, :port])
-      |> do_encode()
-      |> Encoder.encode()
+    @spec extract(Peer.t(), Response.opts()) :: map() | binary()
+    def extract(peer, compact: c, no_peer_id: np) when c != 0 do
+      with {:ok, ip} <- :inet.parse_address(to_charlist(peer.ip)),
+           true <- :inet.is_ipv4_address(ip) do
+        (Tuple.to_list(ip) |> :erlang.list_to_binary()) <> <<peer.port::16>>
+      else
+        _ -> extract(peer, compact: 0, no_peer_id: np)
+      end
     end
 
-    defp do_encode(map_with_atom_keys) do
+    def extract(peer, compact: 0, no_peer_id: np) when np != 0 do
+      peer |> Map.take([:ip, :port])
+    end
+
+    def extract(peer, _) do
+      peer
+      |> Map.take([:peer_id, :ip, :port])
+      |> do_extract()
+    end
+
+    @spec do_extract(map()) :: map()
+    defp do_extract(map_with_atom_keys) do
       for {k, v} <- map_with_atom_keys, into: %{} do
         {Atom.to_string(k) |> String.replace("_", " "), v}
       end

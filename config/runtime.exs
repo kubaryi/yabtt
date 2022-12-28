@@ -10,7 +10,9 @@ config :yabtt,
   # recommend you to set it smaller, like 30. Because this value is
   # important to performance. Practice tells us that even 30 peers is plenty.
   # See: https://wiki.theory.org/BitTorrentSpecification#Tracker_Response
-  query_limit: get_env("YABTT_QUERY_LIMIT", "50") |> to_integer()
+  query_limit: get_env("YABTT_QUERY_LIMIT", "50") |> to_integer(),
+  # Force the use of "compact mode", default to false.
+  compact_only: get_env("YABTT_COMPACT_ONLY", "false") |> downcase() |> to_existing_atom()
 
 config :logger,
   # Set the log level, default to :info.

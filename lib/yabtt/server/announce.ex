@@ -42,10 +42,7 @@ defmodule YaBTT.Server.Announce do
   """
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
-    resp_msg =
-      with {:ok, m} <- YaBTT.insert_or_update(conn) do
-        YaBTT.query(m.torrent)
-      end
+    resp_msg = YaBTT.insert_or_update(conn) |> YaBTT.query()
 
     conn
     |> put_resp_content_type("plain/text")
@@ -53,11 +50,7 @@ defmodule YaBTT.Server.Announce do
     |> send_resp()
   end
 
-  @type resp_msg :: {:ok, Bento.Encoder.t()} | resp_err() | any()
-  @type resp_err ::
-          :error
-          | {:error, Ecto.Changeset.t()}
-          | {:error, Ecto.Multi.name(), Ecto.Changeset.t(), Ecto.Multi.t()}
+  @type resp_msg :: YaBTT.t(Bento.Encoder.t()) | :error
 
   @doc """
   Bind the response message to the connection struct. All the message will be encoded as

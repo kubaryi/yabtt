@@ -13,12 +13,11 @@ defmodule YaBTT do
 
   alias YaBTT.Schema.{Peer, Torrent, Params, Connection}
 
-  @type info_hash :: binary()
-  @type peer_id :: binary()
-  @type params :: map()
-
-  @typep changeset_t :: Ecto.Changeset.t()
-  @typep multi_name :: Ecto.Multi.name()
+  @type errors ::
+          {:error, Ecto.Multi.name(), Ecto.Changeset.t(), Ecto.Multi.t()}
+          | {:error, Ecto.Changeset.t()}
+  @type t(res) :: {:ok, res} | errors()
+  @type t :: t(map())
 
   @doc """
   A transaction that inserts or updates a torrent and a peer.
@@ -51,10 +50,7 @@ defmodule YaBTT do
       iex> conn = %Plug.Conn{params: params, remote_ip: {127, 0, 0, 1}}
       iex> YaBTT.insert_or_update(conn)
   """
-  @spec insert_or_update(Plug.Conn.t()) ::
-          {:ok, map()}
-          | {:error, changeset_t()}
-          | {:error, multi_name(), changeset_t(), Ecto.Multi.t()}
+  @spec insert_or_update(Plug.Conn.t()) :: t()
   def(insert_or_update(conn)) do
     import YaBTT.Repo, only: [get_by: 2, transaction: 1]
 
@@ -86,7 +82,7 @@ defmodule YaBTT do
 
   Practice tells us that even 30 peers is plenty.
 
-  > #### Implementer's Note {: .neutral}
+  > #### Implementer's Note {: .info}
   >
   > Even 30 peers is **plenty**, the official client version 3 in fact only actively
   > forms new connections if it has less than 30 peers and will refuse connections if it has 55.
@@ -100,28 +96,43 @@ defmodule YaBTT do
 
   As required by the [specification], the queried peers will be **random**.
 
+  ## Parameters
+
+  - `transaction`: the result of transactions
+
   ## Examples
 
       iex> torrent = %YaBTT.Schema.Torrent{id: 1}
-      iex> YaBTT.query(torrent)
+      iex> opts = %{compact: 0, no_peer_id: 0}
+      iex> YaBTT.query({:ok, %{torrent: torrent, params: opts}})
 
       iex> torrent = %YaBTT.Schema.Torrent{id: 10000}
-      iex> YaBTT.query(torrent)
+      iex> opts = %{compact: 1, no_peer_id: 1}
+      iex> YaBTT.query({:ok, %{torrent: torrent, params: opts}})
+
+      iex> YaBTT.query({:error, :multi_name, %{}, %{}})
+
+      iex> YaBTT.query({:error, %{}})
 
   <!-- links -->
 
   [specification]: https://wiki.theory.org/BitTorrentSpecification#Tracker_Response
   """
-  @spec query(Torrent.t()) :: {:ok, Torrent.t()} | :error
-  def query(torrent) when is_struct(torrent, Torrent) do
+  @spec query(t()) :: t()
+  def query({:ok, %{torrent: torrent, params: %{compact: c, no_peer_id: np}}}) do
+    alias YaBTT.{Repo, Response}
     import Ecto.Query
 
     query_limit = Application.get_env(:yabtt, :query_limit, 50)
     query = from(p in Peer, order_by: fragment("RANDOM()"), limit: ^query_limit)
 
-    case YaBTT.Repo.preload(torrent, peers: query) do
+    with %{peers: _} = torrent <- Repo.preload(torrent, peers: query) do
+      {:ok, Response.extract(torrent, compact: c, no_peer_id: np)}
+    else
       nil -> :error
-      torrent -> {:ok, torrent}
     end
   end
+
+  def query({:error, _, _, _} = error), do: error
+  def query({:error, _} = error), do: error
 end
