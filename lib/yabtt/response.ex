@@ -46,9 +46,10 @@ defprotocol YaBTT.Response do
 
   ## Options
 
-    * `compact` - If `1`, the `peers` key will be a binary string of the peers.
-      and this option will cover the `no_peer_id` option.
-    * `no_peer_id` - If `1`, the `peer id` key will not be included in the response.
+    * `compact` - Setting this to 1 indicates that the client accepts a compact response.
+      The peers list is replaced by a peers string with 6 bytes per peer.
+    * `no_peer_id` - Indicates that the tracker can omit peer id field in peers dictionary.
+      This option is ignored if compact is enabled.
     * otherwise - The `peer id` key will be included in the response.
 
   > #### Warning {: .warning}
