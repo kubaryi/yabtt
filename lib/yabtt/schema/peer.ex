@@ -93,18 +93,6 @@ defmodule YaBTT.Schema.Peer do
     @doc """
     Extracts the `peer_id`, `ip`, and `port` from a peer and returns a map
     with the keys as strings.
-
-    ## Examples
-
-      iex> alias YaBTT.Schema.Peer
-      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 2001, ip: "192.168.24.52"}
-      iex> YaBTT.Response.extract(peer, compact: 1, no_peer_id: 1)
-      <<192, 168, 24, 52, 7, 209>>
-
-      iex> alias YaBTT.Schema.Peer
-      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "1.2.3.4"}
-      iex> YaBTT.Response.extract(peer, compact: 0, no_peer_id: 1)
-      %{ip: "1.2.3.4", port: 6881}
     """
     @spec extract(Peer.t(), Response.opts()) :: map() | binary()
     def extract(peer, compact: c, no_peer_id: _) when c != 0 do

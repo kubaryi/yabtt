@@ -30,7 +30,42 @@ defprotocol YaBTT.Response do
   @type opts :: [compact: 0 | 1, no_peer_id: 0 | 1]
 
   @doc """
-  Extracts the `YaBBT.Schema.Torrent` or `YaBTT.Schema.Peer` into a `map()`.
+  Extracts the `YaBTT.Schema.Torrent` or `YaBTT.Schema.Peer` into a `map()`.
+
+  We have implemented the [BitTorrent Tracker Protocol Extensions][protocol_extensions].
+  That means that we can control the return of peer through the options `compact` and
+  `no_peer_id`.
+
+  You can see the [specific meaning](#options) and [practical examples](#examples)
+  of the options below.
+
+  ## Parameters
+
+    * `data` - The `YaBTT.Schema.Torrent` or `YaBTT.Schema.Peer` to extract.
+    * `opts` - The [options](#options) to use when extracting the data.
+
+  ## Options
+
+    * `compact` - If `1`, the `peers` key will be a binary string of the peers.
+      and this option will cover the `no_peer_id` option.
+    * `no_peer_id` - If `1`, the `peer id` key will not be included in the response.
+    * otherwise - The `peer id` key will be included in the response.
+
+  ## Examples
+
+      iex> alias YaBTT.Schema.Peer
+      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 2001, ip: "192.168.24.52"}
+      iex> YaBTT.Response.extract(peer, compact: 1, no_peer_id: 1)
+      <<192, 168, 24, 52, 7, 209>>
+
+      iex> alias YaBTT.Schema.Peer
+      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "1.2.3.4"}
+      iex> YaBTT.Response.extract(peer, compact: 0, no_peer_id: 1)
+      %{ip: "1.2.3.4", port: 6881}
+
+  <!-- Links -->
+
+  [protocol_extensions]: https://wiki.theory.org/BitTorrentTrackerExtensions
   """
   @spec extract(data(), opts()) :: map() | binary()
   def extract(data, opts \\ [compact: 0, no_peer_id: 0])
