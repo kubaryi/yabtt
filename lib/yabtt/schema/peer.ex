@@ -95,11 +95,12 @@ defmodule YaBTT.Schema.Peer do
     with the keys as strings.
     """
     @spec extract(Peer.t(), Response.opts()) :: map() | binary()
-    def extract(peer, compact: c, no_peer_id: _) when c != 0 do
-      with {:ok, ip} <- :inet.parse_address(to_charlist(peer.ip)) do
+    def extract(peer, compact: c, no_peer_id: np) when c != 0 do
+      with {:ok, ip} <- :inet.parse_address(to_charlist(peer.ip)),
+           true <- :inet.is_ipv4_address(ip) do
         (Tuple.to_list(ip) |> :erlang.list_to_binary()) <> <<peer.port::16>>
       else
-        _ -> peer |> Map.take([:ip, :port])
+        _ -> extract(peer, compact: 0, no_peer_id: np)
       end
     end
 

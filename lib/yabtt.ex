@@ -82,7 +82,7 @@ defmodule YaBTT do
 
   Practice tells us that even 30 peers is plenty.
 
-  > #### Implementer's Note {: .neutral}
+  > #### Implementer's Note {: .info}
   >
   > Even 30 peers is **plenty**, the official client version 3 in fact only actively
   > forms new connections if it has less than 30 peers and will refuse connections if it has 55.

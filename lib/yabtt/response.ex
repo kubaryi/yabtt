@@ -51,6 +51,16 @@ defprotocol YaBTT.Response do
     * `no_peer_id` - If `1`, the `peer id` key will not be included in the response.
     * otherwise - The `peer id` key will be included in the response.
 
+  > #### Warning {: .warning}
+  >
+  > The compact mode can't work with **IPv6 addresses**.
+  >
+  > If the Client sends a request with `compact == 1` and the IP address of the peer
+  > is an IPv6 address, we will handle according with actual situation:
+  >
+  > * If the `no_peer_id == 1`, we will degenerate to "no_peer_id mode".
+  > * Otherwise, we will return the full peer information.
+
   ## Examples
 
       iex> alias YaBTT.Schema.Peer
@@ -62,6 +72,16 @@ defprotocol YaBTT.Response do
       iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "1.2.3.4"}
       iex> YaBTT.Response.extract(peer, compact: 0, no_peer_id: 1)
       %{ip: "1.2.3.4", port: 6881}
+
+      iex> alias YaBTT.Schema.Peer
+      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "2607:f0d0:1002:51::4"}
+      iex> YaBTT.Response.extract(peer, compact: 1, no_peer_id: 1)
+      %{ip: "2607:f0d0:1002:51::4", port: 6881}
+
+      iex> alias YaBTT.Schema.Peer
+      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "2607:f0d0:1002:51::4"}
+      iex> YaBTT.Response.extract(peer, compact: 1, no_peer_id: 0)
+      %{"ip" => "2607:f0d0:1002:51::4", "peer id" => "-TR14276775888084598", "port" => 6881}
 
   <!-- Links -->
 
