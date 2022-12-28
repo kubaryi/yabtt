@@ -13,6 +13,9 @@ defmodule YaBTT.Schema.Params do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @required_keys [:info_hash, :peer_id, :port, :uploaded, :downloaded, :left]
+  @permitted_keys [:ip, :event, :compact, :no_peer_id | @required_keys]
+
   @primary_key false
   embedded_schema do
     field(:info_hash, :binary)
@@ -23,6 +26,8 @@ defmodule YaBTT.Schema.Params do
     field(:downloaded, :integer)
     field(:left, :integer)
     field(:event, :binary)
+    field(:compact, :integer, default: 0)
+    field(:no_peer_id, :integer, default: 0)
   end
 
   @type t :: %__MODULE__{}
@@ -58,8 +63,8 @@ defmodule YaBTT.Schema.Params do
   @spec changeset(changeset_t() | t(), params()) :: changeset_t()
   def changeset(struct, params) do
     struct
-    |> cast(params, [:info_hash, :peer_id, :ip, :port, :uploaded, :downloaded, :left, :event])
-    |> validate_required([:info_hash, :peer_id, :port, :uploaded, :downloaded, :left])
+    |> cast(params, @permitted_keys)
+    |> validate_required(@required_keys)
   end
 
   @doc """
