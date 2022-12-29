@@ -19,7 +19,7 @@ jobs:
         id: qemu
         uses: docker/setup-qemu-action@v2
         with:
-          platforms: 386,amd64,arm32v7,arm64,ppc64le,s390x
+          platforms: amd64,arm32v7,arm64v8,i386,s390x,ppc64le
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Extract the Docker Metadata
