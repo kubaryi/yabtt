@@ -68,17 +68,17 @@ defmodule YaBTT.Server.Announce do
       iex> YaBTT.Server.Announce.put_resp_msg(conn, msg)
 
       iex> conn = %Plug.Conn{}
-      iex> msg = {:error, %Ecto.Changeset{errors: [ip: {"can't be blank", [validation: :required]}]}}
+      iex> msg = {:error, YaBTT.Schema.Torrent.changeset(%YaBTT.Schema.Torrent{}, %{})}
       iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, msg)
       iex> conn.resp_body
-      "d14:failure reasonll2:ipl14:can't be blankll10:validation8:requiredeeeeee"
+      "d14:failure reasond9:info_hashl14:can't be blankeee"
 
       iex> conn = %Plug.Conn{}
-      iex> changeset = %Ecto.Changeset{errors: [ip: {"can't be blank", [validation: :required]}]}
+      iex> changeset = YaBTT.Schema.Torrent.changeset(%YaBTT.Schema.Torrent{}, %{})
       iex> msg = {:error, :multi_error, changeset, %Ecto.Multi{}}
       iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, msg)
       iex> conn.resp_body
-      "d14:failure reasonll2:ipl14:can't be blankll10:validation8:requiredeeeeee"
+      "d14:failure reasond9:info_hashl14:can't be blankeee"
 
       iex> conn = %Plug.Conn{}
       iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, :error)
@@ -94,10 +94,17 @@ defmodule YaBTT.Server.Announce do
   end
 
   def put_resp_msg(conn, {:error, changeset}) do
+    changeset
+    |> Ecto.Changeset.traverse_errors(fn {msg, opts} ->
+      Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
+        opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
+      end)
+    end)
+    |> (&%{"failure reason" => &1}).()
     # The `Bento.encode/2` has a bug that it will raise an exception when the
-    # input is a map. So we have to use `Bento.Encoder.encode/` instead.
+    # input is a map. So we have to use `Bento.Encoder.encode/1` instead.
     # See: https://github.com/folz/bento/pull/13
-    Bento.Encoder.encode(%{"failure reason" => changeset.errors})
+    |> Bento.Encoder.encode()
     |> IO.iodata_to_binary()
     |> (&resp(conn, 400, &1)).()
   end
