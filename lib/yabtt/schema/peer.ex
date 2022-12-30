@@ -31,7 +31,7 @@ defmodule YaBTT.Schema.Peer do
   @primary_key {:id, :id, autogenerate: true}
   schema "peers" do
     field(:peer_id, :binary_id)
-    field(:ip, :binary)
+    field(:ip, YaBTT.Types.IPAddress)
     field(:port, :integer)
     many_to_many(:torrents, Torrent, join_through: Connection)
 
@@ -58,11 +58,11 @@ defmodule YaBTT.Schema.Peer do
       iex> alias YaBTT.Schema.Peer
       iex> params = %{"peer_id" => "-TR14276775888084598", "port" => "6881", "ip" => "1.2.3.5"}
       iex> Peer.changeset(%Peer{}, params, {1, 2, 3, 4})
-      #Ecto.Changeset<action: nil, changes: %{ip: \"1.2.3.5\", peer_id: \"-TR14276775888084598\", port: 6881}, errors: [], data: #YaBTT.Schema.Peer<>, valid?: true>
+      #Ecto.Changeset<action: nil, changes: %{ip: {1, 2, 3, 5}, peer_id: \"-TR14276775888084598\", port: 6881}, errors: [], data: #YaBTT.Schema.Peer<>, valid?: true>
 
       iex> alias YaBTT.Schema.Peer
       iex> Peer.changeset(%Peer{}, %{}, {1, 2, 3, 4})
-      #Ecto.Changeset<action: nil, changes: %{ip: \"1.2.3.4\"}, errors: [peer_id: {\"can't be blank\", [validation: :required]}, port: {\"can't be blank\", [validation: :required]}], data: #YaBTT.Schema.Peer<>, valid?: false>
+      #Ecto.Changeset<action: nil, changes: %{ip: {1, 2, 3, 4}}, errors: [peer_id: {\"can't be blank\", [validation: :required]}, port: {\"can't be blank\", [validation: :required]}], data: #YaBTT.Schema.Peer<>, valid?: false>
   """
   @spec changeset(changeset_t() | t(), params(), ip_addr()) :: changeset_t()
   def changeset(peer, params, ip) do
@@ -74,13 +74,10 @@ defmodule YaBTT.Schema.Peer do
 
   @spec handle_ip(changeset_t(), ip_addr()) :: changeset_t()
   defp handle_ip(changeset, remote_ip) do
-    with {:ok, ip} <- fetch_change(changeset, :ip),
-         {:ok, ip} <- :inet.parse_address(to_charlist(ip)) do
-      ip |> :inet.ntoa() |> to_string()
-    else
-      _ -> remote_ip |> :inet.ntoa() |> to_string()
+    case fetch_change(changeset, :ip) do
+      {:ok, ip} -> put_change(changeset, :ip, ip)
+      _ -> put_change(changeset, :ip, remote_ip)
     end
-    |> (&put_change(changeset, :ip, &1)).()
   end
 
   defimpl YaBTT.Response do
@@ -96,29 +93,26 @@ defmodule YaBTT.Schema.Peer do
     """
     @spec extract(Peer.t(), Response.opts()) :: map() | binary()
     def extract(peer, compact: c, no_peer_id: np) when c != 0 do
-      with {:ok, ip} <- :inet.parse_address(to_charlist(peer.ip)),
-           true <- :inet.is_ipv4_address(ip) do
-        (Tuple.to_list(ip) |> :erlang.list_to_binary()) <> <<peer.port::16>>
+      with {a, b, c, d} <- peer.ip do
+        <<a::8, b::8, c::8, d::8>> <> <<peer.port::16>>
       else
         _ -> extract(peer, compact: 0, no_peer_id: np)
       end
     end
 
     def extract(peer, compact: 0, no_peer_id: np) when np != 0 do
-      peer |> Map.take([:ip, :port])
+      %{
+        "ip" => :inet.ntoa(peer.ip) |> to_string(),
+        "port" => peer.port
+      }
     end
 
     def extract(peer, _) do
-      peer
-      |> Map.take([:peer_id, :ip, :port])
-      |> do_extract()
-    end
-
-    @spec do_extract(map()) :: map()
-    defp do_extract(map_with_atom_keys) do
-      for {k, v} <- map_with_atom_keys, into: %{} do
-        {Atom.to_string(k) |> String.replace("_", " "), v}
-      end
+      %{
+        "peer id" => peer.peer_id,
+        "ip" => :inet.ntoa(peer.ip) |> to_string(),
+        "port" => peer.port
+      }
     end
   end
 end
