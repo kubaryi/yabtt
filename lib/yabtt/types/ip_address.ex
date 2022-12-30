@@ -75,7 +75,7 @@ defmodule YaBTT.Types.IPAddress do
       iex> YaBTT.Types.IPAddress.load(<<127, 0, 0, 1>>)
       {:ok, {127, 0, 0, 1}}
 
-      iex> YaBTT.Types.IPAddress.load("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x01")
+      iex> YaBTT.Types.IPAddress.load(<<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>)
       {:ok, {0, 0, 0, 0, 0, 0, 0, 1}}
 
       iex> YaBTT.Types.IPAddress.load("abc")
@@ -108,7 +108,7 @@ defmodule YaBTT.Types.IPAddress do
       {:ok, <<127, 0, 0, 1>>}
 
       iex> YaBTT.Types.IPAddress.dump({0, 0, 0, 0, 0, 0, 0, 1})
-      {:ok, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x01"}
+      {:ok, <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>}
 
       iex> YaBTT.Types.IPAddress.dump({"a", "b", "c"})
       :error

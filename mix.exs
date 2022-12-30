@@ -64,11 +64,15 @@ defmodule YaBTT.MixProject do
       groups_for_modules: [
         # YaBTT,
         # YaBTT.Repo,
+        # YaBTT.Resource,
         "Schema for Database": [
           YaBTT.Schema.Connection,
           YaBTT.Schema.Params,
           YaBTT.Schema.Peer,
           YaBTT.Schema.Torrent
+        ],
+        "Database Types": [
+          YaBTT.Types.IPAddress
         ],
         "HTTP routing": [
           YaBTT.Server.Router,
