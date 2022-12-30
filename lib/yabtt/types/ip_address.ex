@@ -6,6 +6,7 @@ defmodule YaBTT.Types.IPAddress do
   use Ecto.Type
 
   @type ip_addr :: :inet.ip_address()
+  @type io_ip_addr :: <<_::8>> | <<_::16>>
 
   @doc """
   Returns the underlying schema type for the custom type.
@@ -71,11 +72,23 @@ defmodule YaBTT.Types.IPAddress do
 
   ## Examples
 
-      iex> YaBTT.Types.IPAddress.load("127.0.0.1")
+      iex> YaBTT.Types.IPAddress.load(<<127, 0, 0, 1>>)
       {:ok, {127, 0, 0, 1}}
+
+      iex> YaBTT.Types.IPAddress.load("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x01")
+      {:ok, {0, 0, 0, 0, 0, 0, 0, 1}}
+
+      iex> YaBTT.Types.IPAddress.load("abc")
+      :error
   """
-  @spec load(binary()) :: :error | {:ok, ip_addr()}
-  def load(ip), do: cast(ip)
+  @spec load(io_ip_addr()) :: :error | {:ok, ip_addr()}
+  def load(<<a::8, b::8, c::8, d::8>>), do: {:ok, {a, b, c, d}}
+
+  def load(<<a::16, b::16, c::16, d::16, e::16, f::16, g::16, h::16>>) do
+    {:ok, {a, b, c, d, e, f, g, h}}
+  end
+
+  def load(_), do: :error
 
   @doc """
   Dumps the IP address to the database.
@@ -92,19 +105,20 @@ defmodule YaBTT.Types.IPAddress do
   ## Examples
 
       iex> YaBTT.Types.IPAddress.dump({127, 0, 0, 1})
-      {:ok, "127.0.0.1"}
+      {:ok, <<127, 0, 0, 1>>}
 
       iex> YaBTT.Types.IPAddress.dump({0, 0, 0, 0, 0, 0, 0, 1})
-      {:ok, "::1"}
+      {:ok, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x01"}
 
-      iex> YaBTT.Types.IPAddress.dump("abc")
+      iex> YaBTT.Types.IPAddress.dump({"a", "b", "c"})
       :error
   """
-  @spec dump(ip_addr()) :: :error | {:ok, binary()}
-  def dump({_, _, _, _} = ipv4), do: {:ok, do_dump(ipv4)}
-  def dump({_, _, _, _, _, _, _, _} = ipv6), do: {:ok, do_dump(ipv6)}
-  def dump(_), do: :error
+  @spec dump(ip_addr()) :: :error | {:ok, io_ip_addr()}
+  def dump({a, b, c, d}), do: {:ok, <<a::8, b::8, c::8, d::8>>}
 
-  @spec do_dump(ip_addr()) :: binary()
-  defp do_dump(ip), do: :inet.ntoa(ip) |> :erlang.list_to_bitstring()
+  def dump({a, b, c, d, e, f, g, h}) do
+    {:ok, <<a::16, b::16, c::16, d::16, e::16, f::16, g::16, h::16>>}
+  end
+
+  def dump(_), do: :error
 end
