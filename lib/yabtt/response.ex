@@ -11,15 +11,15 @@ defprotocol YaBTT.Response do
   ## Examples
 
       iex> alias YaBTT.Schema.{Torrent, Peer}
-      iex> torrent = %Torrent{id: 1, peers: [%Peer{id: 1}]}
+      iex> torrent = %Torrent{id: 1, peers: [%Peer{id: 1, ip: {1, 2, 3, 4}}]}
       iex> resp = YaBTT.Response.extract(torrent)
       iex> resp.peers |> Enum.to_list()
-      [%{"ip" => nil, "peer id" => nil, "port" => nil}]
+      [%{"ip" => "1.2.3.4", "peer id" => nil, "port" => nil}]
       iex> resp.interval
       3600
 
       iex> alias YaBTT.Schema.Peer
-      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "1.2.3.4"}
+      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: {1, 2, 3, 4}}
       iex> YaBTT.Response.extract(peer)
       %{"ip" => "1.2.3.4", "peer id" => "-TR14276775888084598", "port" => 6881}
   """
@@ -65,22 +65,22 @@ defprotocol YaBTT.Response do
   ## Examples
 
       iex> alias YaBTT.Schema.Peer
-      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 2001, ip: "192.168.24.52"}
+      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 2001, ip: {192, 168, 24, 52}}
       iex> YaBTT.Response.extract(peer, compact: 1, no_peer_id: 1)
       <<192, 168, 24, 52, 7, 209>>
 
       iex> alias YaBTT.Schema.Peer
-      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "1.2.3.4"}
+      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: {1, 2, 3, 4}}
       iex> YaBTT.Response.extract(peer, compact: 0, no_peer_id: 1)
-      %{ip: "1.2.3.4", port: 6881}
+      %{"ip" => "1.2.3.4", "port" => 6881}
 
       iex> alias YaBTT.Schema.Peer
-      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "2607:f0d0:1002:51::4"}
+      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: {9735, 61648, 4098, 81, 0, 0, 0, 4}}
       iex> YaBTT.Response.extract(peer, compact: 1, no_peer_id: 1)
-      %{ip: "2607:f0d0:1002:51::4", port: 6881}
+      %{"ip" => "2607:f0d0:1002:51::4", "port" => 6881}
 
       iex> alias YaBTT.Schema.Peer
-      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: "2607:f0d0:1002:51::4"}
+      iex> peer = %Peer{peer_id: "-TR14276775888084598", port: 6881, ip: {9735, 61648, 4098, 81, 0, 0, 0, 4}}
       iex> YaBTT.Response.extract(peer, compact: 1, no_peer_id: 0)
       %{"ip" => "2607:f0d0:1002:51::4", "peer id" => "-TR14276775888084598", "port" => 6881}
 
