@@ -3,7 +3,7 @@ defmodule YaBTT.MixProject do
 
   @source_url "https://github.com/mogeko/yabtt"
   @authors ["Mogeko"]
-  @version "0.0.3"
+  @version "0.0.4"
 
   def project do
     [
