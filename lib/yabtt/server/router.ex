@@ -23,7 +23,9 @@ defmodule YaBTT.Server.Router do
   import Plug.Conn
 
   plug(Plug.Logger)
-  plug(Plug.Parsers, parsers: [:urlencoded])
+  # The `info_hash` is a urlencoded 20-byte SHA1 hash, which is not a valid UTF-8 string.
+  # See: https://wiki.theory.org/BitTorrentSpecification#Tracker_HTTP/HTTPS_Protocol
+  plug(Plug.Parsers, parsers: [:urlencoded], validate_utf8: false)
   plug(:match)
   plug(:dispatch)
 
