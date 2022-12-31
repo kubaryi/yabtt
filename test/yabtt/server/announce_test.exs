@@ -7,7 +7,8 @@ defmodule YaBTT.Server.AnnounceTest do
   alias YaBTT.Server.Announce
 
   @default_params %{
-    "info_hash" => "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e8",
+    "info_hash" =>
+      "\xf0\xa1\x5e\x27\xfa\xfb\xff\xc1\xc2\xf1\x8f\x69\xfc\xac\x2d\xfa\x46\x1f\xf4\xe8",
     "peer_id" => "-TR14276775888084598",
     "downloaded" => "0",
     "uploaded" => "0",

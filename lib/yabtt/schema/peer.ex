@@ -30,7 +30,7 @@ defmodule YaBTT.Schema.Peer do
 
   @primary_key {:id, :id, autogenerate: true}
   schema "peers" do
-    field(:peer_id, :binary_id)
+    field(:peer_id, :binary)
     field(:ip, YaBTT.Types.IPAddress)
     field(:port, :integer)
     many_to_many(:torrents, Torrent, join_through: Connection)
@@ -69,6 +69,7 @@ defmodule YaBTT.Schema.Peer do
     peer
     |> cast(params, [:peer_id, :ip, :port])
     |> validate_required([:peer_id, :port])
+    |> validate_length(:peer_id, is: 20)
     |> handle_ip(ip)
   end
 

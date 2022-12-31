@@ -45,8 +45,9 @@ defmodule YaBTT.Schema.Torrent do
   ## Examples
 
       iex> alias YaBTT.Schema.Torrent
-      iex> Torrent.changeset(%Torrent{}, %{info_hash: "info_hash"})
-      #Ecto.Changeset<action: nil, changes: %{info_hash: "info_hash"}, errors: [], data: #YaBTT.Schema.Torrent<>, valid?: true>
+      iex> Torrent.changeset(%Torrent{}, %{
+      ...>   info_hash: <<18, 52, 86, 120, 154, 188, 222, 241, 35, 69, 103, 137, 171, 205, 239, 18, 52, 86, 120, 154>>})
+      #Ecto.Changeset<action: nil, changes: %{info_hash: <<18, 52, 86, 120, 154, 188, 222, 241, 35, 69, 103, 137, 171, 205, 239, 18, 52, 86, 120, 154>>}, errors: [], data: #YaBTT.Schema.Torrent<>, valid?: true>
 
       iex> alias YaBTT.Schema.Torrent
       iex> Torrent.changeset(%Torrent{}, %{})
@@ -57,6 +58,7 @@ defmodule YaBTT.Schema.Torrent do
     torrent
     |> cast(params, [:info_hash])
     |> validate_required([:info_hash])
+    |> validate_length(:info_hash, is: 20)
   end
 
   defimpl YaBTT.Response do
