@@ -92,12 +92,12 @@ defmodule YaBTT.Schema.Peer do
     Extracts the `peer_id`, `ip`, and `port` from a peer and returns a map
     with the keys as strings.
     """
-    @spec extract(Peer.t(), Response.opts()) :: map() | binary()
-    def extract(peer, compact: c, no_peer_id: np) when c != 0 do
+    @spec extract(Peer.t(), Response.opts()) :: binary()
+    def extract(peer, compact: c, no_peer_id: _) when c != 0 do
       with {a, b, c, d} <- peer.ip do
         <<a::8, b::8, c::8, d::8>> <> <<peer.port::16>>
       else
-        _ -> extract(peer, compact: 0, no_peer_id: np)
+        _ -> <<>>
       end
     end
 
