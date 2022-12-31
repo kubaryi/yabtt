@@ -64,7 +64,9 @@ defmodule YaBTT.MixProject do
       groups_for_modules: [
         # YaBTT,
         # YaBTT.Repo,
-        # YaBTT.Resource,
+        Query: [
+          YaBTT.Query.Peers
+        ],
         "Schema for Database": [
           YaBTT.Schema.Connection,
           YaBTT.Schema.Params,
