@@ -59,6 +59,87 @@ For reference, we have designed a simple benchmark to test the main version of t
 
 You can check our report [here](https://github.com/mogeko/yabtt/tree/master/benchmark).
 
+## Examples and Screenshots
+
+### Call `/announce` with normal mode
+
+> **Note** The `info_hash` need to be encoded to [RFC1738](http://www.faqs.org/rfcs/rfc1738.html). [learn more](https://wiki.theory.org/BitTorrentSpecification#Tracker_HTTP.2FHTTPS_Protocol)
+
+```shell
+curl 'http://localhost:8080/?info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9A&peer_id=00000000000000000001&downloaded=100&uploaded=100&left=0&port=2001&event=completed'
+```
+
+Result:
+
+```plaintext
+d8:intervali3600e5:peersld2:ip7:1.2.3.37:peer id20:000000000000000000034:porti8000eed2:ip7:1.2.3.17:peer id20:000000000000000000014:porti8000eed2:ip7:1.2.3.47:peer id20:000000000000000000044:porti8000eed2:ip7:1.2.3.27:peer id20:000000000000000000024:porti8000eed2:ip7:1.2.3.57:peer id20:000000000000000000054:porti8000eeee
+```
+
+Decode to human readable result:
+
+```elixir
+%{
+  "interval" => 3600,
+  "peers" => [
+    %{"ip" => "1.2.3.3", "peer id" => "00000000000000000003", "port" => 8000},
+    %{"ip" => "1.2.3.1", "peer id" => "00000000000000000001", "port" => 8000},
+    %{"ip" => "1.2.3.4", "peer id" => "00000000000000000004", "port" => 8000},
+    %{"ip" => "1.2.3.2", "peer id" => "00000000000000000002", "port" => 8000},
+    %{"ip" => "1.2.3.5", "peer id" => "00000000000000000005", "port" => 8000}
+  ]
+}
+```
+
+### Call `/announce` with `compact=1`
+
+```shell
+curl 'http://localhost:8080/?info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9A&peer_id=00000000000000000001&downloaded=100&uploaded=100&left=0&port=2001&event=completed&compact=1'
+```
+
+Result:
+
+> **Note** The binary data contained in the result can't be encoded as UTF-8. Let's replace it with `{{peers}}`.
+
+```plaintext
+d8:intervali3600e5:peers30:{{peers}}e
+```
+
+Decode to human readable result:
+
+```elixir
+%{
+  "interval" => 3600,
+  "peers" => <<1, 2, 3, 1, 31, 64, 1, 2, 3, 3, 31, 64, 1, 2, 3, 5, 31, 64, 1, 2, 3, 2, 31, 64, 1, 2, 3, 4, 31, 64>>
+}
+```
+
+### Call `/announce` with `no_peer_id=1`
+
+```shell
+curl 'http://localhost:8080/?info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9A&peer_id=00000000000000000001&downloaded=100&uploaded=100&left=0&port=2001&event=completed&no_peer_id=1'
+```
+
+Result:
+
+```plaintext
+d8:intervali3600e5:peersld2:ip7:1.2.3.14:porti8000eed2:ip7:1.2.3.44:porti8000eed2:ip7:1.2.3.34:porti8000eed2:ip7:1.2.3.24:porti8000eed2:ip7:1.2.3.54:porti8000eeee
+```
+
+Decode to human readable result:
+
+```elixir
+%{
+  "interval" => 3600,
+  "peers" => [
+    %{"ip" => "1.2.3.1", "port" => 8000},
+    %{"ip" => "1.2.3.4", "port" => 8000},
+    %{"ip" => "1.2.3.3", "port" => 8000},
+    %{"ip" => "1.2.3.2", "port" => 8000},
+    %{"ip" => "1.2.3.5", "port" => 8000}
+  ]
+}
+```
+
 ## Build
 
 If you want to compile it yourself, you can follow this guide.
