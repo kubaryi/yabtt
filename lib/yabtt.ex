@@ -76,9 +76,10 @@ defmodule YaBTT do
   @doc """
   A query function optimized specifically for `insert_or_update/1`.
 
-  Its essence is still `query/2`, but we extract the `id` and `opts` from the
-  `transaction` result. At the same time, we wrap the result in a `{:ok, _}`
-  tuple, and propagating the error from the `transaction` result.
+  Its essence is still `query/2`, but we extract the `t:YaBTT.Query.Peers.id/0`
+  and `t:YaBTT.Query.Peers.opts/0` from the `transaction` result. At the same time,
+  we wrap the result in a `{:ok, _}` tuple, and propagating the error from
+  the `transaction` result.
 
   ## Parameters
 
@@ -89,18 +90,14 @@ defmodule YaBTT do
       iex> torrent = %YaBTT.Schema.Torrent{id: 1}
       iex> opts = %{compact: 1, no_peer_id: 1}
       iex> YaBTT.query({:ok, %{torrent: torrent, params: opts}})
-      {:ok, %{"interval" => 3600, "peers" => <<127, 0, 0, 1, 26, 225>>}}
 
       iex> torrent = %YaBTT.Schema.Torrent{id: 10000}
       iex> opts = %{compact: 0, no_peer_id: 1}
       iex> YaBTT.query({:ok, %{torrent: torrent, params: opts}})
-      {:ok, %{"interval" => 3600, "peers" => []}}
 
       iex> YaBTT.query({:error, :multi_name, %{}, %{}})
-      {:error, :multi_name, %{}, %{}}
 
       iex> YaBTT.query({:error, %{}})
-      {:error, %{}}
   """
   @spec query(t()) :: t()
   def query({:ok, %{torrent: t, params: opts}}), do: {:ok, query(t.id, opts)}
@@ -112,10 +109,11 @@ defmodule YaBTT do
   @doc """
   Re-export the `YaBTT.Query.Peers.query/2` function.
 
-  But the difference is that the `opts` parameter is a map with two keys:
+  But the difference is that the `t:opts/0` parameter is a map with two keys:
   `:compact` and `:no_peer_id`, we use `0` to represent `false` and non-zero
-  to represent `true`. The `opts` map will be converted to a list of options
-  that will be passed to the `YaBTT.Query.Peers.query/2`.
+  to represent `true`. The `t:opts/0` map will be converted to a list of
+  options (`t:YaBTT.Query.Peers.opts/0`) that will be passed to
+  the `YaBTT.Query.Peers.query/2`.
 
   Learn [how to limit the number of queries by environment variables](./YaBTT.Query.Peers.html).
 
@@ -127,13 +125,10 @@ defmodule YaBTT do
   ## Examples
 
       iex> YaBTT.query(1, %{compact: 0, no_peer_id: 0})
-      %{"interval" => 3600, "peers" => [%{"ip" => {127, 0, 0, 1}, "peer id" => "-TR14276775888084598", "port" => 6881}]}
 
       iex> YaBTT.query(1, %{compact: 0, no_peer_id: 1})
-      %{"interval" => 3600, "peers" => [%{"ip" => {127, 0, 0, 1}, "port" => 6881}]}
 
       iex> YaBTT.query(1, %{compact: 1, no_peer_id: 1})
-      %{"interval" => 3600, "peers" => <<127, 0, 0, 1, 26, 225>>}
   """
   @spec query(YaBTT.Query.id(), opts()) :: map()
   def query(id, opts) do

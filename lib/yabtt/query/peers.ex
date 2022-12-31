@@ -34,7 +34,22 @@ defmodule YaBTT.Query.Peers do
   @type id :: integer() | binary()
   @type opts :: [mode: :compact | :no_peer_id | nil]
 
-  @doc false
+  @doc """
+  Query the peers who hold the target torrent.
+
+  ## Parameters
+
+  - `id`: the id of the target torrent
+  - `opts`: the options to set the return format
+
+  ## Examples
+
+      iex> YaBTT.Query.Peers.query(1, mode: :compact)
+
+      iex> YaBTT.Query.Peers.query(1, mode: :no_peer_id)
+
+      iex> YaBTT.Query.Peers.query(1, [])
+  """
   @spec query(id(), opts()) :: [Peer.t()] | binary()
   def query(id, mode: :compact) do
     query(id, mode: :no_peer_id)
