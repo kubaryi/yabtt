@@ -41,7 +41,7 @@ defmodule YaBTT.Query do
       inner_join: t in assoc(p, :torrents),
       on: t.id == ^id,
       order_by: fragment("RANDOM()"),
-      limit: 50
+      limit: ^Application.get_env(:yabtt, :query_limit, 50)
     )
   end
 end

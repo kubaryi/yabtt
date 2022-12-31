@@ -119,20 +119,23 @@ defmodule YaBTT do
   [specification]: https://wiki.theory.org/BitTorrentSpecification#Tracker_Response
   """
   @spec query(t()) :: t()
-  def query({:ok, %{torrent: torrent, params: %{compact: c, no_peer_id: np}}}) do
-    alias YaBTT.{Repo, Response}
-    import Ecto.Query
-
-    query_limit = Application.get_env(:yabtt, :query_limit, 50)
-    query = from(p in Peer, order_by: fragment("RANDOM()"), limit: ^query_limit)
-
-    with %{peers: _} = torrent <- Repo.preload(torrent, peers: query) do
-      {:ok, Response.extract(torrent, compact: c, no_peer_id: np)}
-    else
-      nil -> :error
-    end
-  end
-
+  def query({:ok, %{torrent: t, params: opts}}), do: {:ok, query(t.id, opts)}
   def query({:error, _, _, _} = error), do: error
   def query({:error, _} = error), do: error
+
+  @type opts :: %{compact: 0 | 1, no_peer_id: 0 | 1}
+
+  @doc false
+  @spec query(YaBTT.Query.id(), opts()) :: map()
+  def query(id, opts) do
+    case opts do
+      %{compact: c} when c != 0 -> YaBTT.Query.query_peers(id, mode: :compact)
+      %{no_peer_id: np} when np != 0 -> YaBTT.Query.query_peers(id, mode: :no_peer_id)
+      %{compact: 0, no_peer_id: 0} -> YaBTT.Query.query_peers(id, [])
+    end
+    |> (&%{
+          "interval" => Application.get_env(:yabtt, :interval, 1800),
+          "peers" => &1
+        }).()
+  end
 end
