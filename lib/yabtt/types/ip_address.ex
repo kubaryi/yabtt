@@ -15,7 +15,7 @@ defmodule YaBTT.Types.IPAddress do
   def type, do: :binary
 
   @doc """
-  Casts the given value to an IP address (`ip_addr()`).
+  Casts the given value to an IP address (`t:ip_addr/0`).
 
   There are two situations where this callback is called:
 
@@ -27,7 +27,7 @@ defmodule YaBTT.Types.IPAddress do
   ## Parameters
 
     * `ip` - The IP address to cast. The Ip address could be a binary, a
-      charlist, or an `ip_addr()`.
+      charlist, or an `t:ip_addr/0`.
 
   ## Examples
 
@@ -99,8 +99,7 @@ defmodule YaBTT.Types.IPAddress do
 
   ## Parameters
 
-    * `ip` - The IP address to dump to the database. It should be an
-      `ip_addr()`.
+    * `ip` - The IP address to dump to the database. It should be an `t:ip_addr/0`.
 
   ## Examples
 

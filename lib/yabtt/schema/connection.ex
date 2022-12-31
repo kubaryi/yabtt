@@ -50,12 +50,38 @@ defmodule YaBTT.Schema.Connection do
       ...>   "left" => "0",
       ...>   "event" => "started"
       ...> }
-      iex> Connection.changeset(%Connection{}, params, {1, 1})
+      iex> changeset = Connection.changeset(%Connection{}, params, {1, 1})
+      iex> changeset.valid?
+      true
+      iex> changeset.changes
+      %{downloaded: 41421, event: "started", left: 0, peer_id: 1, torrent_id: 1, uploaded: 121}
 
       iex> alias YaBTT.Schema.Connection
       iex> params = %{"uploaded" => "121", "downloaded" => "41421", "left" => "0"}
-      iex> Connection.changeset(%Connection{}, params, {1, 1})
+      iex> changeset = Connection.changeset(%Connection{}, params, {1, 1})
+      iex> changeset.valid?
+      false
+      iex> changeset.errors
+      [event: {"can't be blank for new peers", [validation: :event]}]
 
+      iex> alias YaBTT.Schema.Connection
+      iex> params = %{
+      ...>   "uploaded" => "121",
+      ...>   "downloaded" => "41421",
+      ...>   "left" => "0",
+      ...>   "event" => "I'm not a valid event"
+      ...> }
+      iex> changeset = Connection.changeset(%Connection{}, params, {1, 1})
+      iex> changeset.valid?
+      false
+      iex> changeset.errors
+      [event: {
+        "is invalid", [
+          {:validation, :inclusion},
+          {:enum, ["started", "stopped", "completed", nil]}
+          ]
+        }
+      ]
   """
   @spec changeset(changeset_t() | t(), params(), connect()) :: changeset_t()
   def changeset(connection, params, {torrent_id, peer_id}) do
@@ -67,12 +93,14 @@ defmodule YaBTT.Schema.Connection do
     |> validate_event()
   end
 
+  @available_events ["started", "stopped", "completed", nil]
+
   @spec validate_event(changeset_t()) :: changeset_t()
   defp validate_event(changeset) do
     with {:data, nil} <- fetch_field(changeset, :event) do
       add_error(changeset, :event, "can't be blank for new peers", validation: :event)
     else
-      _ -> changeset
+      _ -> validate_inclusion(changeset, :event, @available_events)
     end
   end
 end

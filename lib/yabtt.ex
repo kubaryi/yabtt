@@ -74,27 +74,12 @@ defmodule YaBTT do
   end
 
   @doc """
-  Query the torrent and its peers.
+  A query function optimized specifically for `insert_or_update/1`.
 
-  You can use the [environment variable](./readme.html#configuration) `YABTT_QUERY_LIMIT` to
-  limit the number of peers returned per query. The value default to 50, but we recommend
-  you to set it smaller, like 30. Because this value is important to performance.
-
-  Practice tells us that even 30 peers is plenty.
-
-  > #### Implementer's Note {: .info}
-  >
-  > Even 30 peers is **plenty**, the official client version 3 in fact only actively
-  > forms new connections if it has less than 30 peers and will refuse connections if it has 55.
-  > **This value is important to performance.** When a new piece has completed download,
-  > HAVE messages (see below) will need to be sent to most active peers.
-  > As a result the cost of broadcast traffic grows in direct proportion to the number of peers. Above 25,
-  > new peers are highly unlikely to increase download speed. UI designers are strongly
-  > advised to make this obscure and hard to change as it is very rare to be useful to do so.
-  >
-  >  See: [Bittorrent Protocol Specification v1.0][specification]
-
-  As required by the [specification], the queried peers will be **random**.
+  Its essence is still `query/2`, but we extract the `t:YaBTT.Query.Peers.id/0`
+  and `t:YaBTT.Query.Peers.opts/0` from the `transaction` result. At the same time,
+  we wrap the result in a `{:ok, _}` tuple, and propagating the error from
+  the `transaction` result.
 
   ## Parameters
 
@@ -103,36 +88,58 @@ defmodule YaBTT do
   ## Examples
 
       iex> torrent = %YaBTT.Schema.Torrent{id: 1}
-      iex> opts = %{compact: 0, no_peer_id: 0}
+      iex> opts = %{compact: 1, no_peer_id: 1}
       iex> YaBTT.query({:ok, %{torrent: torrent, params: opts}})
 
       iex> torrent = %YaBTT.Schema.Torrent{id: 10000}
-      iex> opts = %{compact: 1, no_peer_id: 1}
+      iex> opts = %{compact: 0, no_peer_id: 1}
       iex> YaBTT.query({:ok, %{torrent: torrent, params: opts}})
 
       iex> YaBTT.query({:error, :multi_name, %{}, %{}})
 
       iex> YaBTT.query({:error, %{}})
-
-  <!-- links -->
-
-  [specification]: https://wiki.theory.org/BitTorrentSpecification#Tracker_Response
   """
   @spec query(t()) :: t()
-  def query({:ok, %{torrent: torrent, params: %{compact: c, no_peer_id: np}}}) do
-    alias YaBTT.{Repo, Response}
-    import Ecto.Query
-
-    query_limit = Application.get_env(:yabtt, :query_limit, 50)
-    query = from(p in Peer, order_by: fragment("RANDOM()"), limit: ^query_limit)
-
-    with %{peers: _} = torrent <- Repo.preload(torrent, peers: query) do
-      {:ok, Response.extract(torrent, compact: c, no_peer_id: np)}
-    else
-      nil -> :error
-    end
-  end
-
+  def query({:ok, %{torrent: t, params: opts}}), do: {:ok, query(t.id, opts)}
   def query({:error, _, _, _} = error), do: error
   def query({:error, _} = error), do: error
+
+  @type opts :: %{compact: 0 | 1, no_peer_id: 0 | 1}
+
+  @doc """
+  Re-export the `YaBTT.Query.Peers.query/2` function.
+
+  But the difference is that the `t:opts/0` parameter is a map with two keys:
+  `:compact` and `:no_peer_id`, we use `0` to represent `false` and non-zero
+  to represent `true`. The `t:opts/0` map will be converted to a list of
+  options (`t:YaBTT.Query.Peers.opts/0`) that will be passed to
+  the `YaBTT.Query.Peers.query/2`.
+
+  Learn [how to limit the number of queries by environment variables](./YaBTT.Query.Peers.html).
+
+  ## Parameters
+
+  - `id`: the `torrent` id
+  - `opts`: the options
+
+  ## Examples
+
+      iex> YaBTT.query(1, %{compact: 0, no_peer_id: 0})
+
+      iex> YaBTT.query(1, %{compact: 0, no_peer_id: 1})
+
+      iex> YaBTT.query(1, %{compact: 1, no_peer_id: 1})
+  """
+  @spec query(YaBTT.Query.id(), opts()) :: map()
+  def query(id, opts) do
+    case opts do
+      %{compact: c} when c != 0 -> YaBTT.Query.Peers.query(id, mode: :compact)
+      %{no_peer_id: np} when np != 0 -> YaBTT.Query.Peers.query(id, mode: :no_peer_id)
+      %{compact: 0, no_peer_id: 0} -> YaBTT.Query.Peers.query(id, [])
+    end
+    |> (&%{
+          "interval" => Application.get_env(:yabtt, :interval, 1800),
+          "peers" => &1
+        }).()
+  end
 end

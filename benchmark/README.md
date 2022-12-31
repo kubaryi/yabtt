@@ -48,50 +48,50 @@ User (100, 10000) (1000, 10000) (10000, 10000)
 
 ### Large number of BitTorrents
 
-| Name                     | Iterations per Second | Average |    Deviation |  Median |             Mode | Minimum |  Maximum | Sample size |
-| :----------------------- | --------------------: | ------: | -----------: | ------: | ---------------: | ------: | -------: | ----------: |
-| large number of users    |                420.77 | 2.38 ms | &#177;39.32% | 2.32 ms |          2.29 ms | 1.58 ms | 34.68 ms |        2102 |
-| moderate number of users |                286.17 | 3.49 ms | &#177;12.64% | 3.45 ms | 3.51 ms, 3.40 ms | 3.03 ms | 10.30 ms |        1430 |
-| small number of users    |                259.22 | 3.86 ms | &#177;11.71% | 3.80 ms |          3.86 ms | 3.46 ms | 10.26 ms |        1296 |
+| Name                     | Iterations per Second |   Average |    Deviation |    Median |                 Mode |   Minimum |     Maximum | Sample size |
+| :----------------------- | --------------------: | --------: | -----------: | --------: | -------------------: | --------: | ----------: | ----------: |
+| large number of users    |                1.53 K | 652.99 μs | &#177;33.85% | 628.70 μs | 645.40 μs, 635.70 μs | 419.50 μs |  5584.01 μs |        7617 |
+| moderate number of users |                1.50 K | 664.84 μs | &#177;37.05% | 629.50 μs |            535.00 μs | 409.90 μs |  7383.41 μs |        7480 |
+| small number of users    |                1.01 K | 991.33 μs | &#177;29.80% | 940.79 μs | 824.90 μs, 897.60 μs | 671.00 μs | 10153.44 μs |        5025 |
 
 <p align="center">
-  <img alt="ips-1" src="https://user-images.githubusercontent.com/26341224/209880942-3a9a7417-f178-4b65-b602-4e225fa1ba6a.png" />
+  <img alt="ips-1" src="https://user-images.githubusercontent.com/26341224/210154096-1596d17e-5522-4fd8-b933-cfc4e8871ec0.png" />
 </p>
 
 <p align="center">
-  <img alt="run-time-1" src="https://user-images.githubusercontent.com/26341224/209881097-791e833b-41d2-4059-8e8e-d9709497d40d.png" />
+  <img alt="run-time-1" src="https://user-images.githubusercontent.com/26341224/210154101-a9ba660d-1973-47a6-849c-099887c70f2a.png" />
 </p>
 
 ### Medium number of BitTorrents
 
-| Name                     | Iterations per Second | Average |    Deviation |  Median |                                                                   Mode | Minimum |  Maximum | Sample size |
-| :----------------------- | --------------------: | ------: | -----------: | ------: | ---------------------------------------------------------------------: | ------: | -------: | ----------: |
-| large number of users    |                373.84 | 2.67 ms | &#177;17.26% | 2.64 ms |                                                                2.68 ms | 2.26 ms | 10.50 ms |        1868 |
-| moderate number of users |                285.58 | 3.50 ms | &#177;17.36% | 3.40 ms |                                                       3.36 ms, 3.33 ms | 3.18 ms | 19.07 ms |        1427 |
-| small number of users    |                266.25 | 3.76 ms | &#177;10.83% | 3.69 ms | 3.59 ms, 3.68 ms, 3.56 ms, 3.75 ms, 3.68 ms, 3.62 ms, 3.69 ms, 3.86 ms | 3.42 ms | 10.12 ms |        1331 |
+| Name                     | Iterations per Second |   Average |    Deviation |    Median |                                       Mode |   Minimum |     Maximum | Sample size |
+| :----------------------- | --------------------: | --------: | -----------: | --------: | -----------------------------------------: | --------: | ----------: | ----------: |
+| large number of users    |                1.88 K | 531.61 μs | &#177;37.47% | 485.50 μs |                                  493.90 μs | 346.30 μs |  5613.71 μs |        9349 |
+| moderate number of users |                1.87 K | 533.89 μs | &#177;47.34% | 488.80 μs |    443 μs, 491.70 μs, 417.20 μs, 440.20 μs | 345.90 μs |  8931.21 μs |        9307 |
+| small number of users    |                1.32 K | 755.99 μs | &#177;61.85% | 706.20 μs | 634.60 μs, 702.00 μs, 832.80 μs, 691.80 μs | 518.50 μs | 33562.44 μs |        6582 |
 
 <p align="center">
-  <img alt="ips-2" src="https://user-images.githubusercontent.com/26341224/209881104-b5f0e4f9-395b-4013-a5ca-34d9a3e64234.png" />
+  <img alt="ips-2" src="https://user-images.githubusercontent.com/26341224/210154103-b17fe2cd-0edc-4203-b5b1-51c59e452a7c.png" />
 </p>
 
 <p align="center">
-  <img alt="run-time-2" src="https://user-images.githubusercontent.com/26341224/209881109-0e43e649-aea5-4e99-9765-b48a5009530e.png" />
+  <img alt="run-time-2" src="https://user-images.githubusercontent.com/26341224/210154104-b7940c6d-a47d-4d11-8e50-c21b27fa0b15.png" />
 </p>
 
 ### Small amount of BitTorrent
 
-| Name                     | Iterations per Second | Average |    Deviation |  Median |             Mode | Minimum |  Maximum | Sample size |
-| :----------------------- | --------------------: | ------: | -----------: | ------: | ---------------: | ------: | -------: | ----------: |
-| large number of users    |                302.72 | 3.30 ms | &#177;21.15% | 3.14 ms |          2.94 ms | 2.76 ms | 11.55 ms |        1513 |
-| moderate number of users |                244.74 | 4.09 ms | &#177;17.88% | 3.77 ms | 3.63 ms, 3.73 ms | 3.41 ms | 11.29 ms |        1223 |
-| small number of users    |                232.90 | 4.29 ms | &#177;14.27% | 4.06 ms |          4.02 ms | 3.75 ms | 11.66 ms |        1164 |
+| Name                     | Iterations per Second |   Average |    Deviation |    Median |                                                                                                                 Mode |   Minimum |    Maximum | Sample size |
+| :----------------------- | --------------------: | --------: | -----------: | --------: | -------------------------------------------------------------------------------------------------------------------: | --------: | ---------: | ----------: |
+| large number of users    |                1.91 K | 524.12 μs | &#177;42.72% | 480.50 μs | 445.70 μs, 502.80 μs, 491.60 μs, 489.80 μs, 449.40 μs, 368.30 μs, 498.50 μs, 447 μs, 503.10 μs, 438.20 μs, 498.70 μs | 339.50 μs | 6138.81 μs |        9480 |
+| moderate number of users |                1.83 K | 547.28 μs | &#177;52.97% | 480.50 μs |                                                                                                            483.80 μs | 345.40 μs | 6824.51 μs |        9082 |
+| small number of users    |                1.34 K | 744.98 μs | &#177;31.50% | 707.30 μs |                                                                                                            639.90 μs |    517 μs | 6809.51 μs |        6680 |
 
 <p align="center">
-  <img alt="ips-3" src="https://user-images.githubusercontent.com/26341224/209881112-49e268e0-701a-41f0-a2e9-a7901793855f.png" />
+  <img alt="ips-3" src="https://user-images.githubusercontent.com/26341224/210154105-69e20e36-5401-4e8a-8afe-04f068396ac1.png" />
 </p>
 
 <p align="center">
-  <img alt="run-time-3" src="https://user-images.githubusercontent.com/26341224/209881130-ec140571-80c6-4ef1-8e1f-427f408da8f6.png" />
+  <img alt="run-time-3" src="https://user-images.githubusercontent.com/26341224/210154097-01cbe9c5-7832-4b02-b5fb-1d712304bf6f.png" />
 </p>
 
-> **Note** This report applies to application version [0.0.2](https://github.com/mogeko/yabtt/tree/3c7d18ef2feb17a83863f05db3516a4741a43264).
+> **Note** This report applies to application version [0.0.4](https://github.com/mogeko/yabtt/tree/a69b9ef10256091b58abf17b8b0147e5cca37332).

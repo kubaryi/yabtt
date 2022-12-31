@@ -60,23 +60,4 @@ defmodule YaBTT.Schema.Torrent do
     |> validate_required([:info_hash])
     |> validate_length(:info_hash, is: 20)
   end
-
-  defimpl YaBTT.Response do
-    @moduledoc """
-    Implements the `YaBTT.Response` protocol for `YaBTT.Schema.Torrent`.
-    """
-
-    alias YaBTT.{Schema.Torrent, Response}
-
-    @doc """
-    Extracts a `YaBTT.Schema.Torrent` into a `map()`.
-    """
-    @spec extract(Torrent.t(), Response.opts()) :: map()
-    def extract(torrent, opts) do
-      %{
-        interval: Application.get_env(:yabtt, :interval, 3600),
-        peers: Stream.map(torrent.peers, &Response.extract(&1, opts))
-      }
-    end
-  end
 end

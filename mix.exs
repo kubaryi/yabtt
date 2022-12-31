@@ -3,7 +3,7 @@ defmodule YaBTT.MixProject do
 
   @source_url "https://github.com/mogeko/yabtt"
   @authors ["Mogeko"]
-  @version "0.0.3"
+  @version "0.0.4"
 
   def project do
     [
@@ -64,7 +64,9 @@ defmodule YaBTT.MixProject do
       groups_for_modules: [
         # YaBTT,
         # YaBTT.Repo,
-        # YaBTT.Resource,
+        Query: [
+          YaBTT.Query.Peers
+        ],
         "Schema for Database": [
           YaBTT.Schema.Connection,
           YaBTT.Schema.Params,

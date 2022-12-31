@@ -80,40 +80,4 @@ defmodule YaBTT.Schema.Peer do
       _ -> put_change(changeset, :ip, remote_ip)
     end
   end
-
-  defimpl YaBTT.Response do
-    @moduledoc """
-    Implements the `YaBTT.Response` protocol for `YaBTT.Schema.Peer`.
-    """
-
-    alias YaBTT.{Schema.Peer, Response}
-
-    @doc """
-    Extracts the `peer_id`, `ip`, and `port` from a peer and returns a map
-    with the keys as strings.
-    """
-    @spec extract(Peer.t(), Response.opts()) :: map() | binary()
-    def extract(peer, compact: c, no_peer_id: np) when c != 0 do
-      with {a, b, c, d} <- peer.ip do
-        <<a::8, b::8, c::8, d::8>> <> <<peer.port::16>>
-      else
-        _ -> extract(peer, compact: 0, no_peer_id: np)
-      end
-    end
-
-    def extract(peer, compact: 0, no_peer_id: np) when np != 0 do
-      %{
-        "ip" => :inet.ntoa(peer.ip) |> to_string(),
-        "port" => peer.port
-      }
-    end
-
-    def extract(peer, _) do
-      %{
-        "peer id" => peer.peer_id,
-        "ip" => :inet.ntoa(peer.ip) |> to_string(),
-        "port" => peer.port
-      }
-    end
-  end
 end
