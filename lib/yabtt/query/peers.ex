@@ -37,6 +37,30 @@ defmodule YaBTT.Query.Peers do
   @doc """
   Query the peers who hold the target torrent.
 
+  We have implemented the [BitTorrent Tracker Protocol Extensions][protocol_extensions]. That means
+  that we can use `:compact` and `:no_peer_id` for option `mode` to control the return of peer.
+
+  You can see the specific meaning and [practical examples](#examples) of the options below.
+
+  ## Mode
+
+  - `:compact`: return a binary string of peers in compact format.
+
+    In the mode, the peers list is replaced by a peers string with **6 bytes per peer**. For each peer,
+    the **first 4 bytes are the IP address and the last 2 bytes are the port number**. The length of the
+    whole peers will be a multiple of 6 (`6` × **the number of peers in peers**).
+
+    > #### Warning {: .warning}
+    >
+    > The `:compact` mode can't work with **IPv6 addresses**. If we queried an IPv6 `peer`, we will
+    > ignore those peer.
+
+  - `:no_peer_id`: return a list of peers **without** `peer id`.
+
+    This option is ignored if `:compact` mode is enabled.
+
+  - `nil`: return a list of peers with **full information** (`ip`, `port` and the `peer id`).
+
   ## Parameters
 
   - `id`: the id of the target torrent
