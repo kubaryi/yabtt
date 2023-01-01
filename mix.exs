@@ -57,9 +57,15 @@ defmodule YaBTT.MixProject do
   defp docs do
     [
       main: "readme",
+      source_ref: "master",
       source_url: @source_url,
       authors: ["Mogeko"],
-      extras: ["README.md", "LICENSE", "guides/examples-and-screenshots.cheatmd"],
+      extras: [
+        "README.md",
+        "guides/compilation-guide.md",
+        "guides/examples-and-screenshots.cheatmd",
+        "LICENSE"
+      ],
       groups_for_extras: [
         Others: ["LICENSE"]
       ],
