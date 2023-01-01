@@ -66,18 +66,11 @@ defmodule YaBTT.Schema.Peer do
   """
   @spec changeset(changeset_t() | t(), params(), ip_addr()) :: changeset_t()
   def changeset(peer, params, ip) do
+    params = Map.put_new(params, "ip", ip)
+
     peer
     |> cast(params, [:peer_id, :ip, :port])
-    |> validate_required([:peer_id, :port])
+    |> validate_required([:peer_id, :ip, :port])
     |> validate_length(:peer_id, is: 20)
-    |> handle_ip(ip)
-  end
-
-  @spec handle_ip(changeset_t(), ip_addr()) :: changeset_t()
-  defp handle_ip(changeset, remote_ip) do
-    case fetch_change(changeset, :ip) do
-      {:ok, ip} -> put_change(changeset, :ip, ip)
-      _ -> put_change(changeset, :ip, remote_ip)
-    end
   end
 end
