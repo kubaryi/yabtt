@@ -2,7 +2,6 @@ defmodule YaBTT.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/mogeko/yabtt"
-  @authors ["Mogeko"]
   @version "0.0.4"
 
   def project do
@@ -58,9 +57,12 @@ defmodule YaBTT.MixProject do
   defp docs do
     [
       main: "readme",
-      extras: ["README.md", "LICENSE"],
-      authors: @authors,
       source_url: @source_url,
+      authors: ["Mogeko"],
+      extras: ["README.md", "LICENSE", "guides/examples-and-screenshots.cheatmd"],
+      groups_for_extras: [
+        Others: ["LICENSE"]
+      ],
       groups_for_modules: [
         # YaBTT,
         # YaBTT.Repo,

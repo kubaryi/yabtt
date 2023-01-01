@@ -115,7 +115,7 @@ defmodule YaBTT do
   options (`t:YaBTT.Query.Peers.opts/0`) that will be passed to
   the `YaBTT.Query.Peers.query/2`.
 
-  Learn [how to limit the number of queries by environment variables](./YaBTT.Query.Peers.html).
+  Learn [how to limit the number of queries by environment variables](`YaBTT.Query.Peers`).
 
   ## Parameters
 
