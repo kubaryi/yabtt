@@ -1,29 +1,35 @@
-defmodule Yabtt.Types.Event do
+defmodule YaBTT.Types.Event do
   @moduledoc """
   A custom type for events.
 
-  There are three available events: "started", "stopped", and "completed".
+  There are three available events: `"started"`, `"stopped"`, and `"completed"`.
 
-  The three events are represented by the following event codes:
+  The three events will be `cast/1` to theirs atomic types: `:started`,
+  `:stopped`, and `:completed`. Then, the atomic event will be `dump/1` to
+  database with their event codes: `1`, `0`, and `-1`.
 
-  * "started" - 1
-  * "stopped" - 0
-  * "completed" - -1
+  | EVENT         | ATOMIC EVENT | EVENT CODE |
+  | ------------- | ------------ | ---------- |
+  | `"started"`   | `:started`   | `1`        |
+  | `"stopped"`   | `:stopped`   | `0`        |
+  | `"completed"` | `:completed` | `-1`       |
 
-  The event codes are stored in the database as integers.
-
-  The load process converts the event code to the event.
+  The `load/1` process converts the event code to the atomic event.
   """
 
   use Ecto.Type
 
   @typedoc """
-  The event type. The available events are "started", "stopped", and "completed".
+  The atomic event type. Available with: `:started`, `:stopped`, and `:completed`.
+
+  Learn more about [the relation between the event, atomic event, and event code](`YaBTT.Types.Event`)
   """
-  @type event :: <<_::56, _::_*16>>
+  @type event :: :started | :stopped | :completed
 
   @typedoc """
-  The event code type. The available event codes are 1, 0, and -1.
+  The event code type. Available with: -1, 0, and 1.
+
+  Learn more about [the relation between the event, atomic event, and event code](`YaBTT.Types.Event`)
   """
   @type io_event :: -1 | 0 | 1
 
@@ -36,96 +42,93 @@ defmodule Yabtt.Types.Event do
   @doc """
   Casts the given value to an event (`t:event/0`).
 
-  There are three available events: "started", "stopped", and "completed".
+  There are three available value: `"started"`, `"stopped"`, and `"completed"`.
+
+  The three values will be cast to their atomic types: `:started`, `:stopped`,
+  and `:completed`. The other values will be cast to `:error`.
 
   ## Parameters
 
-    * `event` - The event to cast. The event could be a binary(`t:event/0`).
+    * `event` - The event to cast. The event could be a binary.
 
   ## Examples
 
-      iex> Yabtt.Types.Event.cast("started")
-      {:ok, 1}
+      iex> YaBTT.Types.Event.cast("started")
+      {:ok, :started}
 
-      iex> Yabtt.Types.Event.cast("stopped")
-      {:ok, 0}
+      iex> YaBTT.Types.Event.cast("stopped")
+      {:ok, :stopped}
 
-      iex> Yabtt.Types.Event.cast("completed")
-      {:ok, -1}
+      iex> YaBTT.Types.Event.cast("completed")
+      {:ok, :completed}
 
-      iex> Yabtt.Types.Event.cast("abc")
+      iex> YaBTT.Types.Event.cast("abc")
       :error
 
-      iex> Yabtt.Types.Event.cast(:started)
+      iex> YaBTT.Types.Event.cast(:started)
       :error
   """
-  @spec cast(event()) :: :error | {:ok, io_event()}
-  def cast(event) when is_binary(event) do
-    case event do
-      "started" -> {:ok, 1}
-      "stopped" -> {:ok, 0}
-      "completed" -> {:ok, -1}
-      _ -> :error
-    end
-  end
-
+  @spec cast(binary()) :: :error | {:ok, event()}
+  def cast(event) when event == "started", do: {:ok, :started}
+  def cast(event) when event == "stopped", do: {:ok, :stopped}
+  def cast(event) when event == "completed", do: {:ok, :completed}
   def cast(_), do: :error
 
   @doc """
   Loads the given value from the database.
 
-  The value is an integer, which is the event code(`t:io_event/0`).
+  The value is an event code(`t:io_event/0`).
 
   ## Parameters
 
-    * `event` - The event code to load. The event code could be a integer(`t:io_event/0`).
+    * `event` - The event code(`t:io_event/0`) to load.
 
   ## Examples
 
-      iex> Yabtt.Types.Event.load(1)
-      {:ok, "started"}
+      iex> YaBTT.Types.Event.load(1)
+      {:ok, :started}
 
-      iex> Yabtt.Types.Event.load(0)
-      {:ok, "stopped"}
+      iex> YaBTT.Types.Event.load(0)
+      {:ok, :stopped}
 
-      iex> Yabtt.Types.Event.load(-1)
-      {:ok, "completed"}
+      iex> YaBTT.Types.Event.load(-1)
+      {:ok, :completed}
 
-      iex> Yabtt.Types.Event.load(2)
+      iex> YaBTT.Types.Event.load(2)
       :error
   """
   @spec load(io_event()) :: :error | {:ok, event()}
-  def load(1), do: {:ok, "started"}
-  def load(0), do: {:ok, "stopped"}
-  def load(-1), do: {:ok, "completed"}
+  def load(1), do: {:ok, :started}
+  def load(0), do: {:ok, :stopped}
+  def load(-1), do: {:ok, :completed}
   def load(_), do: :error
 
   @doc """
   Dumps the given value to the database.
 
-  The value is an integer, which is the event code(`t:io_event/0`).
+  The value is an atomic event(`t:event/0`).
 
   ## Parameters
 
-  * `event` - The event code to dump. The event code could be a integer(`t:io_event/0`).
+  * `event` - The atomic event(`t:event/0`) to dump.
 
   ## Examples
 
-      iex> Yabtt.Types.Event.dump(1)
+      iex> YaBTT.Types.Event.dump(:started)
       {:ok, 1}
 
-      iex> Yabtt.Types.Event.dump(0)
+      iex> YaBTT.Types.Event.dump(:stopped)
       {:ok, 0}
 
-      iex> Yabtt.Types.Event.dump(-1)
+      iex> YaBTT.Types.Event.dump(:completed)
       {:ok, -1}
 
-      iex> Yabtt.Types.Event.dump(2)
+      iex> YaBTT.Types.Event.dump(2)
       :error
   """
-  @spec dump(io_event()) :: :error | {:ok, io_event()}
-  def dump(1), do: {:ok, 1}
-  def dump(0), do: {:ok, 0}
-  def dump(-1), do: {:ok, -1}
+  @spec dump(event()) :: :error | {:ok, io_event()}
+  def dump(:started), do: {:ok, 1}
+  def dump(:stopped), do: {:ok, 0}
+  def dump(:completed), do: {:ok, -1}
   def dump(_), do: :error
 end

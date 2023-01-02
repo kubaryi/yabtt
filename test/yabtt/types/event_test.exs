@@ -1,5 +1,5 @@
-defmodule Yabtt.Types.EventTest do
+defmodule YaBTT.Types.EventTest do
   use ExUnit.Case, async: true
 
-  doctest Yabtt.Types.Event
+  doctest YaBTT.Types.Event
 end
