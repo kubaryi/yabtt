@@ -1,5 +1,36 @@
 defmodule YaBTT.Server.Scrape do
-  @moduledoc false
+  @moduledoc """
+  A `Plug` to handle route `/scrape`.
+
+  The original [BitTorrent Protocol Specification](http://www.bittorrent.org/beps/bep_0003.html) defines
+  one exchange between a client and a tracker referred to as an announce. In order to build responsive user
+  interfaces, clients desired an additional way to query metadata about swarms in bulk. The exchange that
+  fetches this metadata for the clients is referred to as a scrape.
+
+  It should be noted that scrape exchanges have no effect on a peer's participation in a swarm.
+
+  ## Scrape Request
+
+  The query string should be like:
+
+  ```plaintext
+  info_hash=Nf%22v%BA%CA%0F%DBk%D6%0Bv%17%8C%D1%19%D1%05%00%13&info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9
+  ```
+
+  Notice that the `info_hash` need to be encoded to [RFC1738](http://www.faqs.org/rfcs/rfc1738.html).
+
+  ## Scrape Response
+
+  The response to a successful request is a bencoded dictionary containing one key-value pair: the key files
+  with the value being a dictionary of the 20-byte string representation of an infohash paired with a dictionary
+  of swarm metadata. The fields found in the swarm metadata dictionary are as follows:
+
+  * `complete` - The number of active peers that have completed downloading.
+  * `incomplete` - The number of active peers that have not completed downloading.
+  * `downloaded` - The number of peers that have ever completed downloading.
+
+  Learn more about [Tracker Protocol Extension: Scrape](http://bittorrent.org/beps/bep_0048.html).
+  """
 
   @behaviour Plug
 

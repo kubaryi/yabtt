@@ -92,7 +92,8 @@ defmodule YaBTT.MixProject do
         ],
         "HTTP routing": [
           YaBTT.Server.Router,
-          YaBTT.Server.Announce
+          YaBTT.Server.Announce,
+          YaBTT.Server.Scrape
         ]
       ]
     ]
