@@ -11,6 +11,7 @@ defmodule YaBTT.MixProject do
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: test_coverage(),
       aliases: aliases(),
 
@@ -38,6 +39,9 @@ defmodule YaBTT.MixProject do
       {:plug_cowboy, "~> 2.6.0"}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp aliases do
     [
