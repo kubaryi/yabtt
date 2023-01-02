@@ -36,7 +36,8 @@ defmodule YaBTT.MixProject do
       {:ecto_sql, "~> 3.8"},
       {:ecto_sqlite3, "~> 0.8"},
       {:ex_doc, "~> 0.29", only: :dev, runtime: false},
-      {:plug_cowboy, "~> 2.6.0"}
+      {:plug_cowboy, "~> 2.6.0"},
+      {:x509, "~> 0.8", only: :dev}
     ]
   end
 
