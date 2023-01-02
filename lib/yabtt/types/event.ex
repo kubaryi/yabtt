@@ -123,7 +123,7 @@ defmodule YaBTT.Types.Event do
       iex> YaBTT.Types.Event.dump(:completed)
       {:ok, -1}
 
-      iex> YaBTT.Types.Event.dump(2)
+      iex> YaBTT.Types.Event.dump(:other)
       :error
   """
   @spec dump(event()) :: :error | {:ok, io_event()}
