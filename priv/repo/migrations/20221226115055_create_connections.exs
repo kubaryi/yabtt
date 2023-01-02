@@ -8,7 +8,7 @@ defmodule YaBTT.Repo.Migrations.CreateConnections do
       add(:downloaded, :integer)
       add(:uploaded, :integer)
       add(:left, :integer)
-      add(:event, :binary)
+      add(:event, :integer)
     end
 
     create(unique_index(:connections, [:torrent_id, :peer_id]))
