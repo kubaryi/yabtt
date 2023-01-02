@@ -101,8 +101,8 @@ defmodule YaBTT do
   """
   @spec query_peers(t()) :: t()
   def query_peers({:ok, %{torrent: t, params: opts}}), do: {:ok, query_peers(t.id, opts)}
-  def query_peers({:error, _, _, _} = error), do: error
-  def query_peers({:error, _} = error), do: error
+  def query_peers({:error, _, _, _} = multi), do: multi
+  def query_peers({:error, _} = changeset), do: changeset
 
   @type opts :: %{compact: 0 | 1, no_peer_id: 0 | 1}
 
@@ -151,7 +151,13 @@ defmodule YaBTT do
   ## Examples
 
       iex> YaBTT.query_state(["info_hash_1", "info_hash_2"])
+
+      iex> YaBTT.query_state({:ok, %{info_hash: ["info_hash_1", "info_hash_2"]}})
+
+      iex> YaBTT.query_state({:error, %{}})
   """
-  @spec query_state([State.info_hash()]) :: [State.t() | nil]
+  @spec query_state([State.info_hash()]) :: State.t()
   def query_state(info_hashs) when is_list(info_hashs), do: State.query(info_hashs)
+  def query_state({:ok, %{info_hash: info_hashs}}), do: {:ok, State.query(info_hashs)}
+  def query_state({:error, _} = changeset), do: changeset
 end

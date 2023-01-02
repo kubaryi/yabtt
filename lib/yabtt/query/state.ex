@@ -8,7 +8,7 @@ defmodule YaBTT.Query.State do
   alias YaBTT.Schema.{Connection, Torrent}
 
   @type info_hash :: binary()
-  @type t :: %{info_hash() => %{binary() => non_neg_integer()}}
+  @type t :: %{binary() => %{info_hash() => %{binary() => non_neg_integer()} | %{}}}
 
   @doc """
   Query the state with `t:info_hash/0` from the `YaBTT.Schema.Connection`.
@@ -37,6 +37,8 @@ defmodule YaBTT.Query.State do
   >
   > [More information about event](`YaBTT.Types.Event`).
 
+  Then we will return a `t:t/0` as required by the [specification][scrape_1].
+
   ## References
 
   - [Tracker Protocol Extension: Scrape][scrape_1]
@@ -52,20 +54,20 @@ defmodule YaBTT.Query.State do
   [scrape_1]: http://bittorrent.org/beps/bep_0048.html
   [scrape_2]: https://wiki.theory.org/BitTorrentSpecification#Tracker_.27scrape.27_Convention
   """
-  @spec query([info_hash()]) :: [t() | nil]
+  @spec query([info_hash()]) :: t()
   def query(info_hashs) do
     from(c in Connection)
     |> join(:inner, [c], t in Torrent, on: c.torrent_id == t.id)
     |> where([_c, t], t.info_hash in ^info_hashs)
     |> group_by([c, t], t.info_hash)
-    |> select([c, t], %{
-      t.info_hash => %{
-        # The event will store as an integer (-1, 0, or 1) in database.
-        "complete" => count(fragment("CASE WHEN left <= 0 AND event == 1 THEN 1 END")),
-        "incomplete" => count(fragment("CASE WHEN left > 0 AND event == 1 THEN 1 END")),
-        "downloaded" => count(fragment("CASE WHEN left <= 0 OR event == -1 THEN 1 END"))
-      }
-    })
+    |> select([c, t], {t.info_hash,
+     %{
+       # The event will store as an integer (-1, 0, or 1) in database.
+       "complete" => count(fragment("CASE WHEN left <= 0 AND event == 1 THEN 1 END")),
+       "incomplete" => count(fragment("CASE WHEN left > 0 AND event == 1 THEN 1 END")),
+       "downloaded" => count(fragment("CASE WHEN left <= 0 OR event == -1 THEN 1 END"))
+     }})
     |> YaBTT.Repo.all()
+    |> (&%{"files" => Map.new(&1)}).()
   end
 end
