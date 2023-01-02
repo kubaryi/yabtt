@@ -2,7 +2,7 @@ defmodule YaBTT.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/mogeko/yabtt"
-  @version "0.0.4"
+  @version "0.0.5-beta"
 
   def project do
     [
@@ -82,6 +82,7 @@ defmodule YaBTT.MixProject do
           YaBTT.Schema.Torrent
         ],
         "Database Types": [
+          YaBTT.Types.Event,
           YaBTT.Types.IPAddress
         ],
         "HTTP routing": [
