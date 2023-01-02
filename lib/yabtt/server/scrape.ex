@@ -9,12 +9,19 @@ defmodule YaBTT.Server.Scrape do
 
   It should be noted that scrape exchanges have no effect on a peer's participation in a swarm.
 
+  Learn more about [Tracker Protocol Extension: Scrape](http://bittorrent.org/beps/bep_0048.html).
+
+  ## Examples
+
+  For reference, we have prepared a [more detailed actual cases](./examples-and-screenshots.html#call-scrape-with-info_hash-list)
+  of call routing `/scrape`.
+
   ## Scrape Request
 
   The query string should be like:
 
   ```plaintext
-  info_hash=Nf%22v%BA%CA%0F%DBk%D6%0Bv%17%8C%D1%19%D1%05%00%13&info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9
+  info_hash=Nf%22v%BA%CA%0F%DBk%D6%0Bv%17%8C%D1%19%D1%05%00%13&info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9A
   ```
 
   Notice that the `info_hash` need to be encoded to [RFC1738](http://www.faqs.org/rfcs/rfc1738.html).
@@ -28,8 +35,6 @@ defmodule YaBTT.Server.Scrape do
   * `complete` - The number of active peers that have completed downloading.
   * `incomplete` - The number of active peers that have not completed downloading.
   * `downloaded` - The number of peers that have ever completed downloading.
-
-  Learn more about [Tracker Protocol Extension: Scrape](http://bittorrent.org/beps/bep_0048.html).
   """
 
   @behaviour Plug
