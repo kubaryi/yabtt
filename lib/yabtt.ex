@@ -156,7 +156,7 @@ defmodule YaBTT do
 
       iex> YaBTT.query_state({:error, %{}})
   """
-  @spec query_state([State.info_hash()]) :: State.t()
+  @spec query_state(t() | [State.info_hash()]) :: t() | State.t()
   def query_state(info_hashs) when is_list(info_hashs), do: State.query(info_hashs)
   def query_state({:ok, %{info_hash: info_hashs}}), do: {:ok, State.query(info_hashs)}
   def query_state({:error, _} = changeset), do: changeset

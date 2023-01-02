@@ -51,7 +51,7 @@ defmodule YaBTT.Server.Announce do
     |> send_resp()
   end
 
-  @type resp_msg :: YaBTT.t(Bento.Encoder.t()) | :error
+  @type resp_msg :: YaBTT.t(term()) | :error
 
   @doc """
   Bind the response message to the connection struct. All the message will be encoded as
