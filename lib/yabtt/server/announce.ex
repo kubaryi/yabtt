@@ -4,6 +4,7 @@ defmodule YaBTT.Server.Announce do
   """
 
   @behaviour Plug
+
   import Plug.Conn
 
   @doc """
