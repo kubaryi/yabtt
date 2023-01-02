@@ -8,6 +8,7 @@ defmodule YaBTT.Query.State do
   alias YaBTT.Schema.{Connection, Torrent}
 
   @type info_hash :: binary()
+  @type t :: %{info_hash() => %{binary() => non_neg_integer()}}
 
   @doc """
   Query the state with `t:info_hash/0` from the `YaBTT.Schema.Connection`.
@@ -51,7 +52,7 @@ defmodule YaBTT.Query.State do
   [scrape_1]: http://bittorrent.org/beps/bep_0048.html
   [scrape_2]: https://wiki.theory.org/BitTorrentSpecification#Tracker_.27scrape.27_Convention
   """
-  @spec query([info_hash()]) :: Ecto.Query.t()
+  @spec query([info_hash()]) :: [t() | nil]
   def query(info_hashs) do
     from(c in Connection)
     |> join(:inner, [c], t in Torrent, on: c.torrent_id == t.id)

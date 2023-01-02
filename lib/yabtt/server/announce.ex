@@ -42,7 +42,7 @@ defmodule YaBTT.Server.Announce do
   """
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
-    resp_msg = YaBTT.insert_or_update(conn) |> YaBTT.query()
+    resp_msg = YaBTT.insert_or_update(conn) |> YaBTT.query_peers()
 
     conn
     |> put_resp_content_type("plain/text")
