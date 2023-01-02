@@ -153,5 +153,5 @@ defmodule YaBTT do
       iex> YaBTT.query_state(["info_hash_1", "info_hash_2"])
   """
   @spec query_state([State.info_hash()]) :: [State.t() | nil]
-  def query_state(info_hashs), do: State.query(info_hashs)
+  def query_state(info_hashs) when is_list(info_hashs), do: State.query(info_hashs)
 end
