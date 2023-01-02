@@ -72,7 +72,7 @@ defmodule YaBTT.Schema.Params do
   defp validate_compact(changeset, params) do
     with true <- Application.get_env(:yabtt, :compact_only, false),
          {:ok, "0"} <- Map.fetch(params, "compact") do
-      add_error(changeset, :compact, "connection refused")
+      add_error(changeset, :compact, "connection refused", validation: :compact)
     else
       :error -> change(changeset, compact: 1)
       _ -> changeset

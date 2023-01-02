@@ -62,7 +62,7 @@ defmodule YaBTT.Schema.Connection do
       iex> changeset.valid?
       false
       iex> changeset.errors
-      [event: {"can't be blank for new peers", [validation: :event]}]
+      [event: {"can't be blank for new peers or you used a wrong event", [validation: :event]}]
   """
   @spec changeset(changeset_t() | t(), params(), connect()) :: changeset_t()
   def changeset(connection, params, {torrent_id, peer_id}) do
@@ -77,7 +77,8 @@ defmodule YaBTT.Schema.Connection do
   @spec validate_event(changeset_t()) :: changeset_t()
   defp validate_event(changeset) do
     with {:data, nil} <- fetch_field(changeset, :event) do
-      add_error(changeset, :event, "can't be blank for new peers", validation: :event)
+      err_msg = "can't be blank for new peers or you used a wrong event"
+      add_error(changeset, :event, err_msg, validation: :event)
     else
       _ -> changeset
     end
