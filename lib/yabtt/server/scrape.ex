@@ -6,10 +6,15 @@ defmodule YaBTT.Server.Scrape do
   import YaBTT.Server.Announce
   import Plug.Conn
 
-  @doc false
+  @doc """
+  Initializes the plug.
+  """
   @spec init(Plug.opts()) :: Plug.opts()
   def init(opts), do: opts
 
+  @doc """
+  The main entry point for the plug.
+  """
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
     res = fetch_info_hashs(conn.query_string) |> YaBTT.query_state()
@@ -23,10 +28,9 @@ defmodule YaBTT.Server.Scrape do
   @spec fetch_info_hashs(String.t()) :: [String.t()]
   defp fetch_info_hashs(call) do
     String.splitter(call, "&", trim: true)
-    |> Stream.filter(fn param -> String.length(param) == 30 end)
     |> Enum.reduce([], fn param, acc ->
       case String.split_at(param, 10) do
-        {"info_hash=", v} -> [v | acc]
+        {"info_hash=", v} -> [URI.decode(v) | acc]
         _ -> acc
       end
     end)
