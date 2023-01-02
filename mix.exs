@@ -73,6 +73,7 @@ defmodule YaBTT.MixProject do
         # YaBTT,
         # YaBTT.Repo,
         Query: [
+          YaBTT.Query.State,
           YaBTT.Query.Peers
         ],
         "Schema for Database": [
