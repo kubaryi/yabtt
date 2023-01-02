@@ -39,6 +39,7 @@ defmodule YaBTT.Server.Router do
   end
 
   forward("/announce", to: YaBTT.Server.Announce)
+  forward("/scrape", to: YaBTT.Server.Scrape)
 
   match _ do
     not_found = "d14:failure reason9:not founde"

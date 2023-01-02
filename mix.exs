@@ -2,7 +2,7 @@ defmodule YaBTT.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/mogeko/yabtt"
-  @version "0.0.5-beta"
+  @version "0.0.5"
 
   def project do
     [
@@ -11,6 +11,7 @@ defmodule YaBTT.MixProject do
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: test_coverage(),
       aliases: aliases(),
 
@@ -39,6 +40,9 @@ defmodule YaBTT.MixProject do
     ]
   end
 
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
   defp aliases do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate"],
@@ -49,7 +53,7 @@ defmodule YaBTT.MixProject do
 
   defp test_coverage do
     [
-      ignore_modules: [YaBBT.Application, YaBTT.Repo],
+      ignore_modules: [YaBBT.Application, YaBTT.Repo, YaBTT.Factory],
       summary: [threshold: 85]
     ]
   end
@@ -73,6 +77,7 @@ defmodule YaBTT.MixProject do
         # YaBTT,
         # YaBTT.Repo,
         Query: [
+          YaBTT.Query.State,
           YaBTT.Query.Peers
         ],
         "Schema for Database": [
@@ -87,7 +92,8 @@ defmodule YaBTT.MixProject do
         ],
         "HTTP routing": [
           YaBTT.Server.Router,
-          YaBTT.Server.Announce
+          YaBTT.Server.Announce,
+          YaBTT.Server.Scrape
         ]
       ]
     ]

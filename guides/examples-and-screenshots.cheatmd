@@ -4,13 +4,13 @@ Here we provide some examples of using this application.
 
 ## Call `/announce` with normal mode
 
-The `info_hash` need to be encoded to [RFC1738](http://www.faqs.org/rfcs/rfc1738.html). click [here](https://wiki.theory.org/BitTorrentSpecification#Tracker_HTTP.2FHTTPS_Protocol) to learn more.
+Notice that the `info_hash` need to be encoded to [RFC1738](http://www.faqs.org/rfcs/rfc1738.html). click [here](https://wiki.theory.org/BitTorrentSpecification#Tracker_HTTP.2FHTTPS_Protocol) to learn more.
 
 ```shell
-curl 'http://localhost:8080/?info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9A&peer_id=00000000000000000001&downloaded=100&uploaded=100&left=0&port=2001&event=completed'
+curl 'http://localhost:8080/announce?info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9A&peer_id=00000000000000000001&downloaded=100&uploaded=100&left=0&port=2001&event=completed'
 ```
 
-We will get results like this:
+We will get response like this:
 
 ```plaintext
 d8:intervali3600e5:peersld2:ip7:1.2.3.37:peer id20:000000000000000000034:porti8000eed2:ip7:1.2.3.17:peer id20:000000000000000000014:porti8000eed2:ip7:1.2.3.47:peer id20:000000000000000000044:porti8000eed2:ip7:1.2.3.27:peer id20:000000000000000000024:porti8000eed2:ip7:1.2.3.57:peer id20:000000000000000000054:porti8000eeee
@@ -34,10 +34,10 @@ Decode to human readable results:
 ## Call `/announce` with `compact=1`
 
 ```shell
-curl 'http://localhost:8080/?info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9A&peer_id=00000000000000000001&downloaded=100&uploaded=100&left=0&port=2001&event=completed&compact=1'
+curl 'http://localhost:8080/announce?info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9A&peer_id=00000000000000000001&downloaded=100&uploaded=100&left=0&port=2001&event=completed&compact=1'
 ```
 
-The results: (The binary data contained in the result can't be encoded as UTF-8. Let's replace it with `{{peers}}`)
+The response: (The binary data contained in the result can't be encoded as UTF-8. Let's replace it with `{{peers}}`)
 
 ```plaintext
 d8:intervali3600e5:peers30:{{peers}}e
@@ -55,10 +55,10 @@ Decode to human readable results:
 ## Call `/announce` with `no_peer_id=1`
 
 ```shell
-curl 'http://localhost:8080/?info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9A&peer_id=00000000000000000001&downloaded=100&uploaded=100&left=0&port=2001&event=completed&no_peer_id=1'
+curl 'http://localhost:8080/announce?info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9A&peer_id=00000000000000000001&downloaded=100&uploaded=100&left=0&port=2001&event=completed&no_peer_id=1'
 ```
 
-We will get results like this:
+We will get response like this:
 
 ```plaintext
 d8:intervali3600e5:peersld2:ip7:1.2.3.14:porti8000eed2:ip7:1.2.3.44:porti8000eed2:ip7:1.2.3.34:porti8000eed2:ip7:1.2.3.24:porti8000eed2:ip7:1.2.3.54:porti8000eeee
@@ -76,5 +76,38 @@ Decode to human readable results:
     %{"ip" => "1.2.3.2", "port" => 8000},
     %{"ip" => "1.2.3.5", "port" => 8000}
   ]
+}
+```
+
+## Call `/scrape` with `info_hash` list
+
+Notice that the `info_hash` need to be encoded to [RFC1738](http://www.faqs.org/rfcs/rfc1738.html).
+
+```shell
+curl 'http://localhost:8080/scrape?info_hash=Nf%22v%BA%CA%0F%DBk%D6%0Bv%17%8C%D1%19%D1%05%00%13&info_hash=%124Vx%9A%BC%DE%F1%23Eg%89%AB%CD%EF%124Vx%9A'
+```
+
+The response: (The binary data contained in the result can't be encoded as UTF-8. Let's replace it with `{{info_hash}}`)
+
+```plaintext
+d5:filesd20:{{info_hash}}d8:completei0e10:downloadedi0e10:incompletei1ee20:{{info_hash}}d8:completei2e10:downloadedi3e10:incompletei1eeee
+```
+
+Decode to human readable results:
+
+```elixir
+%{
+  "files" => %{
+    <<78, 102, 34, 118, 186, 202, 15, 219, 107, 214, 11, 118, 23, 140, 209, 25, 209, 5, 0, 19>>  => %{
+      "complete" => 0,
+      "downloaded" => 0,
+      "incomplete" => 1
+    },
+    <<18, 52, 86, 120, 154, 188, 222, 241, 35, 69, 103, 137, 171, 205, 239, 18, 52, 86, 120, 154>> => %{
+      "complete" => 2,
+      "downloaded" => 3,
+      "incomplete" => 1
+    }
+  }
 }
 ```

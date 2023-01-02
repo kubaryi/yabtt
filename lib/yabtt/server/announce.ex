@@ -4,6 +4,7 @@ defmodule YaBTT.Server.Announce do
   """
 
   @behaviour Plug
+
   import Plug.Conn
 
   @doc """
@@ -42,7 +43,7 @@ defmodule YaBTT.Server.Announce do
   """
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
-    resp_msg = YaBTT.insert_or_update(conn) |> YaBTT.query()
+    resp_msg = YaBTT.insert_or_update(conn) |> YaBTT.query_peers()
 
     conn
     |> put_resp_content_type("plain/text")
@@ -50,7 +51,7 @@ defmodule YaBTT.Server.Announce do
     |> send_resp()
   end
 
-  @type resp_msg :: YaBTT.t(Bento.Encoder.t()) | :error
+  @type resp_msg :: YaBTT.t(term()) | :error
 
   @doc """
   Bind the response message to the connection struct. All the message will be encoded as

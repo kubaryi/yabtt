@@ -76,7 +76,7 @@ defmodule YaBTT do
   @doc """
   A query function optimized specifically for `insert_or_update/1`.
 
-  Its essence is still `query/2`, but we extract the `t:YaBTT.Query.Peers.id/0`
+  Its essence is still `query_peers/2`, but we extract the `t:YaBTT.Query.Peers.id/0`
   and `t:YaBTT.Query.Peers.opts/0` from the `transaction` result. At the same time,
   we wrap the result in a `{:ok, _}` tuple, and propagating the error from
   the `transaction` result.
@@ -89,20 +89,20 @@ defmodule YaBTT do
 
       iex> torrent = %YaBTT.Schema.Torrent{id: 1}
       iex> opts = %{compact: 1, no_peer_id: 1}
-      iex> YaBTT.query({:ok, %{torrent: torrent, params: opts}})
+      iex> YaBTT.query_peers({:ok, %{torrent: torrent, params: opts}})
 
       iex> torrent = %YaBTT.Schema.Torrent{id: 10000}
       iex> opts = %{compact: 0, no_peer_id: 1}
-      iex> YaBTT.query({:ok, %{torrent: torrent, params: opts}})
+      iex> YaBTT.query_peers({:ok, %{torrent: torrent, params: opts}})
 
-      iex> YaBTT.query({:error, :multi_name, %{}, %{}})
+      iex> YaBTT.query_peers({:error, :multi_name, %{}, %{}})
 
-      iex> YaBTT.query({:error, %{}})
+      iex> YaBTT.query_peers({:error, %{}})
   """
-  @spec query(t()) :: t()
-  def query({:ok, %{torrent: t, params: opts}}), do: {:ok, query(t.id, opts)}
-  def query({:error, _, _, _} = error), do: error
-  def query({:error, _} = error), do: error
+  @spec query_peers(t()) :: t()
+  def query_peers({:ok, %{torrent: t, params: opts}}), do: {:ok, query_peers(t.id, opts)}
+  def query_peers({:error, _, _, _} = multi), do: multi
+  def query_peers({:error, _} = changeset), do: changeset
 
   @type opts :: %{compact: 0 | 1, no_peer_id: 0 | 1}
 
@@ -124,14 +124,14 @@ defmodule YaBTT do
 
   ## Examples
 
-      iex> YaBTT.query(1, %{compact: 0, no_peer_id: 0})
+      iex> YaBTT.query_peers(1, %{compact: 0, no_peer_id: 0})
 
-      iex> YaBTT.query(1, %{compact: 0, no_peer_id: 1})
+      iex> YaBTT.query_peers(1, %{compact: 0, no_peer_id: 1})
 
-      iex> YaBTT.query(1, %{compact: 1, no_peer_id: 1})
+      iex> YaBTT.query_peers(1, %{compact: 1, no_peer_id: 1})
   """
-  @spec query(YaBTT.Query.id(), opts()) :: map()
-  def query(id, opts) do
+  @spec query_peers(YaBTT.Query.id(), opts()) :: map()
+  def query_peers(id, opts) do
     case opts do
       %{compact: c} when c != 0 -> YaBTT.Query.Peers.query(id, mode: :compact)
       %{no_peer_id: np} when np != 0 -> YaBTT.Query.Peers.query(id, mode: :no_peer_id)
@@ -142,4 +142,22 @@ defmodule YaBTT do
           "peers" => &1
         }).()
   end
+
+  alias YaBTT.Query.State
+
+  @doc """
+  Re-export the `YaBTT.Query.State.query/1` function.
+
+  ## Examples
+
+      iex> YaBTT.query_state(["info_hash_1", "info_hash_2"])
+
+      iex> YaBTT.query_state({:ok, %{info_hash: ["info_hash_1", "info_hash_2"]}})
+
+      iex> YaBTT.query_state({:error, %{}})
+  """
+  @spec query_state(t() | [State.info_hash()]) :: t() | State.t()
+  def query_state(info_hashs) when is_list(info_hashs), do: State.query(info_hashs)
+  def query_state({:ok, %{info_hash: info_hashs}}), do: {:ok, State.query(info_hashs)}
+  def query_state({:error, _} = changeset), do: changeset
 end
