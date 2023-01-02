@@ -5,58 +5,61 @@ defmodule YaBTT.Query.State do
 
   alias YaBTT.Schema.{Connection, Torrent}
 
-  @type id :: integer() | binary()
+  @type info_hash :: binary()
 
-  defmacrop count_complete do
-    quote do
-      count(
-        fragment(
-          "CASE WHEN left <= 0 AND event == ? THEN 1 END",
-          <<115, 116, 97, 114, 116, 101, 100>>
-        )
-      )
-    end
-  end
+  @doc """
+  Query the state with `t:info_hash/0` from the `YaBTT.Schema.Connection`.
 
-  defmacrop count_incomplete do
-    quote do
-      count(
-        fragment(
-          "CASE WHEN left > 0 AND event == ? THEN 1 END",
-          <<115, 116, 97, 114, 116, 101, 100>>
-        )
-      )
-    end
-  end
+  Use one or more given `t:info_hash/0` to query the following information
+  from the `YaBTT.Schema.Connection`:
 
-  defmacrop count_downloaded do
-    quote do
-      count(
-        fragment(
-          "CASE WHEN left <= 0 OR event == ? THEN 1 END",
-          <<99, 111, 109, 112, 108, 101, 116, 101, 100>>
-        )
-      )
-    end
-  end
+  - `complete`: The number of active peers that have completed downloading.
+    calculate by `left <= 0 AND event == 1`.
+  - `incomplete`: The number of active peers that have not completed downloading.
+    calculate by `left > 0 AND event == 1`.
+  - `downloaded`: The number of peers that have ever completed downloading.
+    calculate by `left <= 0 OR event == -1`.
 
-  @doc false
-  @spec query([id()]) :: Ecto.Query.t()
+  > #### About `event` {: .info}
+  >
+  > The `event` will store as an integer (-1, 0, or 1) in database.
+  >
+  > Since we use `fragment/1` to direct query the database, so we need
+  > compare the `event` with the integer.
+  >
+  > [More information about `event`](`YaBTT.Types.Event`).
+
+  ## References
+
+  - [Tracker Protocol Extension: Scrape][scrape_1]
+  - [Tracker 'scrape' Convention][scrape_2]
+
+  ## Examples
+
+        iex> YaBTT.Query.State.query(["info_hash_1", "info_hash_2"])
+
+  <!-- links -->
+
+  [scrape_1]: http://bittorrent.org/beps/bep_0048.html
+  [scrape_2]: https://wiki.theory.org/BitTorrentSpecification#Tracker_.27scrape.27_Convention
+  """
+  @spec query([info_hash()]) :: Ecto.Query.t()
   def query(info_hashs) do
-    from(
-      c in Connection,
-      inner_join: t in Torrent,
-      on: c.torrent_id == t.id,
-      where: t.info_hash in ^info_hashs,
-      group_by: t.info_hash,
-      select: %{
-        t.info_hash => %{
-          "complete" => count_complete(),
-          "incomplete" => count_incomplete(),
-          "downloaded" => count_downloaded()
-        }
+    from(c in Connection)
+    |> join(:inner, [c], t in Torrent, on: c.torrent_id == t.id)
+    |> where([_c, t], t.info_hash in ^info_hashs)
+    |> group_by([c, t], t.info_hash)
+    |> select([c, t], %{
+      t.info_hash => %{
+        # The event will store as an integer (-1, 0, or 1) in database.
+        # Since we use `fragment/1` to direct query the database, so we need
+        # compare the event with the integer.
+        # See: https://mogeko.github.io/yabtt/YaBTT.Types.Event.html
+        "complete" => count(fragment("CASE WHEN left <= 0 AND event == 1 THEN 1 END")),
+        "incomplete" => count(fragment("CASE WHEN left > 0 AND event == 1 THEN 1 END")),
+        "downloaded" => count(fragment("CASE WHEN left <= 0 OR event == -1 THEN 1 END"))
       }
-    )
+    })
     |> YaBTT.Repo.all()
   end
 end
