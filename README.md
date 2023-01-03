@@ -29,6 +29,7 @@ Or run with [Docker Compose](https://docs.docker.com/compose):
 ```yml
 ---
 version: 2.1
+
 services:
   yabtt:
     image: ghcr.io/mogeko/yabtt:latest
@@ -38,6 +39,8 @@ services:
     ports:
       - 8080:8080
 ```
+
+For **HTTPS**, we have prepared a [_special guide_](./guides/setup-https.md).
 
 ## Configuration
 
