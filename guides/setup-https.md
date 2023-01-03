@@ -39,4 +39,43 @@ services:
 
 ## Obtain certificate files by Cerbot
 
+If you don't have an available certificate yet, you can obtain one for **free** by Cerbot, the official [ACME](https://datatracker.ietf.org/doc/html/rfc8555) software provided by Let's Encrypt.
+
+This certificate will be **valid for 90 days**. After expiration, Cerbot will **automatically renew** it for 90 days (as long as Cerbot does not shut down, it will be permanently valid).
+
+As we recommend, it would be a good idea to deploy Cerbot as a container. To this end, Let's Encrypt provides an official [Docker container](https://hub.docker.com/r/certbot/certbot). At the same time, Let's Encrypt has cooperation with many cloud service providers. If your network infrastructure provider is on this [list](https://hub.docker.com/u/certbot), you can choose a container optimized specifically for your provider. For example, to use Certbot for [Amazon Route 53](https://aws.amazon.com/route53), you'd use [`certbot/dns-route53`](https://hub.docker.com/r/certbot/dns-route53).
+
+```yml
+---
+version: 2.1
+
+services:
+  certbot:
+    image: certbot/dns-route53
+    command: certonly --dns-route53 -d example.com --agree-tos
+    environment:
+      - AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+      - AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    volumes:
+      - certificates:/etc/letsencrypt/live/example.com/
+    container_name: certbot
+
+  yabtt:
+    image: ghcr.io/mogeko/yabtt:latest
+    volumes:
+      - certificates:/etc/yabtt/ssl/
+    container_name: yabtt
+    depends_on:
+      - certbot
+    ports:
+      - 8080:8080
+
+volumes:
+  certificates:
+```
+
+More [documents about `certbot/certbot`](https://eff-certbot.readthedocs.io/en/stable/install.html#alternative-1-docker).
+
+More [documents about `certbot/dns-route53`](https://certbot-dns-route53.readthedocs.io/en/stable).
+
 ## Obtain certificate files by acme.sh
