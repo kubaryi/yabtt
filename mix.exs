@@ -68,6 +68,7 @@ defmodule YaBTT.MixProject do
       extras: [
         "README.md",
         "guides/compilation-guide.md",
+        "guides/setup-https.md",
         "guides/examples-and-screenshots.cheatmd",
         "LICENSE"
       ],

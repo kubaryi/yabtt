@@ -16,12 +16,10 @@ Our philosophy is to make everything as simple as possible. So we chose [SQLite3
 
 Moreover, we provide [Docker](https://www.docker.com/resources/what-container) Container, which is also our most recommended deployment method:
 
-> **Warning**
->
-> We used `YABTT_DISABLE_HTTPS=true` here to disable HTTPS, **but you should NEVER do this in your production environment!**
+> **Note** You should replace `/path/for/certs/` with the location of your [certificates](./guides/setup-https.md#set-up-https).
 
 ```shell
-docker run -d --name yabtt -e YABTT_DISABLE_HTTPS=true -p 8080:8080 ghcr.io/mogeko/yabtt:latest
+docker run -d --name yabtt -v /path/for/certs/:/etc/yabtt/ssl/ -p 8080:8080 ghcr.io/mogeko/yabtt:latest
 ```
 
 Or run with [Docker Compose](https://docs.docker.com/compose):
@@ -33,14 +31,14 @@ version: 2.1
 services:
   yabtt:
     image: ghcr.io/mogeko/yabtt:latest
-    environment:
-      - YABTT_DISABLE_HTTPS=true
+    volumes:
+      - /path/for/certs/:/etc/yabtt/ssl/
     container_name: yabtt
     ports:
       - 8080:8080
 ```
 
-For **HTTPS**, we have prepared a [_special guide_](./guides/setup-https.md).
+For **HTTPS**, We have prepared a [_more detailed guide_](./guides/setup-https.md).
 
 ## Configuration
 

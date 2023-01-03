@@ -86,6 +86,7 @@ If you don't like Cerbot, you can also use acme.sh to obtain certificate files.
 Similar to Cerbot, acme.sh also supports deploying it as a container, the same automatic renew when the certificate expires. It also supports Amazon Route 53.
 
 ```yml
+---
 version: 2.1
 
 services:
