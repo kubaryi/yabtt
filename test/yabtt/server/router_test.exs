@@ -10,7 +10,7 @@ defmodule YaBTT.Server.RouterTest do
 
   test "GET /", opts do
     conn =
-      conn(:get, "/")
+      conn(:get, "https://example.com/")
       # replace `put_req_header/3`
       |> set_req_header("host", "example.com")
       |> Router.call(opts)
@@ -20,7 +20,7 @@ defmodule YaBTT.Server.RouterTest do
   end
 
   test "Returns 404", opts do
-    conn = conn(:get, "/missing", %{}) |> Router.call(opts)
+    conn = conn(:get, "https://example.com/missing", %{}) |> Router.call(opts)
 
     assert conn.state == :sent
     assert conn.status == 404

@@ -1,8 +1,10 @@
 # Yet another BitTorrent Tracker
 
 [![Build](https://github.com/mogeko/yabtt/actions/workflows/build.yml/badge.svg)](https://github.com/mogeko/yabtt/actions/workflows/build.yml)
+[![Version](https://img.shields.io/github/v/tag/mogeko/yabtt?label=Version&logo=docker)](https://github.com/mogeko/yabtt/pkgs/container/yabtt)
+[![Powered-by](https://img.shields.io/badge/Powered%20by-Elixir-%234B275F)](https://elixir-lang.org)
 
-This is a high-performance BitTorrent Tracker written with [Elixir](https://elixir-lang.org).
+This is a **security-first**[^1] and **high-performance**[^2] BitTorrent Tracker.
 
 > The tracker is an HTTP/HTTPS service which responds to HTTP GET requests. The requests include metrics from clients that help the tracker keep overall statistics about the torrent. The response includes a peer list that helps the client participate in the torrent.
 
@@ -16,8 +18,10 @@ Our philosophy is to make everything as simple as possible. So we chose [SQLite3
 
 Moreover, we provide [Docker](https://www.docker.com/resources/what-container) Container, which is also our most recommended deployment method:
 
+> **Note** You should replace `/path/for/certs/` with the location of your [certificates](./guides/setup-https.md#set-up-https).
+
 ```shell
-docker run -d --name yabtt -p 8080:8080 ghcr.io/mogeko/yabtt:latest
+docker run -d --name yabtt -v /path/for/certs/:/etc/yabtt/ssl/ -p 8080:8080 ghcr.io/mogeko/yabtt:latest
 ```
 
 Or run with [Docker Compose](https://docs.docker.com/compose):
@@ -25,13 +29,18 @@ Or run with [Docker Compose](https://docs.docker.com/compose):
 ```yml
 ---
 version: 2.1
+
 services:
   yabtt:
     image: ghcr.io/mogeko/yabtt:latest
+    volumes:
+      - /path/for/certs/:/etc/yabtt/ssl/
     container_name: yabtt
     ports:
       - 8080:8080
 ```
+
+For **HTTPS**, We have prepared a [_more detailed guide_](./guides/setup-https.md).
 
 ## Configuration
 
@@ -39,19 +48,14 @@ You can configure the server by the `YABTT_*` environment variables (the `-e` op
 
 Here are the environment variables we support:
 
-| Environment          | Default | Describe                                                                                         |
-| -------------------- | ------- | ------------------------------------------------------------------------------------------------ |
-| `YABTT_INTERVAL`     | 3600    | Interval in seconds that the client should wait between sending regular requests to the tracker. |
-| `YABTT_PORT`         | 8080    | The port of server monitoring.                                                                   |
-| `YABTT_QUERY_LIMIT`  | 50      | Limit the number of peers that the query can return.                                             |
-| `YABTT_LOG_LEVEL`    | `info`  | The [log level](https://hexdocs.pm/logger/Logger.html#module-levels) printed on TTY.             |
-| `YABTT_COMPACT_ONLY` | `false` | Forces the use of ["compact mode"](https://wiki.theory.org/BitTorrentTrackerExtensions)          |
-
-> **Warning**
->
-> In the situation than `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`. At the same time, it should be noted that the "compact mode" can't work with **IPv6 addresses**. If the IP address of the peer is an IPv6 address, we will ignore those peer.
->
-> You can find more information in [our document](https://mogeko.github.io/yabtt/YaBTT.Query.Peers.html#query/2-mode).
+| Environment           | Default | Describe                                                                                                 |
+| --------------------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| `YABTT_INTERVAL`      | 3600    | Interval in seconds that the client should wait between sending regular requests to the tracker.         |
+| `YABTT_PORT`          | 8080    | The port of server monitoring.                                                                           |
+| `YABTT_QUERY_LIMIT`   | 50      | Limit the number of peers that the query can return.                                                     |
+| `YABTT_COMPACT_ONLY`  | `false` | Force [_compact mode_](https://wiki.theory.org/BitTorrentTrackerExtensions) to save bandwidth. [^3] [^4] |
+| `YABTT_DISABLE_HTTPS` | `false` | Set it to `true` to disable HTTPS, **but you should NOT to do this.**                                    |
+| `YABTT_LOG_LEVEL`     | `info`  | The [log level](https://hexdocs.pm/logger/Logger.html#module-levels) printed on TTY.                     |
 
 ## Examples
 
@@ -79,3 +83,10 @@ This project refers to the following documents or specifications.
 ## License
 
 The code in this project is released under the [GPL-3.0 License](./LICENSE).
+
+<!-- Comments -->
+
+[^1]: By default, we force HTTPS and run it with ["strict mode"](https://www.rfc-editor.org/rfc/rfc6797).
+[^2]: You can check our benchmark [here](https://github.com/mogeko/yabtt/tree/master/benchmark).
+[^3]: In the situation than `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`.
+[^4]: Compact mode can't work with **IPv6 addresses**. If the IP address of the peer is an IPv6 address, we will ignore those peer. [learn more](https://mogeko.github.io/yabtt/YaBTT.Query.Peers.html#query/2-mode)
