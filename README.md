@@ -45,20 +45,17 @@ You can configure the server by the `YABTT_*` environment variables (the `-e` op
 
 Here are the environment variables we support:
 
-| Environment           | Default | Describe                                                                                         |
-| --------------------- | ------- | ------------------------------------------------------------------------------------------------ |
-| `YABTT_INTERVAL`      | 3600    | Interval in seconds that the client should wait between sending regular requests to the tracker. |
-| `YABTT_PORT`          | 8080    | The port of server monitoring.                                                                   |
-| `YABTT_QUERY_LIMIT`   | 50      | Limit the number of peers that the query can return.                                             |
-| `YABTT_COMPACT_ONLY`  | `false` | Forces the use of ["compact mode"](https://wiki.theory.org/BitTorrentTrackerExtensions)          |
-| `YABTT_DISABLE_HTTPS` | `false` | Set it to `true` to disable HTTPS, **but you should NOT to do this.**                            |
-| `YABTT_LOG_LEVEL`     | `info`  | The [log level](https://hexdocs.pm/logger/Logger.html#module-levels) printed on TTY.             |
+| Environment           | Default | Describe                                                                                                 |
+| --------------------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| `YABTT_INTERVAL`      | 3600    | Interval in seconds that the client should wait between sending regular requests to the tracker.         |
+| `YABTT_PORT`          | 8080    | The port of server monitoring.                                                                           |
+| `YABTT_QUERY_LIMIT`   | 50      | Limit the number of peers that the query can return.                                                     |
+| `YABTT_COMPACT_ONLY`  | `false` | Force [_compact mode_](https://wiki.theory.org/BitTorrentTrackerExtensions) to save bandwidth. [^1] [^2] |
+| `YABTT_DISABLE_HTTPS` | `false` | Set it to `true` to disable HTTPS, **but you should NOT to do this.**                                    |
+| `YABTT_LOG_LEVEL`     | `info`  | The [log level](https://hexdocs.pm/logger/Logger.html#module-levels) printed on TTY.                     |
 
-> **Warning**
->
-> In the situation than `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`. At the same time, it should be noted that the "compact mode" can't work with **IPv6 addresses**. If the IP address of the peer is an IPv6 address, we will ignore those peer.
->
-> You can find more information in [our document](https://mogeko.github.io/yabtt/YaBTT.Query.Peers.html#query/2-mode).
+[^1]: In the situation than `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`.
+[^2]: Compact mode can't work with **IPv6 addresses**. If the IP address of the peer is an IPv6 address, we will ignore those peer. [learn more](https://mogeko.github.io/yabtt/YaBTT.Query.Peers.html#query/2-mode)
 
 ## Examples
 
