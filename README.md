@@ -16,8 +16,12 @@ Our philosophy is to make everything as simple as possible. So we chose [SQLite3
 
 Moreover, we provide [Docker](https://www.docker.com/resources/what-container) Container, which is also our most recommended deployment method:
 
+> **Warning**
+>
+> We used `YABTT_DISABLE_HTTPS=true` here to disable HTTPS, **but you should NEVER do this in your production environment!**
+
 ```shell
-docker run -d --name yabtt -p 8080:8080 ghcr.io/mogeko/yabtt:latest
+docker run -d --name yabtt -e YABTT_DISABLE_HTTPS=true -p 8080:8080 ghcr.io/mogeko/yabtt:latest
 ```
 
 Or run with [Docker Compose](https://docs.docker.com/compose):
@@ -28,6 +32,8 @@ version: 2.1
 services:
   yabtt:
     image: ghcr.io/mogeko/yabtt:latest
+    environment:
+      - YABTT_DISABLE_HTTPS=true
     container_name: yabtt
     ports:
       - 8080:8080
@@ -39,13 +45,14 @@ You can configure the server by the `YABTT_*` environment variables (the `-e` op
 
 Here are the environment variables we support:
 
-| Environment          | Default | Describe                                                                                         |
-| -------------------- | ------- | ------------------------------------------------------------------------------------------------ |
-| `YABTT_INTERVAL`     | 3600    | Interval in seconds that the client should wait between sending regular requests to the tracker. |
-| `YABTT_PORT`         | 8080    | The port of server monitoring.                                                                   |
-| `YABTT_QUERY_LIMIT`  | 50      | Limit the number of peers that the query can return.                                             |
-| `YABTT_LOG_LEVEL`    | `info`  | The [log level](https://hexdocs.pm/logger/Logger.html#module-levels) printed on TTY.             |
-| `YABTT_COMPACT_ONLY` | `false` | Forces the use of ["compact mode"](https://wiki.theory.org/BitTorrentTrackerExtensions)          |
+| Environment           | Default | Describe                                                                                         |
+| --------------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| `YABTT_INTERVAL`      | 3600    | Interval in seconds that the client should wait between sending regular requests to the tracker. |
+| `YABTT_PORT`          | 8080    | The port of server monitoring.                                                                   |
+| `YABTT_QUERY_LIMIT`   | 50      | Limit the number of peers that the query can return.                                             |
+| `YABTT_COMPACT_ONLY`  | `false` | Forces the use of ["compact mode"](https://wiki.theory.org/BitTorrentTrackerExtensions)          |
+| `YABTT_DISABLE_HTTPS` | `false` | Set it to `true` to disable HTTPS, **but you should NOT to do this.**                            |
+| `YABTT_LOG_LEVEL`     | `info`  | The [log level](https://hexdocs.pm/logger/Logger.html#module-levels) printed on TTY.             |
 
 > **Warning**
 >
