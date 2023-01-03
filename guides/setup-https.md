@@ -27,6 +27,7 @@ Or run with Docker Compose:
 ```yml
 ---
 version: 2.1
+
 services:
   yabtt:
     image: ghcr.io/mogeko/yabtt:latest
@@ -74,8 +75,46 @@ volumes:
   certificates:
 ```
 
-More [documents about `certbot/certbot`](https://eff-certbot.readthedocs.io/en/stable/install.html#alternative-1-docker).
+Read more [documents about `certbot/certbot`](https://eff-certbot.readthedocs.io/en/stable/install.html#alternative-1-docker).
 
-More [documents about `certbot/dns-route53`](https://certbot-dns-route53.readthedocs.io/en/stable).
+Read more [documents about `certbot/dns-route53`](https://certbot-dns-route53.readthedocs.io/en/stable).
 
 ## Obtain certificate files by acme.sh
+
+If you don't like Cerbot, you can also use acme.sh to obtain certificate files.
+
+Similar to Cerbot, acme.sh also supports deploying it as a container, the same automatic renew when the certificate expires. It also supports Amazon Route 53.
+
+```yml
+version: 2.1
+
+services:
+  acme.sh:
+    image: neilpang/acme.sh
+    command: --issue --dns dns_aws -d example.com
+    environment:
+      - AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+      - AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    volumes:
+      - certificates:/acme.sh
+    container_name: acme.sh
+
+  yabtt:
+    image: ghcr.io/mogeko/yabtt:latest
+    volumes:
+      - certificates:/etc/yabtt/ssl/
+    container_name: yabtt
+    depends_on:
+      - acme.sh
+    ports:
+      - 8080:8080
+
+volumes:
+  certificates:
+```
+
+The [official documents](https://github.com/acmesh-official/acme.sh/wiki) for acme.sh/
+
+Learn more about [run acme.sh in container](https://github.com/acmesh-official/acme.sh/wiki/Run-acme.sh-in-docker).
+
+Learn more about [use Amazon Route53 domain API](https://github.com/acmesh-official/acme.sh/wiki/dnsapi#10-use-amazon-route53-domain-api).
