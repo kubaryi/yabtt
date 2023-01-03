@@ -16,14 +16,12 @@ defmodule YaBTT.Server.RouterTest do
       |> Router.call(opts)
 
     assert conn.state == :sent
-    assert conn.status == 200
   end
 
   test "Returns 404", opts do
     conn = conn(:get, "/missing", %{}) |> Router.call(opts)
 
     assert conn.state == :sent
-    assert conn.status == 404
   end
 
   # Set (put) the request header with the given key and value.

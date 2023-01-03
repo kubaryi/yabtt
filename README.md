@@ -86,7 +86,7 @@ The code in this project is released under the [GPL-3.0 License](./LICENSE).
 
 <!-- Comments -->
 
-[^1]: By default, we force HTTPS.
+[^1]: By default, we force HTTPS and run it with ["strict mode"](https://www.rfc-editor.org/rfc/rfc6797).
 [^2]: You can check our benchmark [here](https://github.com/mogeko/yabtt/tree/master/benchmark).
 [^3]: In the situation than `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`.
 [^4]: Compact mode can't work with **IPv6 addresses**. If the IP address of the peer is an IPv6 address, we will ignore those peer. [learn more](https://mogeko.github.io/yabtt/YaBTT.Query.Peers.html#query/2-mode)
