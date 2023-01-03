@@ -72,6 +72,7 @@ defmodule YaBTT.MixProject do
         "guides/examples-and-screenshots.cheatmd",
         "LICENSE"
       ],
+      markdown_processor: {ExDoc.Markdown.Earmark, footnotes: true},
       groups_for_extras: [
         Others: ["LICENSE"]
       ],
