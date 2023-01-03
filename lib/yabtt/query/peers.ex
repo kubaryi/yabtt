@@ -52,12 +52,14 @@ defmodule YaBTT.Query.Peers do
 
     > #### Warning {: .warning}
     >
-    > The `:compact` mode can't work with **IPv6 addresses**. If we queried an IPv6 `peer`, we will
-    > ignore those peer.
+    > The `:compact` mode can't work with **IPv6 addresses**. If we queried an IPv6 `peer`, we will ignore those peer.
+    >
+    > This is not fair for IPv6 users. From this perspective, this is a _bad
+    > extension_.
 
   - `:no_peer_id`: return a list of peers **without** `peer id`.
 
-    This option is ignored if `:compact` mode is enabled.
+    This option will be **ignored** if `:compact` mode is enabled.
 
   - `nil`: return a list of peers with **full information** (`ip`, `port` and the `peer id`).
 

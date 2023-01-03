@@ -2,7 +2,7 @@ defmodule YaBTT.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/mogeko/yabtt"
-  @version "0.0.5"
+  @version "0.0.6"
 
   def project do
     [
@@ -72,6 +72,7 @@ defmodule YaBTT.MixProject do
         "guides/examples-and-screenshots.cheatmd",
         "LICENSE"
       ],
+      markdown_processor: {ExDoc.Markdown.Earmark, footnotes: true},
       groups_for_extras: [
         Others: ["LICENSE"]
       ],

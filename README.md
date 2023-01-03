@@ -54,7 +54,7 @@ Here are the environment variables we support:
 | `YABTT_PORT`          | 8080    | The port of server monitoring.                                                                           |
 | `YABTT_QUERY_LIMIT`   | 50      | Limit the number of peers that the query can return.                                                     |
 | `YABTT_COMPACT_ONLY`  | `false` | Force [_compact mode_](https://wiki.theory.org/BitTorrentTrackerExtensions) to save bandwidth. [^3] [^4] |
-| `YABTT_DISABLE_HTTPS` | `false` | Set it to `true` to disable HTTPS, **but you should NOT to do this.**                                    |
+| `YABTT_DISABLE_HTTPS` | `false` | Set it to `true` to disable HTTPS, **but you should NEVER do this.**                                     |
 | `YABTT_LOG_LEVEL`     | `info`  | The [log level](https://hexdocs.pm/logger/Logger.html#module-levels) printed on TTY.                     |
 
 ## Examples
@@ -88,5 +88,5 @@ The code in this project is released under the [GPL-3.0 License](./LICENSE).
 
 [^1]: By default, we force HTTPS and run it with ["strict mode"](https://www.rfc-editor.org/rfc/rfc6797).
 [^2]: You can check our benchmark [here](https://github.com/mogeko/yabtt/tree/master/benchmark).
-[^3]: In the situation than `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`.
-[^4]: Compact mode can't work with **IPv6 addresses**. If the IP address of the peer is an IPv6 address, we will ignore those peer. [learn more](https://mogeko.github.io/yabtt/YaBTT.Query.Peers.html#query/2-mode)
+[^3]: In the situation that `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`.
+[^4]: The compact mode can't work with **IPv6 addresses**. [learn more](https://mogeko.github.io/yabtt/YaBTT.Query.Peers.html#query/2-mode)
