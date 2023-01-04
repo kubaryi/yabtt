@@ -11,7 +11,8 @@ defmodule YaBTT do
   is used to query the peers who hold the target torrent.
   """
 
-  alias YaBTT.Schema.{Peer, Torrent, Params, Connection}
+  alias YaBTT.Schema.{Peer, Torrent, Connection}
+  import YaBTT.Repo, only: [get_by: 2, transaction: 1]
 
   @type errors ::
           {:error, Ecto.Multi.name(), Ecto.Changeset.t(), Ecto.Multi.t()}
@@ -52,11 +53,9 @@ defmodule YaBTT do
   """
   @spec insert_or_update(Plug.Conn.t()) :: t()
   def(insert_or_update(conn)) do
-    import YaBTT.Repo, only: [get_by: 2, transaction: 1]
-
     Ecto.Multi.new()
     # Disinfect HTTP parameters, then extract `info_hash` and `peer_id`.
-    |> Ecto.Multi.run(:params, fn _, _ -> Params.apply(conn.params) end)
+    |> Ecto.Multi.run(:params, fn _, _ -> YaBTT.Schema.Announce.apply(conn.params) end)
     # Get the `torrent` from database, or create a new one if it doesn't exist.
     |> Ecto.Multi.insert_or_update(:torrent, fn %{params: %{info_hash: info_hash}} ->
       (get_by(Torrent, info_hash: info_hash) || %Torrent{}) |> Torrent.changeset(conn.params)

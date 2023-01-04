@@ -85,7 +85,7 @@ defmodule YaBTT.MixProject do
         ],
         "Schema for Database": [
           YaBTT.Schema.Connection,
-          YaBTT.Schema.Params,
+          YaBTT.Schema.Announce,
           YaBTT.Schema.Peer,
           YaBTT.Schema.Torrent
         ],

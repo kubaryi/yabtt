@@ -1,6 +1,6 @@
-defmodule YaBTT.Schema.Params do
+defmodule YaBTT.Schema.Announce do
   @moduledoc """
-  The schema for validating the request parameters.
+  The schema for validating the request parameters for routing `/announce`.
 
   We only focus on if the required parameters `info_hash`, `peer_id`,
   `port`, `uploaded`, `downloaded` and `left` are present. We don't
@@ -37,7 +37,7 @@ defmodule YaBTT.Schema.Params do
   @doc """
   Creates a changeset based on the `struct` and `params`.
 
-  In most cases, `struct` is a `%YaBTT.Schema.Params{}` and the `params`
+  In most cases, `struct` is a `%YaBTT.Schema.Announce{}` and the `params`
   is the request parameters.
 
   ## Parameters
@@ -55,10 +55,10 @@ defmodule YaBTT.Schema.Params do
       ...>   "downloaded" => "41421",
       ...>   "left" => "0"
       ...> }
-      iex> YaBTT.Schema.Params.changeset(%YaBTT.Schema.Params{}, params)
+      iex> YaBTT.Schema.Announce.changeset(%YaBTT.Schema.Announce{}, params)
 
       iex> params = %{"info_hash" => "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e8"}
-      iex> YaBTT.Schema.Params.changeset(%YaBTT.Schema.Params{}, params)
+      iex> YaBTT.Schema.Announce.changeset(%YaBTT.Schema.Announce{}, params)
   """
   @spec changeset(changeset_t() | t(), params()) :: changeset_t()
   def changeset(struct, params) do
@@ -80,7 +80,7 @@ defmodule YaBTT.Schema.Params do
   end
 
   @doc """
-  validates the `params` and returns a `YaBTT.Schema.Params` with `:insert` action.
+  validates the `params` and returns a `YaBTT.Schema.Announce` with `:insert` action.
 
   ## Parameters
 
@@ -97,9 +97,9 @@ defmodule YaBTT.Schema.Params do
       ...>   "downloaded" => "41421",
       ...>   "left" => "0",
       ...>   "event" => "completed"
-      ...> } |> YaBTT.Schema.Params.apply()
+      ...> } |> YaBTT.Schema.Announce.apply()
       {:ok,
-        %YaBTT.Schema.Params{
+        %YaBTT.Schema.Announce{
           info_hash: "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e8",
           peer_id: "-TR14276775888084598",
           ip: "127.0.0.1",
@@ -112,7 +112,7 @@ defmodule YaBTT.Schema.Params do
       }
 
       iex> params = %{"info_hash" => "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e8"}
-      iex> {:error, _} =  YaBTT.Schema.Params.apply(params)
+      iex> {:error, _} =  YaBTT.Schema.Announce.apply(params)
   """
   @spec apply(params()) :: {:ok, t()} | {:error, changeset_t()}
   def apply(params), do: changeset(%__MODULE__{}, params) |> apply_action(:insert)
