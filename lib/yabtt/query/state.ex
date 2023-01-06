@@ -4,6 +4,7 @@ defmodule YaBTT.Query.State do
   """
 
   import Ecto.Query
+  import YaBTT.Query.Utils
 
   alias YaBTT.Schema.{Connection, Torrent}
 
@@ -63,9 +64,9 @@ defmodule YaBTT.Query.State do
     |> select([c, t], {t.info_hash,
      %{
        # The event will store as an integer (-1, 0, or 1) in database.
-       "complete" => count(fragment("CASE WHEN left <= 0 AND event == 1 THEN 1 END")),
-       "incomplete" => count(fragment("CASE WHEN left > 0 AND event == 1 THEN 1 END")),
-       "downloaded" => count(fragment("CASE WHEN left <= 0 OR event == -1 THEN 1 END"))
+       "complete" => count(case_then("left <= 0 AND event == 1", do: 1)),
+       "incomplete" => count(case_then("left > 0 AND event == 1", do: 1)),
+       "downloaded" => count(case_then("left <= 0 OR event == -1", do: 1))
      }})
     |> YaBTT.Repo.all()
     |> (&%{"files" => Map.new(&1)}).()

@@ -2,7 +2,7 @@ defmodule YaBTT.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/mogeko/yabtt"
-  @version "0.0.6"
+  @version "0.1.0"
 
   def project do
     [
@@ -67,10 +67,11 @@ defmodule YaBTT.MixProject do
       authors: ["Mogeko"],
       extras: [
         "README.md",
-        "guides/compilation-guide.md",
         "guides/setup-https.md",
+        "guides/compilation-guide.md",
         "guides/examples-and-screenshots.cheatmd",
-        "LICENSE"
+        "LICENSE",
+        "benchmark/README.md": [filename: "benchmark", title: "Benchmark Report"]
       ],
       markdown_processor: {ExDoc.Markdown.Earmark, footnotes: true},
       groups_for_extras: [
@@ -85,7 +86,7 @@ defmodule YaBTT.MixProject do
         ],
         "Schema for Database": [
           YaBTT.Schema.Connection,
-          YaBTT.Schema.Params,
+          YaBTT.Schema.Announce,
           YaBTT.Schema.Peer,
           YaBTT.Schema.Torrent
         ],
@@ -98,7 +99,21 @@ defmodule YaBTT.MixProject do
           YaBTT.Server.Announce,
           YaBTT.Server.Scrape
         ]
-      ]
+      ],
+      before_closing_head_tag: &before_closing_head_tag/1
     ]
   end
+
+  # See: https://github.com/elixir-lang/ex_doc/issues/1452#issuecomment-1002222605
+
+  defp before_closing_head_tag(:html) do
+    """
+    <style>
+      a.reversefootnote {display:inline-block;text-indent:-9999px;line-height:0;}
+      a.reversefootnote:after {content:'↩';text-indent:0;display:block;line-height:initial;}
+    </style>
+    """
+  end
+
+  defp before_closing_head_tag(_), do: ""
 end

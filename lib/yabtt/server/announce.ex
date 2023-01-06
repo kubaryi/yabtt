@@ -65,21 +65,23 @@ defmodule YaBTT.Server.Announce do
   ## Example
 
       iex> conn = %Plug.Conn{}
-      iex> msg = {:ok, %{"interval" => 1800, "min interval" => 1800, "peers" => []}}
-      iex> YaBTT.Server.Announce.put_resp_msg(conn, msg)
-
-      iex> conn = %Plug.Conn{}
-      iex> msg = {:error, YaBTT.Schema.Torrent.changeset(%YaBTT.Schema.Torrent{}, %{})}
+      iex> msg = {:ok, %{"interval" => 1800, "peers" => []}}
       iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, msg)
       iex> conn.resp_body
-      "d14:failure reasond9:info_hashl14:can't be blankeee"
+      "d8:intervali1800e5:peerslee"
 
       iex> conn = %Plug.Conn{}
-      iex> changeset = YaBTT.Schema.Torrent.changeset(%YaBTT.Schema.Torrent{}, %{})
+      iex> msg = {:error, YaBTT.Schema.Announce.changeset(%YaBTT.Schema.Announce{}, %{})}
+      iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, msg)
+      iex> conn.resp_body
+      "d14:failure reasond9:info_hashl14:can't be blanke7:peer_idl14:can't be blankeee"
+
+      iex> conn = %Plug.Conn{}
+      iex> changeset = YaBTT.Schema.Announce.changeset(%YaBTT.Schema.Announce{}, %{})
       iex> msg = {:error, :multi_error, changeset, %Ecto.Multi{}}
       iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, msg)
       iex> conn.resp_body
-      "d14:failure reasond9:info_hashl14:can't be blankeee"
+      "d14:failure reasond9:info_hashl14:can't be blanke7:peer_idl14:can't be blankeee"
 
       iex> conn = %Plug.Conn{}
       iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, :error)
