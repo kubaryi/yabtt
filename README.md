@@ -1,6 +1,8 @@
 # Yet another BitTorrent Tracker
 
-[![build_badge]][ci] [![ver_badge]][ghcr] [![powered_by_badge]][elixir]
+[![Build](https://github.com/mogeko/yabtt/actions/workflows/build.yml/badge.svg)](https://github.com/mogeko/yabtt/actions/workflows/build.yml)
+[![Version](https://img.shields.io/github/v/tag/mogeko/yabtt?label=Version&logo=docker)](https://github.com/mogeko/yabtt/pkgs/container/yabtt)
+[![Powered-by](https://img.shields.io/badge/Powered%20by-Elixir-%234B275F)](https://elixir-lang.org)
 
 This is a **security-first**[^1] and **high-performance**[^2] BitTorrent Tracker.
 
@@ -98,24 +100,8 @@ This project refers to the following documents or specifications.
 
 The code in this project is released under the [GPL-3.0 License](./LICENSE).
 
-<!-- Comments -->
-
-[^1]: By default, we force HTTPS and run it with ["strict mode"][rfc6797].
-[^2]: You can check our benchmark report [here][benchmark].
-[^3]: The compact mode can't work with **IPv6 addresses**. However, we will solve this problem with [BEP0007](bep_0007) in the future. [learn more][limit_for_compact_mode]
-[^4]: In the situation that `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`.
-
-<!-- badegs -->
-
-[build_badge]: https://github.com/mogeko/yabtt/actions/workflows/build.yml/badge.svg
-[ver_badge]: https://img.shields.io/github/v/tag/mogeko/yabtt?label=Version&logo=docker
-[powered_by_badge]: https://img.shields.io/badge/Powered%20by-Elixir-%234B275F
-
 <!-- links -->
 
-[ci]: https://github.com/mogeko/yabtt/actions/workflows/build.yml
-[ghcr]: https://github.com/mogeko/yabtt/pkgs/container/yabtt
-[elixir]: https://elixir-lang.org
 [sqlite]: https://www.sqlite.org
 [docker]: https://www.docker.com/resources/what-container
 [docker_compose]: https://docs.docker.com/compose
@@ -123,14 +109,14 @@ The code in this project is released under the [GPL-3.0 License](./LICENSE).
 [https_wiki]: https://en.wikipedia.org/wiki/HTTPS
 [limit_for_dot]: https://www.cloudflare.com/learning/dns/dns-over-tls
 
-<!-- Documents -->
+<!-- documents -->
 
 [documents]: http://mogeko.github.io/yabtt
-[https_certs]: ./guides/setup-https.md#set-up-https
 [examples]: https://mogeko.github.io/yabtt/examples-and-screenshots.html
-[benchmark]: https://github.com/mogeko/yabtt/tree/master/benchmark
-[build_guide]: ./guides/compilation-guide.md
 [limit_for_compact_mode]: https://mogeko.github.io/yabtt/YaBTT.Query.Peers.html#query/2-mode
+[https_certs]: ./guides/setup-https.md#set-up-https
+[benchmark]: ./benchmark/README.md
+[build_guide]: ./guides/compilation-guide.md
 
 <!-- BitTorrent Enhancement Proposals -->
 
@@ -147,3 +133,10 @@ The code in this project is released under the [GPL-3.0 License](./LICENSE).
 [rfc8484]: https://www.rfc-editor.org/rfc/rfc8484
 [rfc7540]: https://www.rfc-editor.org/rfc/rfc7540
 [rfc9114]: https://www.rfc-editor.org/rfc/rfc9114
+
+<!-- Comments -->
+
+[^1]: By default, we force HTTPS and run it with ["strict mode"][rfc6797].
+[^2]: You can check our benchmark report [here][benchmark].
+[^3]: The compact mode can't work with **IPv6 addresses**. However, we will solve this problem with [BEP0007][bep_0007] in the future. [learn more][limit_for_compact_mode]
+[^4]: In the situation that `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`.

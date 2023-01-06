@@ -67,10 +67,11 @@ defmodule YaBTT.MixProject do
       authors: ["Mogeko"],
       extras: [
         "README.md",
-        "guides/compilation-guide.md",
         "guides/setup-https.md",
+        "guides/compilation-guide.md",
         "guides/examples-and-screenshots.cheatmd",
-        "LICENSE"
+        "LICENSE",
+        "benchmark/README.md": [filename: "benchmark", title: "Benchmark Report"]
       ],
       markdown_processor: {ExDoc.Markdown.Earmark, footnotes: true},
       groups_for_extras: [
