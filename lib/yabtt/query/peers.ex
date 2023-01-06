@@ -57,6 +57,8 @@ defmodule YaBTT.Query.Peers do
     >
     > This is not fair for IPv6 users. From this perspective, this is a _bad
     > extension_.
+    >
+    > However, we will sovle this problem with [BEP0007](http://bittorrent.org/beps/bep_0007.html) in the future.
 
   - `:no_peer_id`: return a list of peers **without** `peer id`.
 

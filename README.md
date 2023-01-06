@@ -12,7 +12,7 @@ Read [our documents][documents] to learn more.
 
 1. **Native support for [HTTPS][https_wiki] and [HSTS][rfc6797]**.
 2. Full supports for the HTTP Tracker Protocol in the [BitTorrent protocol specification][bep_0003], but we **don't support or plan to support** the [UDP Tracker Protocol][bep_0015]. -> [_why?_](#why-udp-tracker-protocol-is-not-a-good-idea)
-3. Supports both IPv4 and IPv6[^4].
+3. Supports both IPv4 and IPv6[^3].
 4. Supports the [Tracker "Scrape" Extension][bep_0048].
 5. Supports [Compact mode][bep_0023] and `no-peer-id` mode.
 
@@ -102,8 +102,8 @@ The code in this project is released under the [GPL-3.0 License](./LICENSE).
 
 [^1]: By default, we force HTTPS and run it with ["strict mode"][rfc6797].
 [^2]: You can check our benchmark report [here][benchmark].
-[^3]: In the situation that `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`.
-[^4]: The compact mode can't work with **IPv6 addresses**. [learn more][limit_for_compact_mode]
+[^3]: The compact mode can't work with **IPv6 addresses**. However, we will solve this problem with [BEP0007](bep_0007) in the future. [learn more][limit_for_compact_mode]
+[^4]: In the situation that `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`.
 
 <!-- badegs -->
 
@@ -135,6 +135,7 @@ The code in this project is released under the [GPL-3.0 License](./LICENSE).
 <!-- BitTorrent Enhancement Proposals -->
 
 [bep_0003]: http://bittorrent.org/beps/bep_0003.html
+[bep_0007]: http://bittorrent.org/beps/bep_0007.html
 [bep_0015]: http://bittorrent.org/beps/bep_0015.html
 [bep_0023]: http://bittorrent.org/beps/bep_0023.html
 [bep_0048]: http://bittorrent.org/beps/bep_0048.html
