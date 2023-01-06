@@ -11,8 +11,8 @@ Read [our documents][documents] to learn more.
 ## Features
 
 1. **Native support for [HTTPS][https_wiki] and [HSTS][rfc6797]**.
-2. Full supports for the HTTP Tracker protocol in the [BitTorrent protocol specification][bep_0003], but we **don't support or plan to support** the [UDP Tracker Protocol][bep_0015]. -> [_why?_](#why-udp-tracker-protocol-is-not-a-good-idea)
-3. Supports both IPv4 and IPv6.
+2. Full supports for the HTTP Tracker Protocol in the [BitTorrent protocol specification][bep_0003], but we **don't support or plan to support** the [UDP Tracker Protocol][bep_0015]. -> [_why?_](#why-udp-tracker-protocol-is-not-a-good-idea)
+3. Supports both IPv4 and IPv6[^4].
 4. Supports the [Tracker "Scrape" Extension][bep_0048].
 5. Supports [Compact mode][bep_0023] and `no-peer-id` mode.
 
