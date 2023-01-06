@@ -58,6 +58,5 @@ defmodule YaBTT.Schema.Torrent do
     torrent
     |> cast(params, [:info_hash])
     |> validate_required([:info_hash])
-    |> validate_length(:info_hash, is: 20)
   end
 end

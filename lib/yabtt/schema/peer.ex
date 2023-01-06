@@ -71,6 +71,5 @@ defmodule YaBTT.Schema.Peer do
     peer
     |> cast(params, [:peer_id, :ip, :port])
     |> validate_required([:peer_id, :port])
-    |> validate_length(:peer_id, is: 20)
   end
 end
