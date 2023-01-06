@@ -20,8 +20,6 @@ Read [our documents][documents] to learn more.
 
 ## Usage
 
-> **Warning** **Not ready for production!**
-
 Our philosophy is to make everything as simple as possible. So we chose [SQLite3][sqlite] as the database, which means that you don't need to deploy the database separately.
 
 Moreover, we provide [Docker][docker] Container, which is also our most recommended deployment method:
