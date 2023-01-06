@@ -99,7 +99,21 @@ defmodule YaBTT.MixProject do
           YaBTT.Server.Announce,
           YaBTT.Server.Scrape
         ]
-      ]
+      ],
+      before_closing_head_tag: &before_closing_head_tag/1
     ]
   end
+
+  # See: https://github.com/elixir-lang/ex_doc/issues/1452#issuecomment-1002222605
+
+  defp before_closing_head_tag(:html) do
+    """
+    <style>
+      a.reversefootnote {display:inline-block;text-indent:-9999px;line-height:0;}
+      a.reversefootnote:after {content:'↩';text-indent:0;display:block;line-height:initial;}
+    </style>
+    """
+  end
+
+  defp before_closing_head_tag(_), do: ""
 end
