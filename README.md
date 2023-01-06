@@ -10,6 +10,14 @@ This is a **security-first**[^1] and **high-performance**[^2] BitTorrent Tracker
 
 Read [our documents](http://mogeko.github.io/yabtt) to learn more.
 
+## Features
+
+1. **Native support for [HTTPS](https://en.wikipedia.org/wiki/HTTPS) and [HSTS](https://www.rfc-editor.org/rfc/rfc6797)**.
+2. Supports the HTTP Tracker Protocol ([BEP0003](http://bittorrent.org/beps/bep_0003.html)), but we **don't support or plan** to support the UDP Tracker Protocol ([BEP0015](http://bittorrent.org/beps/bep_0015.html)). -> [_why?_](#why-udp-tracker-protocol-is-not-a-good-idea)
+3. Supports both IPv4 and IPv6.
+4. Supports the Tracker "Scrape" Extension ([BEP0048](http://bittorrent.org/beps/bep_0048.html)).
+5. Supports Compact mode and `no-peer-id` mode ([BEP0023](http://bittorrent.org/beps/bep_0023.html)).
+
 ## Usage
 
 > **Warning** **Not ready for production!**
@@ -66,6 +74,8 @@ See [Examples and Screenshots](http://mogeko.github.io/yabtt/examples-and-screen
 For reference, we have designed a simple benchmark to test the main version of the application. However, it should be noted that **the results can only be used as a reference and cannot represent the actual performance of the application in production**.
 
 You can check our report [here](https://github.com/mogeko/yabtt/tree/master/benchmark).
+
+## Why UDP Tracker Protocol is not a good idea?
 
 ## Build
 
