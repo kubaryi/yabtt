@@ -81,10 +81,11 @@ defmodule YaBTT.Query.Peers do
   """
   @spec query(id(), opts()) :: [Peer.t()] | binary()
   def query(id, mode: :compact) do
-    query(id, mode: :no_peer_id)
-    |> Enum.reduce(<<>>, fn peer, acc ->
-      with {:ok, {a, b, c, d}} <- Map.fetch(peer, "ip"),
-           {:ok, port} <- Map.fetch(peer, "port") do
+    do_query(id)
+    |> select([p], {p.ip, p.port})
+    |> YaBTT.Repo.all()
+    |> Enum.reduce(<<>>, fn {ip, port}, acc ->
+      with {:ok, {a, b, c, d}} <- ip do
         acc <> <<a::8, b::8, c::8, d::8>> <> <<port::16>>
       else
         _ -> acc
