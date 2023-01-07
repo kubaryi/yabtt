@@ -79,30 +79,40 @@ defmodule YaBTT.Query.Peers do
 
       iex> YaBTT.Query.Peers.query(1, [])
   """
-  @spec query(id(), opts()) :: [Peer.t()] | binary()
+  @spec query(id(), opts()) :: map()
   def query(id, mode: :compact) do
     do_query(id)
     |> select([p], {p.ip, p.port})
     |> YaBTT.Repo.all()
-    |> Enum.reduce(<<>>, fn {ip, port}, acc ->
-      with {:ok, {a, b, c, d}} <- ip do
-        acc <> <<a::8, b::8, c::8, d::8>> <> <<port::16>>
-      else
-        _ -> acc
+    |> Enum.reduce({<<>>, <<>>}, fn {ip, port}, {ipv4, ipv6} ->
+      case ip do
+        {a, b, c, d} ->
+          {ipv4 <> <<a::8, b::8, c::8, d::8>> <> <<port::16>>, ipv6}
+
+        {a, b, c, d, e, f, g, h} ->
+          {ipv4,
+           ipv6 <> <<a::16, b::16, c::16, d::16, e::16, f::16, g::16, h::16>> <> <<port::16>>}
       end
     end)
+    |> case do
+      {ipv4, <<>>} -> %{"peers" => ipv4}
+      {<<>>, ipv6} -> %{"peers6" => ipv6}
+      {ipv4, ipv6} -> %{"peers" => ipv4, "peers6" => ipv6}
+    end
   end
 
   def query(id, mode: :no_peer_id) do
     do_query(id)
     |> select([p], %{"ip" => p.ip, "port" => p.port})
     |> YaBTT.Repo.all()
+    |> (&%{"peers" => &1}).()
   end
 
   def query(id, _opts) do
     do_query(id)
     |> select([p], %{"peer id" => p.peer_id, "ip" => p.ip, "port" => p.port})
     |> YaBTT.Repo.all()
+    |> (&%{"peers" => &1}).()
   end
 
   @spec do_query(id()) :: Ecto.Query.t()
