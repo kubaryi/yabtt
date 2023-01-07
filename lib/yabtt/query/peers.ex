@@ -47,18 +47,12 @@ defmodule YaBTT.Query.Peers do
 
   - `:compact`: return a binary string of peers in compact format.
 
-    In the mode, the peers list is replaced by a peers string with **6 bytes per peer**. For each peer,
-    the **first 4 bytes are the IP address and the last 2 bytes are the port number**. The length of the
-    whole peers will be a multiple of 6 (`6` × **the number of peers in peers**).
+    In the mode, the peers with IPv4 list is replaced by a peers string with **6 bytes per peer**.
+    For each peer, the **first 4 bytes are the IP address and the last 2 bytes are the port number**.
+    The length of the whole peers will be a multiple of 6 (6 × **the number of peers in peers**).
 
-    > #### Warning {: .warning}
-    >
-    > The `:compact` mode can't work with **IPv6 addresses**. If we queried an IPv6 `peer`, we will ignore those peer.
-    >
-    > This is not fair for IPv6 users. From this perspective, this is a _bad
-    > extension_.
-    >
-    > However, we will sovle this problem with [BEP0007](http://bittorrent.org/beps/bep_0007.html) in the future.
+    If the peers with Ipv6, the situation is similar, but the each peer is **18 bytes** (The first
+    16 bytes are the IP address and the last 2 bytes are the port number).
 
   - `:no_peer_id`: return a list of peers **without** `peer id`.
 
