@@ -6,7 +6,7 @@ defmodule YaBTT.Types.IPAddress do
   use Ecto.Type
 
   @type ip_addr :: :inet.ip_address()
-  @type io_ip_addr :: <<_::8>> | <<_::16>>
+  @type io_ip_addr :: <<_::32>> | <<_::128>>
 
   @doc """
   Returns the underlying schema type for the custom type.
