@@ -41,7 +41,7 @@ gen_faker_header = fn info_hash_list, peer_id_list ->
 end
 
 call_announce = fn i, l2 ->
-  conn(:get, "/announce", gen_faker_header.(i, l2)) |> Router.call(opts)
+  conn(:get, "https://example.com/announce", gen_faker_header.(i, l2)) |> Router.call(opts)
 end
 
 # Benchmark Data
