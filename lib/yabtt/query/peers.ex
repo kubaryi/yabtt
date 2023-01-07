@@ -47,18 +47,12 @@ defmodule YaBTT.Query.Peers do
 
   - `:compact`: return a binary string of peers in compact format.
 
-    In the mode, the peers list is replaced by a peers string with **6 bytes per peer**. For each peer,
-    the **first 4 bytes are the IP address and the last 2 bytes are the port number**. The length of the
-    whole peers will be a multiple of 6 (`6` × **the number of peers in peers**).
+    In the mode, the peers with IPv4 list is replaced by a peers string with **6 bytes per peer**.
+    For each peer, the **first 4 bytes are the IP address and the last 2 bytes are the port number**.
+    The length of the whole peers will be a multiple of 6 (6 × **the number of peers in peers**).
 
-    > #### Warning {: .warning}
-    >
-    > The `:compact` mode can't work with **IPv6 addresses**. If we queried an IPv6 `peer`, we will ignore those peer.
-    >
-    > This is not fair for IPv6 users. From this perspective, this is a _bad
-    > extension_.
-    >
-    > However, we will sovle this problem with [BEP0007](http://bittorrent.org/beps/bep_0007.html) in the future.
+    If the peers with Ipv6, the situation is similar, but the each peer is **18 bytes** (The first
+    16 bytes are the IP address and the last 2 bytes are the port number).
 
   - `:no_peer_id`: return a list of peers **without** `peer id`.
 
@@ -79,29 +73,36 @@ defmodule YaBTT.Query.Peers do
 
       iex> YaBTT.Query.Peers.query(1, [])
   """
-  @spec query(id(), opts()) :: [Peer.t()] | binary()
+  @spec query(id(), opts()) :: map()
   def query(id, mode: :compact) do
-    query(id, mode: :no_peer_id)
-    |> Enum.reduce(<<>>, fn peer, acc ->
-      with {:ok, {a, b, c, d}} <- Map.fetch(peer, "ip"),
-           {:ok, port} <- Map.fetch(peer, "port") do
-        acc <> <<a::8, b::8, c::8, d::8>> <> <<port::16>>
-      else
-        _ -> acc
+    do_query(id)
+    |> select([p], {fragment("ip"), p.port})
+    |> YaBTT.Repo.all()
+    |> Enum.reduce({<<>>, <<>>}, fn {ip, port}, {ipv4, ipv6} ->
+      case ip do
+        <<_::32>> -> {ipv4 <> ip <> <<port::16>>, ipv6}
+        <<_::128>> -> {ipv4, ipv6 <> ip <> <<port::16>>}
       end
     end)
+    |> case do
+      {ipv4, <<>>} -> %{"peers" => ipv4}
+      {<<>>, ipv6} -> %{"peers6" => ipv6}
+      {ipv4, ipv6} -> %{"peers" => ipv4, "peers6" => ipv6}
+    end
   end
 
   def query(id, mode: :no_peer_id) do
     do_query(id)
     |> select([p], %{"ip" => p.ip, "port" => p.port})
     |> YaBTT.Repo.all()
+    |> (&%{"peers" => &1}).()
   end
 
   def query(id, _opts) do
     do_query(id)
     |> select([p], %{"peer id" => p.peer_id, "ip" => p.ip, "port" => p.port})
     |> YaBTT.Repo.all()
+    |> (&%{"peers" => &1}).()
   end
 
   @spec do_query(id()) :: Ecto.Query.t()

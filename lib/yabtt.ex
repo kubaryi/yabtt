@@ -136,10 +136,7 @@ defmodule YaBTT do
       %{no_peer_id: np} when np != 0 -> YaBTT.Query.Peers.query(id, mode: :no_peer_id)
       %{compact: 0, no_peer_id: 0} -> YaBTT.Query.Peers.query(id, [])
     end
-    |> (&%{
-          "interval" => Application.get_env(:yabtt, :interval, 1800),
-          "peers" => &1
-        }).()
+    |> Map.put("interval", Application.get_env(:yabtt, :interval, 1800))
   end
 
   alias YaBTT.Query.State

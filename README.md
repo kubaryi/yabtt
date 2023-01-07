@@ -14,9 +14,9 @@ Read [our documents][documents] to learn more.
 
 1. **Native support for [HTTPS][https_wiki] and [HSTS][rfc6797]**.
 2. Full supports for the HTTP Tracker Protocol in the [BitTorrent protocol specification][bep_0003], but we **don't support or plan to support** the [UDP Tracker Protocol][bep_0015]. -> [_why?_](#why-udp-tracker-protocol-is-not-a-good-idea)
-3. Supports both IPv4 and IPv6[^3].
+3. Full supports for both IPv4 and IPv6 (including the [Compact mode for IPv6][bep_0007]).
 4. Supports the [Tracker "Scrape" Extension][bep_0048].
-5. Supports [Compact mode][bep_0023] and `no-peer-id` mode.
+5. Supports [Compact mode][bep_0023] and provide [`no-peer-id` mode][nopeerid] for compatibility.
 
 ## Usage
 
@@ -59,7 +59,7 @@ Here are the environment variables we support:
 | `YABTT_INTERVAL`      | 3600    | Interval in seconds that the client should wait between sending regular requests to the tracker. |
 | `YABTT_PORT`          | 8080    | The port of server monitoring.                                                                   |
 | `YABTT_QUERY_LIMIT`   | 50      | Limit the number of peers that the query can return.                                             |
-| `YABTT_COMPACT_ONLY`  | `false` | Force [_compact mode_][bep_0023] to save bandwidth. [^3] [^4]                                    |
+| `YABTT_COMPACT_ONLY`  | `false` | Force [_compact mode_][bep_0023] to save bandwidth. [^3]                                         |
 | `YABTT_DISABLE_HTTPS` | `false` | Set it to `true` to disable HTTPS, **but you should NEVER do this.**                             |
 | `YABTT_LOG_LEVEL`     | `info`  | The [log level][log_level] printed on TTY.                                                       |
 
@@ -106,6 +106,7 @@ The code in this project is released under the [GPL-3.0 License](./LICENSE).
 [log_level]: https://hexdocs.pm/logger/Logger.html#module-levels
 [https_wiki]: https://en.wikipedia.org/wiki/HTTPS
 [limit_for_dot]: https://www.cloudflare.com/learning/dns/dns-over-tls
+[nopeerid]: https://wiki.theory.org/BitTorrentTrackerExtensions
 
 <!-- documents -->
 
@@ -136,5 +137,4 @@ The code in this project is released under the [GPL-3.0 License](./LICENSE).
 
 [^1]: By default, we force HTTPS and run it with ["strict mode"][rfc6797].
 [^2]: You can check our benchmark report [here][benchmark].
-[^3]: The compact mode can't work with **IPv6 addresses**. However, we will solve this problem with [BEP0007][bep_0007] in the future. [learn more][limit_for_compact_mode]
-[^4]: In the situation that `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`.
+[^3]: In the situation that `YABTT_COMPACT_ONLY` be setting by `true`, we will **refuse the request** if the request contains `compact=0`.
