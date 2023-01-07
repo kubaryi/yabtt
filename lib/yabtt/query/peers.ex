@@ -82,16 +82,12 @@ defmodule YaBTT.Query.Peers do
   @spec query(id(), opts()) :: map()
   def query(id, mode: :compact) do
     do_query(id)
-    |> select([p], {p.ip, p.port})
+    |> select([p], {fragment("ip"), p.port})
     |> YaBTT.Repo.all()
     |> Enum.reduce({<<>>, <<>>}, fn {ip, port}, {ipv4, ipv6} ->
       case ip do
-        {a, b, c, d} ->
-          {ipv4 <> <<a::8, b::8, c::8, d::8>> <> <<port::16>>, ipv6}
-
-        {a, b, c, d, e, f, g, h} ->
-          {ipv4,
-           ipv6 <> <<a::16, b::16, c::16, d::16, e::16, f::16, g::16, h::16>> <> <<port::16>>}
+        <<_::32>> -> {ipv4 <> ip <> <<port::16>>, ipv6}
+        <<_::128>> -> {ipv4, ipv6 <> ip <> <<port::16>>}
       end
     end)
     |> case do
