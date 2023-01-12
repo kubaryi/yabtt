@@ -119,3 +119,23 @@ The [official documents](https://github.com/acmesh-official/acme.sh/wiki) for ac
 Learn more about [run acme.sh in container](https://github.com/acmesh-official/acme.sh/wiki/Run-acme.sh-in-docker).
 
 Learn more about [use Amazon Route53 domain API](https://github.com/acmesh-official/acme.sh/wiki/dnsapi#10-use-amazon-route53-domain-api).
+
+## R.I.P. Mr. Peter
+
+<img src="https://user-images.githubusercontent.com/26341224/212175638-94333d89-f5fc-4975-b498-a111e81347ca.jpg"
+     title="Peter Eckersley in San Francisco (March 2022)"
+     alt="Peter Eckersley"
+     width="400px"
+     />
+
+He is [Peter Eckersley](<https://en.wikipedia.org/wiki/Peter_Eckersley_(computer_scientist)>).
+
+He and his friends founded Let's Encrypt.
+
+His work allows every website to obtain HTTPS certificates for free.
+
+Unfortunately, he died on September 2, 2022[^1].
+
+Let's say: **Thank you, Peter!** :hearts:
+
+[^1]: [Peter Eckersley, may his memory be a blessing](https://community.letsencrypt.org/t/peter-eckersley-may-his-memory-be-a-blessing/183854)
