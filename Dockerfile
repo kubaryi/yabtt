@@ -1,8 +1,8 @@
-ARG ALPINE_VERSION=3.16
-ARG ELIXIR_VERSION=1.14
+ARG DEBIAN_VERSION=stable-slim
+ARG ELIXIR_VERSION=1.14.2-slim
 
 # ==== Builder ====
-FROM elixir:${ELIXIR_VERSION}-alpine AS builder
+FROM elixir:${ELIXIR_VERSION} AS builder
 
 # The environment to build with
 ARG MIX_ENV=prod
@@ -14,10 +14,10 @@ WORKDIR /app
 RUN mix local.hex --force && \
     mix local.rebar --force
 
-COPY . .
-
 # Install dependencies for build sqlite3
-RUN apk add --no-cache build-base
+RUN apt update && apt install -y build-essential
+
+COPY . .
 
 # Install & compile the dependencies of Elixir
 RUN mix deps.get --only ${MIX_ENV} && \
@@ -30,15 +30,12 @@ RUN mix do compile, release
 
 
 # ==== Runtime ====
-FROM alpine:${ALPINE_VERSION} AS app
+FROM debian:${DEBIAN_VERSION} AS app
 
 # Set the locale to UTF-8
 ENV LANG=C.UTF-8
 
 WORKDIR /app
-
-# Install dependencies for Erlang and Elixir
-RUN apk add --no-cache openssl libstdc++ ncurses-libs
 
 # Copy the release from the builder
 COPY --from=builder /app/_build/prod/rel/yabtt .
