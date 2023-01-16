@@ -1,10 +1,12 @@
-defmodule YaBTT.Repo.Migrations.CreateConnections do
+defmodule YaBTT.Repo.Migrations.RenameTorrentsPeersToConnections do
   use Ecto.Migration
 
   def change do
-    create table(:connections) do
-      add(:torrent_id, references(:torrents))
-      add(:peer_id, references(:peers))
+    drop(unique_index(:torrents_peers, [:torrent_id, :peer_id]))
+
+    rename(table(:torrents_peers), to: table(:connections))
+
+    alter table(:connections) do
       add(:downloaded, :integer)
       add(:uploaded, :integer)
       add(:left, :integer)
