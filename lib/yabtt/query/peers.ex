@@ -29,7 +29,7 @@ defmodule YaBTT.Query.Peers do
 
   import Ecto.Query
 
-  alias YaBTT.Schema.Peer
+  alias YaBTT.Schema.{Connection, Peer}
 
   @type id :: integer() | binary()
   @type opts :: [mode: :compact | :no_peer_id | nil]
@@ -108,8 +108,9 @@ defmodule YaBTT.Query.Peers do
   defp do_query(id) do
     from(
       p in Peer,
-      inner_join: t in assoc(p, :torrents),
-      on: t.id == ^id,
+      inner_join: c in Connection,
+      on: c.torrent_id == ^id,
+      where: p.id == c.peer_id and c.started == true,
       order_by: fragment("RANDOM()"),
       limit: ^Application.get_env(:yabtt, :query_limit, 50)
     )
