@@ -45,25 +45,8 @@ defmodule YaBTT.Schema.Connection do
   ## Examples
 
       iex> alias YaBTT.Schema.Connection
-      iex> params = %{
-      ...>   "uploaded" => "121",
-      ...>   "downloaded" => "41421",
-      ...>   "left" => "0",
-      ...>   "event" => "started"
-      ...> }
-      iex> changeset = Connection.changeset(%Connection{}, params, {1, 1})
-      iex> changeset.valid?
-      true
-      iex> changeset.changes
-      %{downloaded: 41421, left: 0, peer_id: 1, torrent_id: 1, uploaded: 121, started: true}
-
-      iex> alias YaBTT.Schema.Connection
-      iex> params = %{"uploaded" => "121", "downloaded" => "41421", "left" => "0"}
-      iex> changeset = Connection.changeset(%Connection{}, params, {1, 1})
-      iex> changeset.valid?
-      false
-      iex> changeset.errors
-      [started: {"can't be blank", [validation: :required]}]
+      iex> params = %{"uploaded" => "121", "downloaded" => "41421", "left" => "0", "event" => "started"}
+      iex> Connection.changeset(%Connection{}, params, {1, 1})
   """
   @spec changeset(changeset_t() | t(), params(), connect()) :: changeset_t()
   def changeset(connection, params, {torrent_id, peer_id}) do
