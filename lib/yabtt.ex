@@ -46,7 +46,7 @@ defmodule YaBTT do
       ...>   "uploaded" => "121",
       ...>   "downloaded" => "41421",
       ...>   "left" => "0",
-      ...>   "event" => "completed"
+      ...>   "event" => "started"
       ...> }
       iex> conn = %Plug.Conn{params: params, remote_ip: {127, 0, 0, 1}}
       iex> YaBTT.insert_or_update(conn)

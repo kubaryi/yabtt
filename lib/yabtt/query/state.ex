@@ -4,12 +4,18 @@ defmodule YaBTT.Query.State do
   """
 
   import Ecto.Query
-  import YaBTT.Query.Utils
 
   alias YaBTT.Schema.{Connection, Torrent}
 
   @type info_hash :: binary()
   @type t :: %{binary() => %{info_hash() => %{binary() => non_neg_integer()} | %{}}}
+
+  @spec case_when(term(), then: term()) :: term()
+  defmacrop case_when(condition, then: clauses) do
+    quote do
+      fragment(unquote("CASE WHEN #{condition} THEN #{clauses} END"))
+    end
+  end
 
   @doc """
   Query the state with `t:info_hash/0` from the `YaBTT.Schema.Connection`.
@@ -63,10 +69,10 @@ defmodule YaBTT.Query.State do
     |> group_by([c, t], t.info_hash)
     |> select([c, t], {t.info_hash,
      %{
-       # The event will store as an integer (-1, 0, or 1) in database.
-       "complete" => count(case_then("left <= 0 AND event == 1", do: 1)),
-       "incomplete" => count(case_then("left > 0 AND event == 1", do: 1)),
-       "downloaded" => count(case_then("left <= 0 OR event == -1", do: 1))
+       # Query with the `CASE WHEN ... THEN ... END` syntax
+       "complete" => count(case_when("started AND completed", then: 1)),
+       "incomplete" => count(case_when("started AND NOT completed", then: 1)),
+       "downloaded" => count(case_when("completed", then: 1))
      }})
     |> YaBTT.Repo.all()
     |> (&%{"files" => Map.new(&1)}).()
