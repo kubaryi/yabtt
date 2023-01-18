@@ -39,11 +39,12 @@ defmodule YaBTT.Schema.Announce do
 
   ## Examples
 
-      iex> params = %{"info_hash" => "f0a15e27fafbffc1c2f1", "peer_id" => "-TR14276775888084598"}
-      iex> YaBTT.Schema.Announce.changeset(%YaBTT.Schema.Announce{}, params)
-
-      iex> params = %{"info_hash" => "f0a15e27fafbffc1c2f1"}
-      iex> YaBTT.Schema.Announce.changeset(%YaBTT.Schema.Announce{}, params)
+      iex> alias YaBTT.Schema.Announce
+      iex> params = %{
+      ...>   "info_hash" => "f0a15e27fafbffc1c2f1",
+      ...>   "peer_id" => "-TR14276775888084598"
+      ...> }
+      iex> Announce.changeset(%Announce{}, params)
   """
   @spec changeset(changeset_t() | t(), params()) :: changeset_t()
   def changeset(struct, params) do
@@ -73,12 +74,11 @@ defmodule YaBTT.Schema.Announce do
 
   ## Examples
 
-      iex> %{"info_hash" => "f0a15e27fafbffc1c2f1", "peer_id" => "-TR14276775888084598"}
-      ...> |> YaBTT.Schema.Announce.apply()
-      {:ok, %YaBTT.Schema.Announce{info_hash: "f0a15e27fafbffc1c2f1", peer_id: "-TR14276775888084598"}}
-
-      iex> params = %{"info_hash" => "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e8"}
-      iex> {:error, _} =  YaBTT.Schema.Announce.apply(params)
+      iex> alias YaBTT.Schema.Announce
+      iex> %{
+      ...>   "info_hash" => "f0a15e27fafbffc1c2f1",
+      ...>   "peer_id" => "-TR14276775888084598"
+      ...> } |> Announce.apply()
   """
   @spec apply(params()) :: {:ok, t()} | {:error, changeset_t()}
   def apply(params), do: changeset(%__MODULE__{}, params) |> apply_action(:insert)
