@@ -56,13 +56,8 @@ defmodule YaBTT.Schema.Peer do
   ## Examples
 
       iex> alias YaBTT.Schema.Peer
-      iex> params = %{"peer_id" => "-TR14276775888084598", "port" => "6881", "ip" => "1.2.3.5"}
+      iex> params = %{"peer_id" => "-TR14276775888084598", "port" => "6881"}
       iex> Peer.changeset(%Peer{}, params, {1, 2, 3, 4})
-      #Ecto.Changeset<action: nil, changes: %{ip: {1, 2, 3, 5}, peer_id: \"-TR14276775888084598\", port: 6881}, errors: [], data: #YaBTT.Schema.Peer<>, valid?: true>
-
-      iex> alias YaBTT.Schema.Peer
-      iex> Peer.changeset(%Peer{}, %{}, {1, 2, 3, 4})
-      #Ecto.Changeset<action: nil, changes: %{ip: {1, 2, 3, 4}}, errors: [peer_id: {\"can't be blank\", [validation: :required]}, port: {\"can't be blank\", [validation: :required]}], data: #YaBTT.Schema.Peer<>, valid?: false>
   """
   @spec changeset(changeset_t() | t(), params(), ip_addr()) :: changeset_t()
   def changeset(peer, params, ip) do

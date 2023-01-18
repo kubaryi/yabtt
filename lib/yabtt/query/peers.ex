@@ -28,7 +28,6 @@ defmodule YaBTT.Query.Peers do
   """
 
   import Ecto.Query
-  import YaBTT.Query.Utils
 
   alias YaBTT.Schema.Peer
 
@@ -111,7 +110,7 @@ defmodule YaBTT.Query.Peers do
       p in Peer,
       inner_join: t in assoc(p, :torrents),
       on: t.id == ^id,
-      order_by: random(),
+      order_by: fragment("RANDOM()"),
       limit: ^Application.get_env(:yabtt, :query_limit, 50)
     )
   end

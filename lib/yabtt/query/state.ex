@@ -4,12 +4,18 @@ defmodule YaBTT.Query.State do
   """
 
   import Ecto.Query
-  import YaBTT.Query.Utils
 
   alias YaBTT.Schema.{Connection, Torrent}
 
   @type info_hash :: binary()
   @type t :: %{binary() => %{info_hash() => %{binary() => non_neg_integer()} | %{}}}
+
+  @spec case_when(term(), then: term()) :: term()
+  defmacrop case_when(condition, then: clauses) do
+    quote do
+      fragment(unquote("CASE WHEN #{condition} THEN #{clauses} END"))
+    end
+  end
 
   @doc """
   Query the state with `t:info_hash/0` from the `YaBTT.Schema.Connection`.
@@ -18,25 +24,8 @@ defmodule YaBTT.Query.State do
   from the `YaBTT.Schema.Connection`:
 
   * `complete` - The number of active peers that have completed downloading.
-
-    calculate by `left <= 0 AND event == 1`.
-
   * `incomplete` - The number of active peers that have not completed downloading.
-
-    calculate by `left > 0 AND event == 1`.
-
   * `downloaded` - The number of peers that have ever completed downloading.
-
-    calculate by `left <= 0 OR event == -1`.
-
-  > #### About the `event` {: .info}
-  >
-  > The `event` will store as an integer (`t:YaBTT.Types.Event.io_event/0`) in database.
-  >
-  > Since we use `Ecto.Query.API.fragment/1` and the [`CASE WHEN` syntax][case_when] to direct
-  > query information from the database, so we have to compare the `event` with the integer.
-  >
-  > [More information about event](`YaBTT.Types.Event`).
 
   Then we will return a `t:t/0` as required by the [specification][scrape_1].
 
@@ -47,7 +36,7 @@ defmodule YaBTT.Query.State do
 
   ## Examples
 
-        iex> YaBTT.Query.State.query(["info_hash_1", "info_hash_2"])
+      iex> YaBTT.Query.State.query(["info_hash_1", "info_hash_2"])
 
   <!-- links -->
 
@@ -63,10 +52,10 @@ defmodule YaBTT.Query.State do
     |> group_by([c, t], t.info_hash)
     |> select([c, t], {t.info_hash,
      %{
-       # The event will store as an integer (-1, 0, or 1) in database.
-       "complete" => count(case_then("left <= 0 AND event == 1", do: 1)),
-       "incomplete" => count(case_then("left > 0 AND event == 1", do: 1)),
-       "downloaded" => count(case_then("left <= 0 OR event == -1", do: 1))
+       # Query with the `CASE WHEN ... THEN ... END` syntax
+       "complete" => count(case_when("started AND completed", then: 1)),
+       "incomplete" => count(case_when("started AND NOT completed", then: 1)),
+       "downloaded" => count(case_when("completed", then: 1))
      }})
     |> YaBTT.Repo.all()
     |> (&%{"files" => Map.new(&1)}).()
