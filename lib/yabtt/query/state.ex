@@ -60,4 +60,23 @@ defmodule YaBTT.Query.State do
     |> YaBTT.Repo.all()
     |> (&%{"files" => Map.new(&1)}).()
   end
+
+  @spec query :: map()
+  def query do
+    from(c in Connection,
+      select: %{
+        # Connections
+        active: count(case_when("started", then: 1)),
+        seeders: count(case_when("started AND completed", then: 1)),
+        leechers: count(case_when("started AND NOT completed", then: 1)),
+        completed: count(case_when("completed", then: 1)),
+        total: count(),
+        # Torrents
+        torrents: count(c.torrent_id, :distinct),
+        # Peers
+        peers: count(c.peer_id, :distinct)
+      }
+    )
+    |> YaBTT.Repo.one()
+  end
 end
