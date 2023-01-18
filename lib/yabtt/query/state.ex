@@ -24,25 +24,8 @@ defmodule YaBTT.Query.State do
   from the `YaBTT.Schema.Connection`:
 
   * `complete` - The number of active peers that have completed downloading.
-
-    calculate by `left <= 0 AND event == 1`.
-
   * `incomplete` - The number of active peers that have not completed downloading.
-
-    calculate by `left > 0 AND event == 1`.
-
   * `downloaded` - The number of peers that have ever completed downloading.
-
-    calculate by `left <= 0 OR event == -1`.
-
-  > #### About the `event` {: .info}
-  >
-  > The `event` will store as an integer (`t:YaBTT.Types.Event.io_event/0`) in database.
-  >
-  > Since we use `Ecto.Query.API.fragment/1` and the [`CASE WHEN` syntax][case_when] to direct
-  > query information from the database, so we have to compare the `event` with the integer.
-  >
-  > [More information about event](`YaBTT.Types.Event`).
 
   Then we will return a `t:t/0` as required by the [specification][scrape_1].
 
@@ -53,7 +36,7 @@ defmodule YaBTT.Query.State do
 
   ## Examples
 
-        iex> YaBTT.Query.State.query(["info_hash_1", "info_hash_2"])
+      iex> YaBTT.Query.State.query(["info_hash_1", "info_hash_2"])
 
   <!-- links -->
 
