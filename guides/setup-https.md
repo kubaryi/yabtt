@@ -128,7 +128,7 @@ Learn more about [use Amazon Route53 domain API](https://github.com/acmesh-offic
      width="400px"
      />
 
-He is [Peter Eckersley](<https://en.wikipedia.org/wiki/Peter_Eckersley_(computer_scientist)>).
+He is [Peter Eckersley](https://www.eff.org/about/staff/peter-eckersley).
 
 He and his friends founded Let's Encrypt.
 
