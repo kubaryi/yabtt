@@ -36,7 +36,8 @@ defmodule YaBTT.Factory do
       uploaded: 1000,
       downloaded: 1000,
       left: 1000,
-      event: :started
+      completed: false,
+      started: true
     }
   end
 

@@ -22,7 +22,6 @@ defmodule YaBTT.Schema.Connection do
     field(:uploaded, :integer)
     field(:downloaded, :integer)
     field(:left, :integer)
-    field(:event, YaBTT.Types.Event)
     field(:completed, :boolean, default: false)
     field(:started, :boolean)
   end
@@ -56,7 +55,7 @@ defmodule YaBTT.Schema.Connection do
       iex> changeset.valid?
       true
       iex> changeset.changes
-      %{downloaded: 41421, event: :started, left: 0, peer_id: 1, torrent_id: 1, uploaded: 121, started: true}
+      %{downloaded: 41421, left: 0, peer_id: 1, torrent_id: 1, uploaded: 121, started: true}
 
       iex> alias YaBTT.Schema.Connection
       iex> params = %{"uploaded" => "121", "downloaded" => "41421", "left" => "0"}
@@ -69,20 +68,16 @@ defmodule YaBTT.Schema.Connection do
   @spec changeset(changeset_t() | t(), params(), connect()) :: changeset_t()
   def changeset(connection, params, {torrent_id, peer_id}) do
     connection
-    |> cast(params, [:uploaded, :downloaded, :left, :event])
+    |> cast(params, [:uploaded, :downloaded, :left])
     |> validate_required([:uploaded, :downloaded, :left])
     |> put_change(:torrent_id, torrent_id)
     |> put_change(:peer_id, peer_id)
-    |> handle_event()
-  end
-
-  defp handle_event(changeset) do
-    case fetch_change(changeset, :event) do
-      {:ok, :completed} -> change(changeset, completed: true)
-      {:ok, :started} -> change(changeset, started: true)
-      {:ok, :stopped} -> change(changeset, started: false)
-      _ -> changeset
-    end
+    |> handle_event(Map.fetch(params, "event"))
     |> validate_required([:started])
   end
+
+  defp handle_event(changeset, {:ok, "completed"}), do: change(changeset, completed: true)
+  defp handle_event(changeset, {:ok, "started"}), do: change(changeset, started: true)
+  defp handle_event(changeset, {:ok, "stopped"}), do: change(changeset, started: false)
+  defp handle_event(changeset, _), do: changeset
 end
