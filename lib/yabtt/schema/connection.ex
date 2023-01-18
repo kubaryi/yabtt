@@ -23,6 +23,8 @@ defmodule YaBTT.Schema.Connection do
     field(:downloaded, :integer)
     field(:left, :integer)
     field(:event, YaBTT.Types.Event)
+    field(:completed, :boolean, default: false)
+    field(:started, :boolean)
   end
 
   @type t :: %__MODULE__{}
@@ -54,7 +56,7 @@ defmodule YaBTT.Schema.Connection do
       iex> changeset.valid?
       true
       iex> changeset.changes
-      %{downloaded: 41421, event: :started, left: 0, peer_id: 1, torrent_id: 1, uploaded: 121}
+      %{downloaded: 41421, event: :started, left: 0, peer_id: 1, torrent_id: 1, uploaded: 121, started: true}
 
       iex> alias YaBTT.Schema.Connection
       iex> params = %{"uploaded" => "121", "downloaded" => "41421", "left" => "0"}
@@ -62,7 +64,7 @@ defmodule YaBTT.Schema.Connection do
       iex> changeset.valid?
       false
       iex> changeset.errors
-      [event: {"can't be blank for new peers or you used a wrong event", [validation: :event]}]
+      [started: {"can't be blank", [validation: :required]}]
   """
   @spec changeset(changeset_t() | t(), params(), connect()) :: changeset_t()
   def changeset(connection, params, {torrent_id, peer_id}) do
@@ -71,16 +73,16 @@ defmodule YaBTT.Schema.Connection do
     |> validate_required([:uploaded, :downloaded, :left])
     |> put_change(:torrent_id, torrent_id)
     |> put_change(:peer_id, peer_id)
-    |> validate_event()
+    |> handle_event()
   end
 
-  @spec validate_event(changeset_t()) :: changeset_t()
-  defp validate_event(changeset) do
-    with {:data, nil} <- fetch_field(changeset, :event) do
-      err_msg = "can't be blank for new peers or you used a wrong event"
-      add_error(changeset, :event, err_msg, validation: :event)
-    else
+  defp handle_event(changeset) do
+    case fetch_change(changeset, :event) do
+      {:ok, :completed} -> change(changeset, completed: true)
+      {:ok, :started} -> change(changeset, started: true)
+      {:ok, :stopped} -> change(changeset, started: false)
       _ -> changeset
     end
+    |> validate_required([:started])
   end
 end
