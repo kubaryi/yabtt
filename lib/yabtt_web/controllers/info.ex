@@ -1,15 +1,31 @@
 defmodule YaBTTWeb.Controllers.Info do
-  @moduledoc false
+  @moduledoc """
+  A controller (Plug) for the tracker statistics page.
+
+  This controller is responsible to show the current state of the tracker.
+
+  We query the state of the tracker by calling `YaBTT.Query.State.query/0`.
+  Then we render the result to a HTML page using `EEx`. Finally, we send the
+  response to the client (Browser).
+  """
 
   @behaviour Plug
 
   import Plug.Conn
 
-  @doc false
+  @doc """
+  Initializes the Plug.
+  """
   @spec init(Plug.opts()) :: Plug.opts()
   def init(opts), do: opts
 
-  @doc false
+  @doc """
+  Handles the request.
+
+  Query, and render the result to a HTML page.
+
+  Finally, send the response to the client.
+  """
   @spec call(Plug.Conn.t(), Plug.opts()) :: Plug.Conn.t()
   def call(conn, _opts) do
     {result, _} = YaBTT.Query.State.query() |> quote_eex()

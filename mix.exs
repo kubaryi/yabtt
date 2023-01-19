@@ -96,7 +96,8 @@ defmodule YaBTT.MixProject do
         "HTTP routing": [
           YaBTTWeb.Controllers.Router,
           YaBTTWeb.Controllers.Announce,
-          YaBTTWeb.Controllers.Scrape
+          YaBTTWeb.Controllers.Scrape,
+          YaBTTWeb.Controllers.Info
         ]
       ],
       before_closing_head_tag: &before_closing_head_tag/1
