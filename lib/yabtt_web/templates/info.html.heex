@@ -1,0 +1,25 @@
+<html>
+
+<head>
+  <title>Yet another BitTorrent Tracker</title>
+  <meta http-equiv="Content-Security-Policy" content="defalit-src 'self'; img-src *;" />
+  <meta charset="utf-8" />
+</head>
+
+<body>
+  <h1>Tracker statistics</h1>
+
+  <p>Connections: <%= @state.total %></p>
+  <ul>
+    <li>Active connections: <%= @state.active %></li>
+    <li>Seeders: <%= @state.seeders %></li>
+    <li>Leechers: <%= @state.leechers %></li>
+    <li>Completed: <%= @state.completed %></li>
+  </ul>
+
+  <p>Torrents: <%= @state.torrents %></p>
+
+  <p>Peers: <%= @state.peers %></p>
+</body>
+
+</html>

@@ -41,6 +41,8 @@ defmodule YaBTTWeb.Router do
 
   forward("/announce", to: YaBTTWeb.Controllers.Announce)
   forward("/scrape", to: YaBTTWeb.Controllers.Scrape)
+  forward("/info", to: YaBTTWeb.Controllers.Info)
+  forward("/stats", to: YaBTTWeb.Controllers.Info)
 
   match _ do
     not_found = "d14:failure reason9:not founde"
