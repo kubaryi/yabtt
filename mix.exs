@@ -94,7 +94,7 @@ defmodule YaBTT.MixProject do
           YaBTT.CustomTypes.IPAddress
         ],
         "HTTP routing": [
-          YaBTTWeb.Controllers.Router,
+          YaBTTWeb.Router,
           YaBTTWeb.Controllers.Announce,
           YaBTTWeb.Controllers.Scrape,
           YaBTTWeb.Controllers.Info
