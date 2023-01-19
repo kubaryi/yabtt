@@ -7,6 +7,9 @@ defmodule YaBTTWeb.Controllers.Info do
   We query the state of the tracker by calling `YaBTT.Query.State.query/0`.
   Then we render the result to a HTML page using `EEx`. Finally, we send the
   response to the client (Browser).
+
+  You can check `YaBTT.Query.State.query/0` for more information about what
+  information we statistics.
   """
 
   @behaviour Plug

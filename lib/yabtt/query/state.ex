@@ -61,6 +61,25 @@ defmodule YaBTT.Query.State do
     |> (&%{"files" => Map.new(&1)}).()
   end
 
+  @doc """
+  Query the statistics of the tracker from the `YaBTT.Schema.Connection`.
+
+  The following information will be queried:
+
+  * `active` - The number of active connections.
+  * `seeders` - The number of active connections that have completed downloading.
+  * `leechers` - The number of active connections that have not completed downloading.
+  * `completed` - The number of connections that have ever completed downloading.
+  * `total` - The total number of connections.
+  * `torrents` - The total number of torrents.
+  * `peers` - The total number of peers.
+
+  Then we will return a key-value map and the value will be a non-negative integer.
+
+  ## Examples
+
+      iex> YaBTT.Query.State.query()
+  """
   @spec query :: map()
   def query do
     from(c in Connection,
