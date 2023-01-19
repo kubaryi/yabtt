@@ -91,7 +91,7 @@ defmodule YaBTT.MixProject do
           YaBTT.Schema.Torrent
         ],
         "Database Types": [
-          YaBTT.Types.IPAddress
+          YaBTT.CustomTypes.IPAddress
         ],
         "HTTP routing": [
           YaBTTWeb.Controllers.Router,

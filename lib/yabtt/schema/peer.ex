@@ -31,7 +31,7 @@ defmodule YaBTT.Schema.Peer do
   @primary_key {:id, :id, autogenerate: true}
   schema "peers" do
     field(:peer_id, :binary)
-    field(:ip, YaBTT.Types.IPAddress)
+    field(:ip, YaBTT.CustomTypes.IPAddress)
     field(:port, :integer)
     many_to_many(:torrents, Torrent, join_through: Connection)
 
