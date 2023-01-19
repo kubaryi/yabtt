@@ -17,6 +17,7 @@ Read [our documents][documents] to learn more.
 3. Full supports for both IPv4 and IPv6 (including the [Compact mode for IPv6][bep_0007]).
 4. Supports the [Tracker "Scrape" Extension][bep_0048].
 5. Supports [Compact mode][bep_0023] and provide [`no-peer-id` mode][nopeerid] for compatibility.
+6. Tracker statistics via web interface at `/info` or `/stats`. -> [Screenshots][router_info_screenshots]
 
 ## Usage
 
@@ -112,6 +113,7 @@ The code in this project is released under the [GPL-3.0 License](./LICENSE).
 
 [documents]: http://mogeko.github.io/yabtt
 [examples]: https://mogeko.github.io/yabtt/examples-and-screenshots.html
+[router_info_screenshots]: https://mogeko.github.io/yabtt/examples-and-screenshots.html#call-info-or-stats
 [limit_for_compact_mode]: https://mogeko.github.io/yabtt/YaBTT.Query.Peers.html#query/2-mode
 [https_certs]: ./guides/setup-https.md#set-up-https
 [benchmark]: ./benchmark/README.md
