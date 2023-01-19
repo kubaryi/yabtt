@@ -1,10 +1,10 @@
-defmodule YaBTT.Server.ScrapeTest do
+defmodule YaBTTWeb.Controllers.ScrapeTest do
   use ExUnit.Case
   use Plug.Test
 
-  doctest YaBTT.Server.Scrape
+  doctest YaBTTWeb.Controllers.Scrape
 
-  alias YaBTT.Server.Scrape
+  alias YaBTTWeb.Controllers.Scrape
 
   @default_query_string "info_hash=Nf%22v%BA%CA%0F%DBk%D6%0Bv%17%8C%D1%19%D1%05%00%13"
 

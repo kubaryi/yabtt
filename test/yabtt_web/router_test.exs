@@ -1,8 +1,8 @@
-defmodule YaBTT.Server.RouterTest do
+defmodule YaBTTWeb.RouterTest do
   use ExUnit.Case
   use Plug.Test
 
-  alias YaBTT.Server.Router
+  alias YaBTTWeb.Router
 
   setup_all do
     {:ok, Router.init([])}

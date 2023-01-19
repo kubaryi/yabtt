@@ -1,4 +1,4 @@
-defmodule YaBTT.Server.Router do
+defmodule YaBTTWeb.Router do
   @moduledoc """
   Plug router for the Tracker application.
 
@@ -39,8 +39,8 @@ defmodule YaBTT.Server.Router do
     |> send_resp(200, resp_msg)
   end
 
-  forward("/announce", to: YaBTT.Server.Announce)
-  forward("/scrape", to: YaBTT.Server.Scrape)
+  forward("/announce", to: YaBTTWeb.Controllers.Announce)
+  forward("/scrape", to: YaBTTWeb.Controllers.Scrape)
 
   match _ do
     not_found = "d14:failure reason9:not founde"

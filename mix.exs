@@ -54,7 +54,7 @@ defmodule YaBTT.MixProject do
 
   defp test_coverage do
     [
-      ignore_modules: [YaBBT.Application, YaBTT.Repo, YaBTT.Factory],
+      ignore_modules: [YaBBT.Application, YaBTT.Repo, YaBTT.Factory, YaBTTWeb],
       summary: [threshold: 85]
     ]
   end
@@ -94,9 +94,9 @@ defmodule YaBTT.MixProject do
           YaBTT.Types.IPAddress
         ],
         "HTTP routing": [
-          YaBTT.Server.Router,
-          YaBTT.Server.Announce,
-          YaBTT.Server.Scrape
+          YaBTTWeb.Controllers.Router,
+          YaBTTWeb.Controllers.Announce,
+          YaBTTWeb.Controllers.Scrape
         ]
       ],
       before_closing_head_tag: &before_closing_head_tag/1
