@@ -2,7 +2,7 @@ defmodule YaBTT.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/mogeko/yabtt"
-  @version "0.1.2"
+  @version "0.1.3"
 
   def project do
     [
