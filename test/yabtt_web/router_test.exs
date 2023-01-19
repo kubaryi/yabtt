@@ -19,6 +19,30 @@ defmodule YaBTTWeb.RouterTest do
     assert conn.status == 200
   end
 
+  test "GET /announce" do
+    conn = conn(:get, "https://example.com/announce") |> Router.call([])
+
+    assert conn.state == :sent
+  end
+
+  test "GET /scrape" do
+    conn = conn(:get, "https://example.com/scrape") |> Router.call([])
+
+    assert conn.state == :sent
+  end
+
+  test "GET /info" do
+    conn = conn(:get, "https://example.com/info") |> Router.call([])
+
+    assert conn.state == :sent
+  end
+
+  test "GRT /stats" do
+    conn = conn(:get, "https://example.com/stats") |> Router.call([])
+
+    assert conn.state == :sent
+  end
+
   test "Returns 404", opts do
     conn = conn(:get, "https://example.com/missing", %{}) |> Router.call(opts)
 
