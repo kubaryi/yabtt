@@ -65,7 +65,7 @@ defmodule YaBTT.Schema.PeerTest do
     assert not changeset.valid?
 
     assert changeset.errors == [
-             ip: {"is invalid", [{:type, YaBTT.Types.IPAddress}, {:validation, :cast}]}
+             ip: {"is invalid", [{:type, YaBTT.CustomTypes.IPAddress}, {:validation, :cast}]}
            ]
   end
 end

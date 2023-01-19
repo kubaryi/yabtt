@@ -1,4 +1,4 @@
-defmodule YaBTT.Server.Announce do
+defmodule YaBTTWeb.Controllers.Announce do
   @moduledoc """
   The Announce controller for the YaBTT application.
   """
@@ -66,25 +66,25 @@ defmodule YaBTT.Server.Announce do
 
       iex> conn = %Plug.Conn{}
       iex> msg = {:ok, %{"interval" => 1800, "peers" => []}}
-      iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, msg)
+      iex> conn = YaBTTWeb.Controllers.Announce.put_resp_msg(conn, msg)
       iex> conn.resp_body
       "d8:intervali1800e5:peerslee"
 
       iex> conn = %Plug.Conn{}
       iex> msg = {:error, YaBTT.Schema.Announce.changeset(%YaBTT.Schema.Announce{}, %{})}
-      iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, msg)
+      iex> conn = YaBTTWeb.Controllers.Announce.put_resp_msg(conn, msg)
       iex> conn.resp_body
       "d14:failure reasond9:info_hashl14:can't be blanke7:peer_idl14:can't be blankeee"
 
       iex> conn = %Plug.Conn{}
       iex> changeset = YaBTT.Schema.Announce.changeset(%YaBTT.Schema.Announce{}, %{})
       iex> msg = {:error, :multi_error, changeset, %Ecto.Multi{}}
-      iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, msg)
+      iex> conn = YaBTTWeb.Controllers.Announce.put_resp_msg(conn, msg)
       iex> conn.resp_body
       "d14:failure reasond9:info_hashl14:can't be blanke7:peer_idl14:can't be blankeee"
 
       iex> conn = %Plug.Conn{}
-      iex> conn = YaBTT.Server.Announce.put_resp_msg(conn, :error)
+      iex> conn = YaBTTWeb.Controllers.Announce.put_resp_msg(conn, :error)
       iex> conn.resp_body
       "d14:failure reason22:unknown internal errore"
   """

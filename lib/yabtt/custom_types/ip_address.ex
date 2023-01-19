@@ -1,4 +1,4 @@
-defmodule YaBTT.Types.IPAddress do
+defmodule YaBTT.CustomTypes.IPAddress do
   @moduledoc """
   A custom type for IP addresses.
   """
@@ -31,16 +31,16 @@ defmodule YaBTT.Types.IPAddress do
 
   ## Examples
 
-      iex> YaBTT.Types.IPAddress.cast('127.0.0.1')
+      iex> YaBTT.CustomTypes.IPAddress.cast('127.0.0.1')
       {:ok, {127, 0, 0, 1}}
 
-      iex> YaBTT.Types.IPAddress.cast("::1")
+      iex> YaBTT.CustomTypes.IPAddress.cast("::1")
       {:ok, {0, 0, 0, 0, 0, 0, 0, 1}}
 
-      iex> YaBTT.Types.IPAddress.cast({127, 0, 0, 1})
+      iex> YaBTT.CustomTypes.IPAddress.cast({127, 0, 0, 1})
       {:ok, {127, 0, 0, 1}}
 
-      iex> YaBTT.Types.IPAddress.cast("abc")
+      iex> YaBTT.CustomTypes.IPAddress.cast("abc")
       :error
   """
   @spec cast(binary() | charlist()) :: :error | {:ok, ip_addr()}
@@ -72,13 +72,13 @@ defmodule YaBTT.Types.IPAddress do
 
   ## Examples
 
-      iex> YaBTT.Types.IPAddress.load(<<127, 0, 0, 1>>)
+      iex> YaBTT.CustomTypes.IPAddress.load(<<127, 0, 0, 1>>)
       {:ok, {127, 0, 0, 1}}
 
-      iex> YaBTT.Types.IPAddress.load(<<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>)
+      iex> YaBTT.CustomTypes.IPAddress.load(<<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>)
       {:ok, {0, 0, 0, 0, 0, 0, 0, 1}}
 
-      iex> YaBTT.Types.IPAddress.load("abc")
+      iex> YaBTT.CustomTypes.IPAddress.load("abc")
       :error
   """
   @spec load(io_ip_addr()) :: :error | {:ok, ip_addr()}
@@ -103,13 +103,13 @@ defmodule YaBTT.Types.IPAddress do
 
   ## Examples
 
-      iex> YaBTT.Types.IPAddress.dump({127, 0, 0, 1})
+      iex> YaBTT.CustomTypes.IPAddress.dump({127, 0, 0, 1})
       {:ok, <<127, 0, 0, 1>>}
 
-      iex> YaBTT.Types.IPAddress.dump({0, 0, 0, 0, 0, 0, 0, 1})
+      iex> YaBTT.CustomTypes.IPAddress.dump({0, 0, 0, 0, 0, 0, 0, 1})
       {:ok, <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>}
 
-      iex> YaBTT.Types.IPAddress.dump({"a", "b", "c"})
+      iex> YaBTT.CustomTypes.IPAddress.dump({"a", "b", "c"})
       :error
   """
   @spec dump(ip_addr()) :: :error | {:ok, io_ip_addr()}

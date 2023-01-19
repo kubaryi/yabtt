@@ -1,10 +1,10 @@
-defmodule YaBTT.Server.AnnounceTest do
+defmodule YaBTTWeb.Controllers.AnnounceTest do
   use ExUnit.Case
   use Plug.Test
 
-  doctest YaBTT.Server.Announce
+  doctest YaBTTWeb.Controllers.Announce
 
-  alias YaBTT.Server.Announce
+  alias YaBTTWeb.Controllers.Announce
 
   @default_params %{
     "info_hash" =>

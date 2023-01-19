@@ -1,6 +1,6 @@
 use Plug.Test
 
-alias YaBTT.Server.Router
+alias YaBTTWeb.Controllers.Router
 
 # Environment variables
 tag = System.get_env("BENCHMARK_TAG", nil)
@@ -34,7 +34,7 @@ gen_faker_header = fn info_hash_list, peer_id_list ->
     "uploaded" => Enum.random(0..100),
     "downloaded" => Enum.random(0..100),
     "left" => Enum.random(0..100_000),
-    "event" => Enum.random(["started", "stopped", "completed"]),
+    "event" => Enum.random(["started", "stopped"]),
     "compact" => Enum.random([0, 1]),
     "no_peer_id" => Enum.random([0, 1])
   }

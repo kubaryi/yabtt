@@ -2,7 +2,7 @@ defmodule YaBTT.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/mogeko/yabtt"
-  @version "0.1.1"
+  @version "0.1.3"
 
   def project do
     [
@@ -54,7 +54,7 @@ defmodule YaBTT.MixProject do
 
   defp test_coverage do
     [
-      ignore_modules: [YaBBT.Application, YaBTT.Repo, YaBTT.Factory],
+      ignore_modules: [YaBBT.Application, YaBTT.Repo, YaBTT.Factory, YaBTTWeb],
       summary: [threshold: 85]
     ]
   end
@@ -91,12 +91,13 @@ defmodule YaBTT.MixProject do
           YaBTT.Schema.Torrent
         ],
         "Database Types": [
-          YaBTT.Types.IPAddress
+          YaBTT.CustomTypes.IPAddress
         ],
         "HTTP routing": [
-          YaBTT.Server.Router,
-          YaBTT.Server.Announce,
-          YaBTT.Server.Scrape
+          YaBTTWeb.Router,
+          YaBTTWeb.Controllers.Announce,
+          YaBTTWeb.Controllers.Scrape,
+          YaBTTWeb.Controllers.Info
         ]
       ],
       before_closing_head_tag: &before_closing_head_tag/1

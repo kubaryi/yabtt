@@ -1,8 +1,8 @@
-defmodule YaBTT.Server.RouterTest do
+defmodule YaBTTWeb.RouterTest do
   use ExUnit.Case
   use Plug.Test
 
-  alias YaBTT.Server.Router
+  alias YaBTTWeb.Router
 
   setup_all do
     {:ok, Router.init([])}
@@ -17,6 +17,30 @@ defmodule YaBTT.Server.RouterTest do
 
     assert conn.state == :sent
     assert conn.status == 200
+  end
+
+  test "GET /announce" do
+    conn = conn(:get, "https://example.com/announce") |> Router.call([])
+
+    assert conn.state == :sent
+  end
+
+  test "GET /scrape" do
+    conn = conn(:get, "https://example.com/scrape") |> Router.call([])
+
+    assert conn.state == :sent
+  end
+
+  test "GET /info" do
+    conn = conn(:get, "https://example.com/info") |> Router.call([])
+
+    assert conn.state == :sent
+  end
+
+  test "GRT /stats" do
+    conn = conn(:get, "https://example.com/stats") |> Router.call([])
+
+    assert conn.state == :sent
   end
 
   test "Returns 404", opts do

@@ -1,4 +1,4 @@
-defmodule YaBTT.Server.Scrape do
+defmodule YaBTTWeb.Controllers.Scrape do
   @moduledoc """
   A `Plug` to handle route `/scrape`.
 
@@ -39,7 +39,7 @@ defmodule YaBTT.Server.Scrape do
 
   @behaviour Plug
 
-  import YaBTT.Server.Announce
+  import YaBTTWeb.Controllers.Announce
   import Plug.Conn
 
   @doc """

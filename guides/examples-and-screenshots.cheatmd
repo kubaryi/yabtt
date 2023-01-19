@@ -111,3 +111,9 @@ Decode to human readable results:
   }
 }
 ```
+
+## Call `/info` or `/stats`
+
+Visit `https://localhost:8080/info` in the browser.
+
+![Tracker statistics](https://user-images.githubusercontent.com/26341224/213574754-85837b9a-ff02-4a81-ba22-fbd6cea3d9d6.png)
