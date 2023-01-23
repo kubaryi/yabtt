@@ -11,7 +11,11 @@ defmodule YaBTTWeb.Controllers.InfoTest do
   end
 
   test "info", opts do
-    conn = conn(:get, "/info") |> Info.call(opts)
+    conn =
+      conn(:get, "/info")
+      |> put_req_header("authorization", "Basic YWRtaW46YWRtaW4=")
+      |> Info.call(opts)
+
     [content_type | _tail] = get_resp_header(conn, "content-type")
 
     assert content_type == "text/html; charset=utf-8"
