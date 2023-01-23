@@ -18,6 +18,11 @@ config :yabtt, YaBTTWeb,
   # Set the port to listen on, default to 8080.
   port: get_env("YABTT_PORT", "8080") |> to_integer()
 
+config :yabtt, YaBTTWeb.Auth,
+  # Set the username and password for basic auth, default to "admin" and "admin".
+  username: get_env("YABTT_AUTH_USERNAME", "admin"),
+  password: get_env("YABTT_AUTH_PASSWORD", "admin")
+
 config :logger,
   # Set the log level, default to :info.
   # See: https://hexdocs.pm/logger/Logger.html#module-levels
