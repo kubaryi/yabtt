@@ -14,9 +14,14 @@ config :yabtt,
   # Disable HTTPS, default to false.
   disable_https: get_env("YABTT_DISABLE_HTTPS", "false") |> downcase() |> to_existing_atom()
 
-config :yabtt, Plug.Cowboy,
+config :yabtt, YaBTTWeb,
   # Set the port to listen on, default to 8080.
   port: get_env("YABTT_PORT", "8080") |> to_integer()
+
+config :yabtt, YaBTTWeb.Auth,
+  # Set the username and password for basic auth, default to "admin" and "admin".
+  username: get_env("YABTT_AUTH_USERNAME", "admin"),
+  password: get_env("YABTT_AUTH_PASSWORD", "admin")
 
 config :logger,
   # Set the log level, default to :info.

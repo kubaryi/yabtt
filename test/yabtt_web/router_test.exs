@@ -34,13 +34,13 @@ defmodule YaBTTWeb.RouterTest do
   test "GET /info" do
     conn = conn(:get, "https://example.com/info") |> Router.call([])
 
-    assert conn.state == :sent
+    assert conn.state == :set
   end
 
   test "GRT /stats" do
     conn = conn(:get, "https://example.com/stats") |> Router.call([])
 
-    assert conn.state == :sent
+    assert conn.state == :set
   end
 
   test "Returns 404", opts do
