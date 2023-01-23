@@ -14,7 +14,7 @@ config :yabtt,
   # Disable HTTPS, default to false.
   disable_https: get_env("YABTT_DISABLE_HTTPS", "false") |> downcase() |> to_existing_atom()
 
-config :yabtt, Plug.Cowboy,
+config :yabtt, YaBTTWeb,
   # Set the port to listen on, default to 8080.
   port: get_env("YABTT_PORT", "8080") |> to_integer()
 
