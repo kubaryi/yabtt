@@ -15,7 +15,7 @@ defmodule YaBTTWeb.Auth do
 
   @spec auth_config(keyword()) :: keyword()
   def auth_config(opts) do
-    Application.get_env(:yabtt, __MODULE__, Keyword.merge(@default_auth, opts))
+    Keyword.merge(Application.get_env(:yabtt, __MODULE__, @default_auth), opts)
   end
 
   @spec auth(Plug.Conn.t(), keyword()) :: Plug.Conn.t()
