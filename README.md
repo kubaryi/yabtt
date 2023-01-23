@@ -62,6 +62,8 @@ Here are the environment variables we support:
 | `YABTT_QUERY_LIMIT`   | 50      | Limit the number of peers that the query can return.                                             |
 | `YABTT_COMPACT_ONLY`  | `false` | Force [_compact mode_][bep_0023] to save bandwidth. [^3]                                         |
 | `YABTT_DISABLE_HTTPS` | `false` | Set it to `true` to disable HTTPS, **but you should NEVER do this.**                             |
+| `YABTT_AUTH_USERNAME` | `admin` | Set the ['Basic' HTTP Authentication][rfc7617] for [tracker statistics](#features).              |
+| `YABTT_AUTH_PASSWORD` | `admin` | Set the ['Basic' HTTP Authentication][rfc7617] for [tracker statistics](#features).              |
 | `YABTT_LOG_LEVEL`     | `info`  | The [log level][log_level] printed on TTY.                                                       |
 
 ## Examples
@@ -134,6 +136,7 @@ The code in this project is released under the [GPL-3.0 License](./LICENSE).
 [rfc8484]: https://www.rfc-editor.org/rfc/rfc8484
 [rfc7540]: https://www.rfc-editor.org/rfc/rfc7540
 [rfc9114]: https://www.rfc-editor.org/rfc/rfc9114
+[rfc7617]: https://www.rfc-editor.org/rfc/rfc7617
 
 <!-- Comments -->
 

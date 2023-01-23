@@ -4,6 +4,10 @@ defmodule YaBTTWeb.Controllers.Info do
 
   This controller is responsible to show the current state of the tracker.
 
+  > #### Noice {: .info}
+  >
+  > This controller requires the authentication. See: `YaBTTWeb.Auth`.
+
   We query the state of the tracker by calling `YaBTT.Query.State.query/0`.
   Then we render the result to a HTML page using `EEx`. Finally, we send the
   response to the client (Browser).
