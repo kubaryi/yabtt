@@ -5,7 +5,7 @@ defmodule YaBTT.Query.State do
 
   import Ecto.Query
 
-  alias YaBTT.Schema.{Connection, Torrent}
+  alias YaBTT.Schema.Connection
 
   @type info_hash :: binary()
   @type t :: %{binary() => %{info_hash() => %{binary() => non_neg_integer()} | %{}}}
@@ -47,10 +47,9 @@ defmodule YaBTT.Query.State do
   @spec query([info_hash()]) :: t()
   def query(info_hashs) do
     from(c in Connection)
-    |> join(:inner, [c], t in Torrent, on: c.torrent_id == t.id)
-    |> where([_c, t], t.info_hash in ^info_hashs)
-    |> group_by([c, t], t.info_hash)
-    |> select([c, t], {t.info_hash,
+    |> where([c], c.torrent_info_hash in ^info_hashs)
+    |> group_by([c], c.torrent_info_hash)
+    |> select([c], {c.torrent_info_hash,
      %{
        # Query with the `CASE WHEN ... THEN ... END` syntax
        "complete" => count(case_when("started AND completed", then: 1)),
@@ -91,7 +90,7 @@ defmodule YaBTT.Query.State do
         completed: count(case_when("completed", then: 1)),
         total: count(),
         # Torrents
-        torrents: count(c.torrent_id, :distinct),
+        torrents: count(c.torrent_info_hash, :distinct),
         # Peers
         peers: count(c.peer_id, :distinct)
       }

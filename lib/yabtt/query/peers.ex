@@ -66,11 +66,11 @@ defmodule YaBTT.Query.Peers do
 
   ## Examples
 
-      iex> YaBTT.Query.Peers.query(1, mode: :compact)
+      iex> YaBTT.Query.Peers.query("info_hash", mode: :compact)
 
-      iex> YaBTT.Query.Peers.query(1, mode: :no_peer_id)
+      iex> YaBTT.Query.Peers.query("info_hash", mode: :no_peer_id)
 
-      iex> YaBTT.Query.Peers.query(1, [])
+      iex> YaBTT.Query.Peers.query("info_hash", [])
   """
   @spec query(id(), opts()) :: map()
   def query(info_hash, mode: :compact) do

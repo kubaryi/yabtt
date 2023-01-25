@@ -87,13 +87,8 @@ defmodule YaBTT do
 
   ## Examples
 
-      iex> torrent = %YaBTT.Schema.Torrent{id: 1}
-      iex> opts = %{compact: 1, no_peer_id: 1}
-      iex> YaBTT.query_peers({:ok, %{torrent: torrent, params: opts}})
-
-      iex> torrent = %YaBTT.Schema.Torrent{id: 10000}
-      iex> opts = %{compact: 0, no_peer_id: 1}
-      iex> YaBTT.query_peers({:ok, %{torrent: torrent, params: opts}})
+      iex> params = %{info_hash: "info_hash", compact: 1, no_peer_id: 1}
+      iex> YaBTT.query_peers({:ok, %{params: params}})
 
       iex> YaBTT.query_peers({:error, :multi_name, %{}, %{}})
 
@@ -124,11 +119,11 @@ defmodule YaBTT do
 
   ## Examples
 
-      iex> YaBTT.query_peers(1, %{compact: 0, no_peer_id: 0})
+      iex> YaBTT.query_peers("info_hash", %{compact: 0, no_peer_id: 0})
 
-      iex> YaBTT.query_peers(1, %{compact: 0, no_peer_id: 1})
+      iex> YaBTT.query_peers("info_hash", %{compact: 0, no_peer_id: 1})
 
-      iex> YaBTT.query_peers(1, %{compact: 1, no_peer_id: 1})
+      iex> YaBTT.query_peers("info_hash", %{compact: 1, no_peer_id: 1})
   """
   @spec query_peers(YaBTT.Query.id(), opts()) :: map()
   def query_peers(info_hash, opts) do
