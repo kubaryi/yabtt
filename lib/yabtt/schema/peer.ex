@@ -35,7 +35,10 @@ defmodule YaBTT.Schema.Peer do
 
     many_to_many(:torrents, YaBTT.Schema.Torrent,
       join_through: YaBTT.Schema.Connection,
-      join_keys: [peer_id: :id, torrent_info_hash: :info_hash]
+      join_keys: [
+        peer_id: :id,
+        torrent_info_hash: :info_hash
+      ]
     )
 
     timestamps()
@@ -71,7 +74,7 @@ defmodule YaBTT.Schema.Peer do
     params = Map.put_new(params, "ip", ip)
 
     peer
-    |> cast(params, [:peer_id, :ip, :port, :key])
+    |> cast(params, [:peer_id, :key, :ip, :port])
     |> validate_required([:peer_id, :port])
   end
 end

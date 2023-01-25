@@ -41,8 +41,9 @@ defmodule YaBTT do
   ## Examples
 
       iex> params = %{
-      ...>   "info_hash" => "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e8",
-      ...>   "peer_id" => "-TR14276775888084598",
+      ...>   "info_hash" => "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e7",
+      ...>   "peer_id" => "-TR14276775888084597",
+      ...>   "key" => "ecsc1ggh0h",
       ...>   "port" => "6881",
       ...>   "uploaded" => "121",
       ...>   "downloaded" => "41421",
@@ -62,8 +63,9 @@ defmodule YaBTT do
       (get(Torrent, info_hash) || %Torrent{}) |> Torrent.changeset(conn.params)
     end)
     # Get the `peer` from database, or create a new one if it doesn't exist.
-    |> Ecto.Multi.insert_or_update(:peer, fn %{params: %{peer_id: peer_id}} ->
-      (get_by(Peer, peer_id: peer_id) || %Peer{}) |> Peer.changeset(conn.params, conn.remote_ip)
+    |> Ecto.Multi.insert_or_update(:peer, fn %{params: %{peer_id: id, key: key}} ->
+      (get_by(Peer, [peer_id: id] ++ if(is_nil(key), do: [], else: [key: key])) || %Peer{})
+      |> Peer.changeset(conn.params, conn.remote_ip)
     end)
     # link the `torrent` and the `peer`. If the link already exists, update it.
     |> Ecto.Multi.insert_or_update(:torrent_peer, fn %{torrent: t, peer: p} ->
