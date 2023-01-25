@@ -19,12 +19,18 @@ defmodule YaBTT.Schema.Torrent do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias YaBTT.Schema.{Connection, Peer}
-
-  @primary_key {:id, :id, autogenerate: true}
+  @primary_key false
+  @foreign_key_type :binary_id
   schema "torrents" do
-    field(:info_hash, :binary)
-    many_to_many(:peers, Peer, join_through: Connection)
+    field(:info_hash, :binary_id, primary_key: true)
+
+    many_to_many(:peers, YaBTT.Schema.Peer,
+      join_through: YaBTT.Schema.Connection,
+      join_keys: [
+        torrent_info_hash: :info_hash,
+        peer_id: :id
+      ]
+    )
 
     timestamps()
   end

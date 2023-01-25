@@ -13,17 +13,23 @@ defmodule YaBTT.Schema.Connection do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias YaBTT.Schema.{Torrent, Peer}
-
   @primary_key {:id, :id, autogenerate: true}
   schema "connections" do
-    belongs_to(:torrent, Torrent)
-    belongs_to(:peer, Peer)
     field(:uploaded, :integer)
     field(:downloaded, :integer)
     field(:left, :integer)
     field(:completed, :boolean, default: false)
     field(:started, :boolean)
+
+    belongs_to(
+      :torrent,
+      YaBTT.Schema.Torrent,
+      foreign_key: :torrent_info_hash,
+      references: :info_hash,
+      type: :binary_id
+    )
+
+    belongs_to(:peer, YaBTT.Schema.Peer)
   end
 
   @type t :: %__MODULE__{}
@@ -49,11 +55,11 @@ defmodule YaBTT.Schema.Connection do
       iex> Connection.changeset(%Connection{}, params, {1, 1})
   """
   @spec changeset(changeset_t() | t(), params(), connect()) :: changeset_t()
-  def changeset(connection, params, {torrent_id, peer_id}) do
+  def changeset(connection, params, {info_hash, peer_id}) do
     connection
     |> cast(params, [:uploaded, :downloaded, :left])
     |> validate_required([:uploaded, :downloaded, :left])
-    |> put_change(:torrent_id, torrent_id)
+    |> put_change(:torrent_info_hash, info_hash)
     |> put_change(:peer_id, peer_id)
     |> handle_event(Map.fetch(params, "event"))
     |> validate_required([:started])
