@@ -32,7 +32,8 @@ defmodule YaBTT.Factory do
   defp build(:connection) do
     %Connection{
       peer_id: 1,
-      torrent_id: 1,
+      torrent_info_hash:
+        "\x4e\x66\x22\x76\xba\xca\x0f\xdb\x6b\xd6\x0b\x76\x17\x8c\xd1\x19\xd1\x05\x00\x13",
       uploaded: 1000,
       downloaded: 1000,
       left: 1000,

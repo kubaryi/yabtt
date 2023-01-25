@@ -66,15 +66,15 @@ defmodule YaBTT.Query.Peers do
 
   ## Examples
 
-      iex> YaBTT.Query.Peers.query(1, mode: :compact)
+      iex> YaBTT.Query.Peers.query("info_hash", mode: :compact)
 
-      iex> YaBTT.Query.Peers.query(1, mode: :no_peer_id)
+      iex> YaBTT.Query.Peers.query("info_hash", mode: :no_peer_id)
 
-      iex> YaBTT.Query.Peers.query(1, [])
+      iex> YaBTT.Query.Peers.query("info_hash", [])
   """
   @spec query(id(), opts()) :: map()
-  def query(id, mode: :compact) do
-    do_query(id)
+  def query(info_hash, mode: :compact) do
+    do_query(info_hash)
     |> select([p], {fragment("ip"), p.port})
     |> YaBTT.Repo.all()
     |> Enum.reduce({<<>>, <<>>}, fn {ip, port}, {ipv4, ipv6} ->
@@ -90,26 +90,26 @@ defmodule YaBTT.Query.Peers do
     end
   end
 
-  def query(id, mode: :no_peer_id) do
-    do_query(id)
+  def query(info_hash, mode: :no_peer_id) do
+    do_query(info_hash)
     |> select([p], %{"ip" => p.ip, "port" => p.port})
     |> YaBTT.Repo.all()
     |> (&%{"peers" => &1}).()
   end
 
-  def query(id, _opts) do
-    do_query(id)
+  def query(info_hash, _opts) do
+    do_query(info_hash)
     |> select([p], %{"peer id" => p.peer_id, "ip" => p.ip, "port" => p.port})
     |> YaBTT.Repo.all()
     |> (&%{"peers" => &1}).()
   end
 
   @spec do_query(id()) :: Ecto.Query.t()
-  defp do_query(id) do
+  defp do_query(info_hash) do
     from(
       p in Peer,
       inner_join: c in Connection,
-      on: c.torrent_id == ^id,
+      on: c.torrent_info_hash == ^info_hash,
       where: p.id == c.peer_id and c.started == true,
       order_by: fragment("RANDOM()"),
       limit: ^Application.get_env(:yabtt, :query_limit, 50)

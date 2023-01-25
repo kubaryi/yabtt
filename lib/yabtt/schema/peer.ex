@@ -26,14 +26,20 @@ defmodule YaBTT.Schema.Peer do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias YaBTT.Schema.{Connection, Torrent}
-
   @primary_key {:id, :id, autogenerate: true}
   schema "peers" do
     field(:peer_id, :binary)
+    field(:key, :binary)
     field(:ip, YaBTT.CustomTypes.IPAddress)
     field(:port, :integer)
-    many_to_many(:torrents, Torrent, join_through: Connection)
+
+    many_to_many(:torrents, YaBTT.Schema.Torrent,
+      join_through: YaBTT.Schema.Connection,
+      join_keys: [
+        peer_id: :id,
+        torrent_info_hash: :info_hash
+      ]
+    )
 
     timestamps()
   end
@@ -56,7 +62,11 @@ defmodule YaBTT.Schema.Peer do
   ## Examples
 
       iex> alias YaBTT.Schema.Peer
-      iex> params = %{"peer_id" => "-TR14276775888084598", "port" => "6881"}
+      iex> params = %{
+      ...>   "peer_id" => "-TR14276775888084598",
+      ...>   "key" => "ecsc1ggh0h",
+      ...>   "port" => "6881"
+      ...> }
       iex> Peer.changeset(%Peer{}, params, {1, 2, 3, 4})
   """
   @spec changeset(changeset_t() | t(), params(), ip_addr()) :: changeset_t()
@@ -64,7 +74,7 @@ defmodule YaBTT.Schema.Peer do
     params = Map.put_new(params, "ip", ip)
 
     peer
-    |> cast(params, [:peer_id, :ip, :port])
+    |> cast(params, [:peer_id, :key, :ip, :port])
     |> validate_required([:peer_id, :port])
   end
 end

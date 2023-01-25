@@ -18,6 +18,8 @@ defmodule YaBTT.Schema.Announce do
   embedded_schema do
     field(:info_hash, :binary)
     field(:peer_id, :binary)
+    field(:key, :binary)
+
     field(:compact, :integer, default: 0)
     field(:no_peer_id, :integer, default: 0)
   end
@@ -42,14 +44,15 @@ defmodule YaBTT.Schema.Announce do
       iex> alias YaBTT.Schema.Announce
       iex> params = %{
       ...>   "info_hash" => "f0a15e27fafbffc1c2f1",
-      ...>   "peer_id" => "-TR14276775888084598"
+      ...>   "peer_id" => "-TR14276775888084598",
+      ...>   "key" => "ecsc1ggh0h"
       ...> }
       iex> Announce.changeset(%Announce{}, params)
   """
   @spec changeset(changeset_t() | t(), params()) :: changeset_t()
   def changeset(struct, params) do
     struct
-    |> cast(params, [:info_hash, :peer_id, :compact, :no_peer_id])
+    |> cast(params, [:info_hash, :peer_id, :key, :compact, :no_peer_id])
     |> validate_required([:info_hash, :peer_id])
     |> validate_compact(params)
   end
