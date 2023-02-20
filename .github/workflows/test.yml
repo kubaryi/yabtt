@@ -15,6 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Caching dependencies and compilation results
+        id: cache
         uses: actions/cache@v3
         with:
           path: |
@@ -30,6 +31,7 @@ jobs:
       - name: Check the format
         run: mix format --check-formatted
       - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: mix do deps.get, deps.compile
       - name: Run test & gen coverage report
         run: mix test --cover

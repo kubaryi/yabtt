@@ -15,6 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Caching dependencies and compilation results
+        id: cache
         uses: actions/cache@v3
         with:
           path: |
@@ -28,6 +29,7 @@ jobs:
           otp-version: 25
           elixir-version: 1.14
       - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: mix do deps.get, deps.compile
       - name: Compile app
         run: mix compile
