@@ -7,6 +7,9 @@ on:
     branches: [master]
   workflow_dispatch:
 
+env:
+  MIX_ENV: dev
+
 jobs:
   build:
     name: Build Elixir App
@@ -21,7 +24,7 @@ jobs:
           path: |
             _build
             deps
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          key: ${{ runner.os }}-${{ env.MIX_ENV }}-mix-${{ hashFiles('**/mix.lock') }}
           restore-keys: ${{ runner.os }}-mix-
       - name: Setup Elixir
         uses: erlef/setup-beam@v1
@@ -30,6 +33,8 @@ jobs:
           elixir-version: 1.14
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: mix do deps.get, deps.compile
+        run: |
+          mix deps.get --only ${MIX_ENV}
+          mix deps.compile --force
       - name: Compile app
         run: mix compile

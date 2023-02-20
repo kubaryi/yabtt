@@ -7,6 +7,9 @@ on:
     branches: [master]
   workflow_dispatch:
 
+env:
+  MIX_ENV: test
+
 jobs:
   build:
     name: Run Unit Test
@@ -21,7 +24,7 @@ jobs:
           path: |
             _build
             deps
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          key: ${{ runner.os }}-${{ env.MIX_ENV }}-mix-${{ hashFiles('**/mix.lock') }}
           restore-keys: ${{ runner.os }}-mix-
       - name: Setup Elixir
         uses: erlef/setup-beam@v1
@@ -32,6 +35,10 @@ jobs:
         run: mix format --check-formatted
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: mix do deps.get, deps.compile
-      - name: Run test & gen coverage report
+        run: |
+          mix deps.get --only ${MIX_ENV}
+          mix deps.compile --force
+      - name: Run unit tests
+        run: mix test
+      - name: Gen coverage report
         run: mix test --cover
