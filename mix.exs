@@ -32,7 +32,7 @@ defmodule YaBTT.MixProject do
     [
       {:benchee, "~> 1.1.0", only: [:dev, :bench]},
       {:benchee_html, "~> 1.0", only: [:dev, :bench]},
-      {:bento, "~> 0.9"},
+      {:bento, "~> 1.0"},
       {:ecto_sql, "~> 3.8"},
       {:ecto_sqlite3, "~> 0.8"},
       {:ex_doc, "~> 0.29", only: :dev, runtime: false},
