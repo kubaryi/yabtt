@@ -6,8 +6,6 @@ defimpl Bento.Encoder, for: Tuple do
   `BitString` if it is. Otherwise, we will encode it into a `List`.
   """
 
-  use Bento.Encode
-
   alias Bento.Encoder
 
   @doc """
