@@ -103,13 +103,12 @@ defmodule YaBTTWeb.Controllers.Announce do
         opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
       end)
     end)
-    |> (&%{"failure reason" => &1}).()
-    # The `Bento.encode/2` has a bug that it will raise an exception when the
-    # input is a map. So we have to use `Bento.Encoder.encode/1` instead.
-    # See: https://github.com/folz/bento/pull/13
-    |> Bento.Encoder.encode()
-    |> IO.iodata_to_binary()
-    |> (&resp(conn, 400, &1)).()
+    |> case do
+      msg when is_map(msg) -> %{"failure reason" => msg} |> Bento.encode!()
+    end
+    |> case do
+      resp when is_binary(resp) -> resp(conn, 200, resp)
+    end
   end
 
   def put_resp_msg(conn, {:error, _name, changeset, _multi}) do
