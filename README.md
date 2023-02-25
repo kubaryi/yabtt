@@ -1,7 +1,7 @@
 # Yet another BitTorrent Tracker
 
-[![Build](https://github.com/mogeko/yabtt/actions/workflows/build.yml/badge.svg)](https://github.com/mogeko/yabtt/actions/workflows/build.yml)
-[![Version](https://img.shields.io/github/v/tag/mogeko/yabtt?label=Version&logo=docker)](https://github.com/mogeko/yabtt/pkgs/container/yabtt)
+[![Build](https://github.com/kubaryi/yabtt/actions/workflows/build.yml/badge.svg)](https://github.com/kubaryi/yabtt/actions/workflows/build.yml)
+[![Version](https://img.shields.io/github/v/tag/kubaryi/yabtt?label=Version&logo=docker)](https://github.com/kubaryi/yabtt/pkgs/container/yabtt)
 [![Powered-by](https://img.shields.io/badge/Powered%20by-Elixir-%234B275F)](https://elixir-lang.org)
 
 This is a **security-first**[^1] and **high-performance**[^2] BitTorrent Tracker.
@@ -28,7 +28,7 @@ Moreover, we provide [Docker][docker] Container, which is also our most recommen
 > **Note** You should replace `/path/for/certs/` with the location of your [certificates][https_certs].
 
 ```shell
-docker run -d --name yabtt -v /path/for/certs/:/etc/yabtt/ssl/ -p 8080:8080 ghcr.io/mogeko/yabtt:latest
+docker run -d --name yabtt -v /path/for/certs/:/etc/yabtt/ssl/ -p 8080:8080 ghcr.io/kubaryi/yabtt:latest
 ```
 
 Or run with [Docker Compose][docker_compose]:
@@ -39,7 +39,7 @@ version: 2.1
 
 services:
   yabtt:
-    image: ghcr.io/mogeko/yabtt:latest
+    image: ghcr.io/kubaryi/yabtt:latest
     volumes:
       - /path/for/certs/:/etc/yabtt/ssl/
     container_name: yabtt
@@ -113,10 +113,10 @@ The code in this project is released under the [GPL-3.0 License](./LICENSE).
 
 <!-- documents -->
 
-[documents]: http://mogeko.github.io/yabtt
-[examples]: https://mogeko.github.io/yabtt/examples-and-screenshots.html
-[router_info_screenshots]: https://mogeko.github.io/yabtt/examples-and-screenshots.html#call-info-or-stats
-[limit_for_compact_mode]: https://mogeko.github.io/yabtt/YaBTT.Query.Peers.html#query/2-mode
+[documents]: http://kubaryi.github.io/yabtt
+[examples]: https://kubaryi.github.io/yabtt/examples-and-screenshots.html
+[router_info_screenshots]: https://kubaryi.github.io/yabtt/examples-and-screenshots.html#call-info-or-stats
+[limit_for_compact_mode]: https://kubaryi.github.io/yabtt/YaBTT.Query.Peers.html#query/2-mode
 [https_certs]: ./guides/setup-https.md#set-up-https
 [benchmark]: ./benchmark/README.md
 [build_guide]: ./guides/compilation-guide.md

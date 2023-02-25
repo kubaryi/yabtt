@@ -7,7 +7,7 @@ If you want to compile the application yourself, you can follow this guide.
 First of all, you need to download the source code by [Git](https://git-scm.com):
 
 ```shell
-git clone https://github.com/mogeko/yabtt.git
+git clone https://github.com/kubaryi/yabtt.git
 ```
 
 Then enter the working directory `./yabtt`.
@@ -26,7 +26,7 @@ Then the Docker will take care of everything for us.
 
 ### Build containers based on `alpine`
 
-Since [`0.1.1-r1`](https://github.com/mogeko/yabtt/tree/18ee9f3986ea63db2b870da84d0aa150ac96e80d), we have used [`debian:stable-slim`](https://hub.docker.com/_/debian) as the basic container by default for better compatibility reasons. But it has to be admitted that the containers based on [`alpine`](https://hub.docker.com/_/alpine) will have an unparalleled <sub>size</sub> advantage.
+Since [`0.1.1-r1`](https://github.com/kubaryi/yabtt/tree/18ee9f3986ea63db2b870da84d0aa150ac96e80d), we have used [`debian:stable-slim`](https://hub.docker.com/_/debian) as the basic container by default for better compatibility reasons. But it has to be admitted that the containers based on [`alpine`](https://hub.docker.com/_/alpine) will have an unparalleled <sub>size</sub> advantage.
 
 ```plaintext
 REPOSITORY             TAG               IMAGE ID       CREATED              SIZE

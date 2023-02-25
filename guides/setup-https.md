@@ -19,7 +19,7 @@ docker run -d \
   --name yabtt \
   -v /path/for/certs/:/etc/yabtt/ssl/ \
   -p 8080:8080 \
-  ghcr.io/mogeko/yabtt:latest
+  ghcr.io/kubaryi/yabtt:latest
 ```
 
 Or run with Docker Compose:
@@ -30,7 +30,7 @@ version: 2.1
 
 services:
   yabtt:
-    image: ghcr.io/mogeko/yabtt:latest
+    image: ghcr.io/kubaryi/yabtt:latest
     volumes:
       - /path/for/certs/:/etc/yabtt/ssl/
     container_name: yabtt
@@ -62,7 +62,7 @@ services:
     container_name: certbot
 
   yabtt:
-    image: ghcr.io/mogeko/yabtt:latest
+    image: ghcr.io/kubaryi/yabtt:latest
     volumes:
       - certificates:/etc/yabtt/ssl/
     container_name: yabtt
@@ -101,7 +101,7 @@ services:
     container_name: acme.sh
 
   yabtt:
-    image: ghcr.io/mogeko/yabtt:latest
+    image: ghcr.io/kubaryi/yabtt:latest
     volumes:
       - certificates:/etc/yabtt/ssl/
     container_name: yabtt
