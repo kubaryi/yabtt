@@ -94,4 +94,4 @@ User (100, 10000) (1000, 10000) (10000, 10000)
   <img alt="run-time-3" src="https://user-images.githubusercontent.com/26341224/210154097-01cbe9c5-7832-4b02-b5fb-1d712304bf6f.png" />
 </p>
 
-> **Note** This report applies to application version [0.0.4](https://github.com/mogeko/yabtt/tree/a69b9ef10256091b58abf17b8b0147e5cca37332).
+> **Note** This report applies to application version [0.0.4](https://github.com/kubaryi/yabtt/tree/a69b9ef10256091b58abf17b8b0147e5cca37332).
