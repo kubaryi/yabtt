@@ -1,7 +1,7 @@
 # Yet another BitTorrent Tracker
 
 [![Build](https://github.com/kubaryi/yabtt/actions/workflows/build.yml/badge.svg)](https://github.com/kubaryi/yabtt/actions/workflows/build.yml)
-[![Version](https://img.shields.io/docker/v/mogeko/yabtt?label=Version&sort=semver)](https://github.com/kubaryi/yabtt/pkgs/container/yabtt)
+[![Version](https://img.shields.io/github/v/tag/kubaryi/yabtt?label=Version&logo=docker)](https://github.com/kubaryi/yabtt/pkgs/container/yabtt)
 [![Powered-by](https://img.shields.io/badge/Powered%20by-Elixir-%234B275F)](https://elixir-lang.org)
 
 This is a **security-first**[^1] and **high-performance**[^2] BitTorrent Tracker.
@@ -28,7 +28,7 @@ Moreover, we provide [Docker][docker] Container, which is also our most recommen
 > **Note** You should replace `/path/for/certs/` with the location of your [certificates][https_certs].
 
 ```shell
-docker run -d --name yabtt -v /path/for/certs/:/etc/yabtt/ssl/ -p 8080:8080 mogeko/yabtt:latest
+docker run -d --name yabtt -v /path/for/certs/:/etc/yabtt/ssl/ -p 8080:8080 ghcr.io/kubaryi/yabtt:latest
 ```
 
 Or run with [Docker Compose][docker_compose]:
@@ -39,7 +39,7 @@ version: 2.1
 
 services:
   yabtt:
-    image: mogeko/yabtt:latest
+    image: ghcr.io/kubaryi/yabtt:latest
     volumes:
       - /path/for/certs/:/etc/yabtt/ssl/
     container_name: yabtt
