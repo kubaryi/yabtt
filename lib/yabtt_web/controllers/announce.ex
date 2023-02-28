@@ -53,6 +53,8 @@ defmodule YaBTTWeb.Controllers.Announce do
 
   @type resp_msg :: YaBTT.t(term()) | :error
 
+  defguardp is_changeset(changeset) when is_struct(changeset, Ecto.Changeset)
+
   @doc """
   Bind the response message to the connection struct. All the message will be encoded as
   [bencoding](http://www.bittorrent.org/beps/bep_0003.html#bencoding) with `Bento.encode/2`.
@@ -71,17 +73,10 @@ defmodule YaBTTWeb.Controllers.Announce do
       "d8:intervali1800e5:peerslee"
 
       iex> conn = %Plug.Conn{}
-      iex> msg = {:error, YaBTT.Schema.Announce.changeset(%YaBTT.Schema.Announce{}, %{})}
+      iex> msg = {:error, "Some error message"}
       iex> conn = YaBTTWeb.Controllers.Announce.put_resp_msg(conn, msg)
       iex> conn.resp_body
-      "d14:failure reasond9:info_hashl14:can't be blanke7:peer_idl14:can't be blankeee"
-
-      iex> conn = %Plug.Conn{}
-      iex> changeset = YaBTT.Schema.Announce.changeset(%YaBTT.Schema.Announce{}, %{})
-      iex> msg = {:error, :multi_error, changeset, %Ecto.Multi{}}
-      iex> conn = YaBTTWeb.Controllers.Announce.put_resp_msg(conn, msg)
-      iex> conn.resp_body
-      "d14:failure reasond9:info_hashl14:can't be blanke7:peer_idl14:can't be blankeee"
+      "d14:failure reason18:Some error messagee"
 
       iex> conn = %Plug.Conn{}
       iex> conn = YaBTTWeb.Controllers.Announce.put_resp_msg(conn, :error)
@@ -96,7 +91,7 @@ defmodule YaBTTWeb.Controllers.Announce do
     end
   end
 
-  def put_resp_msg(conn, {:error, changeset}) do
+  def put_resp_msg(conn, {:error, changeset}) when is_changeset(changeset) do
     changeset
     |> Ecto.Changeset.traverse_errors(fn {msg, opts} ->
       Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
@@ -104,11 +99,12 @@ defmodule YaBTTWeb.Controllers.Announce do
       end)
     end)
     |> case do
-      msg when is_map(msg) -> %{"failure reason" => msg} |> Bento.encode!()
+      msg -> put_resp_msg(conn, {:error, msg})
     end
-    |> case do
-      resp when is_binary(resp) -> resp(conn, 200, resp)
-    end
+  end
+
+  def put_resp_msg(conn, {:error, msg}) do
+    resp(conn, 200, %{"failure reason" => msg} |> Bento.encode!())
   end
 
   def put_resp_msg(conn, {:error, _name, changeset, _multi}) do

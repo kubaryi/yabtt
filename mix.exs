@@ -2,7 +2,7 @@ defmodule YaBTT.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/kubaryi/yabtt"
-  @version "0.1.4"
+  @version "0.1.5"
 
   def project do
     [
@@ -79,7 +79,10 @@ defmodule YaBTT.MixProject do
       ],
       groups_for_modules: [
         # YaBTT,
+        # YaBTT.Deco,
+        # YaBTT.Deconstruct,
         # YaBTT.Repo,
+        # YaBTTWeb.Auth,
         Query: [
           YaBTT.Query.State,
           YaBTT.Query.Peers

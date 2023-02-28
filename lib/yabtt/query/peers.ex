@@ -32,7 +32,13 @@ defmodule YaBTT.Query.Peers do
   alias YaBTT.Schema.{Connection, Peer}
 
   @type id :: integer() | binary()
-  @type opts :: [mode: :compact | :no_peer_id | nil]
+  @type opts :: YaBTT.Deco.config()
+
+  @doc """
+  Query the peers who hold the target torrent by `t:YaBTT.Deco.t/0`.
+  """
+  @spec query(YaBTT.Deco.t()) :: map()
+  def query(%{ids: %{info_hash: i}, config: c}), do: query(i, c)
 
   @doc """
   Query the peers who hold the target torrent.
@@ -66,15 +72,21 @@ defmodule YaBTT.Query.Peers do
 
   ## Examples
 
-      iex> YaBTT.Query.Peers.query("info_hash", mode: :compact)
+      iex> YaBTT.Query.Peers.query("info_hash", %{mode: :compact})
 
-      iex> YaBTT.Query.Peers.query("info_hash", mode: :no_peer_id)
+      iex> YaBTT.Query.Peers.query("info_hash", %{mode: :no_peer_id})
 
-      iex> YaBTT.Query.Peers.query("info_hash", [])
+      iex> YaBTT.Query.Peers.query("info_hash", %{})
   """
   @spec query(id(), opts()) :: map()
-  def query(info_hash, mode: :compact) do
-    do_query(info_hash)
+  def query(info_hash, opts) do
+    do_query(info_hash, opts) |> Map.put("interval", interval())
+  end
+
+  defp interval, do: Application.get_env(:yabtt, :interval, 1800)
+
+  defp do_query(info_hash, %{mode: :compact, query_limit: limit}) do
+    do_query_from(info_hash, limit)
     |> select([p], {fragment("ip"), p.port})
     |> YaBTT.Repo.all()
     |> Enum.reduce({<<>>, <<>>}, fn {ip, port}, {ipv4, ipv6} ->
@@ -90,29 +102,28 @@ defmodule YaBTT.Query.Peers do
     end
   end
 
-  def query(info_hash, mode: :no_peer_id) do
-    do_query(info_hash)
+  defp do_query(info_hash, %{mode: :no_peer_id, query_limit: limit}) do
+    do_query_from(info_hash, limit)
     |> select([p], %{"ip" => p.ip, "port" => p.port})
     |> YaBTT.Repo.all()
     |> (&%{"peers" => &1}).()
   end
 
-  def query(info_hash, _opts) do
-    do_query(info_hash)
+  defp do_query(info_hash, _opts) do
+    do_query_from(info_hash)
     |> select([p], %{"peer id" => p.peer_id, "ip" => p.ip, "port" => p.port})
     |> YaBTT.Repo.all()
     |> (&%{"peers" => &1}).()
   end
 
-  @spec do_query(id()) :: Ecto.Query.t()
-  defp do_query(info_hash) do
+  defp do_query_from(info_hash, limit \\ 50) do
     from(
       p in Peer,
       inner_join: c in Connection,
       on: c.torrent_info_hash == ^info_hash,
       where: p.id == c.peer_id and c.started == true,
       order_by: fragment("RANDOM()"),
-      limit: ^Application.get_env(:yabtt, :query_limit, 50)
+      limit: ^limit
     )
   end
 end
