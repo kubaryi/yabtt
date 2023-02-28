@@ -1,4 +1,4 @@
-defmodule YaBTT.Dec do
+defmodule YaBTT.Deco do
   @moduledoc """
   To store the deconstruct of the announce request parameters.
   """
@@ -22,17 +22,17 @@ defmodule YaBTT.Deconstruct do
 
   The `params` can be a `t:map/0` or a `t:Keyword.t/0`. If it is a Keyword, it will be converted to
   a map first. The `params` must contain the `info_hash` and `peer_id` keys. Otherwise, it will
-  return an error. The `params` will be stored in the `t:YaBTT.Dec.t/0` struct.
+  return an error. The `params` will be stored in the `t:YaBTT.Deco.t/0` struct.
   """
-  @spec dec(term()) :: {:error, String.t()} | {:ok, YaBTT.Dec.t()}
-  def dec(kv) when is_map(kv) do
-    with {:ok, struct} <- ids(%YaBTT.Dec{}, kv) do
+  @spec deco(term()) :: {:error, String.t()} | {:ok, YaBTT.Deco.t()}
+  def deco(kv) when is_map(kv) do
+    with {:ok, struct} <- ids(%YaBTT.Deco{}, kv) do
       {:ok, struct |> params(kv) |> config(kv)}
     end
   end
 
-  def dec(kv) when is_list(kv), do: dec(Map.new(kv))
-  def dec(_), do: {:error, "invalid params"}
+  def deco(kv) when is_list(kv), do: deco(Map.new(kv))
+  def deco(_), do: {:error, "invalid params"}
 
   defp ids(struct, %{"info_hash" => _, "peer_id" => _} = params) do
     {:ok, %{struct | ids: do_ids(struct.ids, params)}}

@@ -12,7 +12,6 @@ defmodule YaBTT do
   """
 
   alias YaBTT.Schema.{Peer, Torrent, Connection}
-  alias YaBTT.{Dec, Deconstruct}
   import YaBTT.Repo, only: [get_by: 2, transaction: 1, get: 2]
 
   @type errors ::
@@ -58,13 +57,13 @@ defmodule YaBTT do
   def insert_or_update(conn) do
     Ecto.Multi.new()
     # Disinfect HTTP parameters, then extract `info_hash` and `peer_id`.
-    |> Ecto.Multi.run(:dec, fn _, _ -> Deconstruct.dec(conn.params) end)
+    |> Ecto.Multi.run(:deco, fn _, _ -> YaBTT.Deconstruct.deco(conn.params) end)
     # Get the `torrent` from database, or create a new one if it doesn't exist.
-    |> Ecto.Multi.insert_or_update(:torrent, fn %{dec: %{ids: %{info_hash: info_hash}}} ->
+    |> Ecto.Multi.insert_or_update(:torrent, fn %{deco: %{ids: %{info_hash: info_hash}}} ->
       (get(Torrent, info_hash) || %Torrent{}) |> Torrent.changeset(conn.params)
     end)
     # Get the `peer` from database, or create a new one if it doesn't exist.
-    |> Ecto.Multi.insert_or_update(:peer, fn %{dec: %{ids: %{peer_id: id, key: key}}} ->
+    |> Ecto.Multi.insert_or_update(:peer, fn %{deco: %{ids: %{peer_id: id, key: key}}} ->
       (get_by(Peer, [peer_id: id] ++ if(is_nil(key), do: [], else: [key: key])) || %Peer{})
       |> Peer.changeset(conn.params, conn.remote_ip)
     end)
@@ -90,11 +89,11 @@ defmodule YaBTT do
 
   ## Examples
 
-      iex> dec = %YaBTT.Dec{
+      iex> deco = %YaBTT.Deco{
       ...>   ids: %{info_hash: "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e7"},
       ...>   config: %{mode: :compact, query_limit: 50}
       ...> }
-      iex> YaBTT.query_peers({:ok, %{dec: dec}})
+      iex> YaBTT.query_peers({:ok, %{deco: deco}})
 
       iex> YaBTT.query_peers({:error, :multi_name, %{}, %{}})
 
@@ -103,12 +102,12 @@ defmodule YaBTT do
       iex> YaBTT.query_peers(:internal_errors)
   """
   @spec query_peers(t()) :: t()
-  def query_peers({:ok, %{dec: dec}}), do: query_peers(dec)
+  def query_peers({:ok, %{deco: deco}}), do: query_peers(deco)
   def query_peers({:error, _, _, _} = multi), do: multi
   def query_peers({:error, _} = changeset), do: changeset
 
-  def query_peers(dec) when is_struct(dec, Dec) do
-    {:ok, YaBTT.Query.Peers.query(dec)}
+  def query_peers(deco) when is_struct(deco, YaBTT.Deco) do
+    {:ok, YaBTT.Query.Peers.query(deco)}
   end
 
   def query_peers(_), do: {:error, "Internal Errors"}

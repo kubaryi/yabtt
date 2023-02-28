@@ -79,7 +79,7 @@ defmodule YaBTT.MixProject do
       ],
       groups_for_modules: [
         # YaBTT,
-        # YaBTT.Dec,
+        # YaBTT.Deco,
         # YaBTT.Deconstruct,
         # YaBTT.Repo,
         # YaBTTWeb.Auth,
