@@ -62,7 +62,7 @@ defmodule YaBTT.MixProject do
   defp docs do
     [
       main: "readme",
-      source_ref: "v#{@version}",
+      source_ref: "master",
       source_url: @source_url,
       authors: ["Mogeko"],
       extras: [
