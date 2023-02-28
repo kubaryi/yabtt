@@ -1,5 +1,5 @@
 ARG DEBIAN_VERSION=stable-slim
-ARG ELIXIR_VERSION=1.14.2-slim
+ARG ELIXIR_VERSION=1.14.3-slim
 
 # ==== Builder ====
 FROM elixir:${ELIXIR_VERSION} AS builder
