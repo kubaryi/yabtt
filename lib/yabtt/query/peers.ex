@@ -32,7 +32,10 @@ defmodule YaBTT.Query.Peers do
   alias YaBTT.Schema.{Connection, Peer}
 
   @type id :: integer() | binary()
-  @type opts :: [mode: :compact | :no_peer_id | nil]
+  @type opts :: YaBTT.Dec.config()
+
+  @spec query(YaBTT.Dec.t()) :: map()
+  def query(%{ids: %{info_hash: i}, config: c}), do: query(i, c)
 
   @doc """
   Query the peers who hold the target torrent.
@@ -66,14 +69,20 @@ defmodule YaBTT.Query.Peers do
 
   ## Examples
 
-      iex> YaBTT.Query.Peers.query("info_hash", mode: :compact)
+      iex> YaBTT.Query.Peers.query("info_hash", %{mode: :compact})
 
-      iex> YaBTT.Query.Peers.query("info_hash", mode: :no_peer_id)
+      iex> YaBTT.Query.Peers.query("info_hash", %{mode: :no_peer_id})
 
-      iex> YaBTT.Query.Peers.query("info_hash", [])
+      iex> YaBTT.Query.Peers.query("info_hash", %{})
   """
   @spec query(id(), opts()) :: map()
-  def query(info_hash, mode: :compact) do
+  def query(info_hash, opts) do
+    do_query(info_hash, opts) |> Map.put("interval", interval())
+  end
+
+  defp interval, do: Application.get_env(:yabtt, :interval, 1800)
+
+  defp do_query(info_hash, %{mode: :compact}) do
     do_query(info_hash)
     |> select([p], {fragment("ip"), p.port})
     |> YaBTT.Repo.all()
@@ -90,21 +99,20 @@ defmodule YaBTT.Query.Peers do
     end
   end
 
-  def query(info_hash, mode: :no_peer_id) do
+  defp do_query(info_hash, %{mode: :no_peer_id}) do
     do_query(info_hash)
     |> select([p], %{"ip" => p.ip, "port" => p.port})
     |> YaBTT.Repo.all()
     |> (&%{"peers" => &1}).()
   end
 
-  def query(info_hash, _opts) do
+  defp do_query(info_hash, _opts) do
     do_query(info_hash)
     |> select([p], %{"peer id" => p.peer_id, "ip" => p.ip, "port" => p.port})
     |> YaBTT.Repo.all()
     |> (&%{"peers" => &1}).()
   end
 
-  @spec do_query(id()) :: Ecto.Query.t()
   defp do_query(info_hash) do
     from(
       p in Peer,

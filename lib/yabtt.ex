@@ -11,12 +11,13 @@ defmodule YaBTT do
   is used to query the peers who hold the target torrent.
   """
 
-  alias YaBTTWeb.Controllers.Announce
   alias YaBTT.Schema.{Peer, Torrent, Connection}
+  alias YaBTT.{Dec, Deconstruct}
   import YaBTT.Repo, only: [get_by: 2, transaction: 1, get: 2]
 
   @type errors ::
           {:error, Ecto.Multi.name(), Ecto.Changeset.t(), Ecto.Multi.t()}
+          | {:error, Bento.Encoder.bencodable()}
           | {:error, Ecto.Changeset.t()}
   @type t(res) :: {:ok, res} | errors()
   @type t :: t(map())
@@ -57,13 +58,13 @@ defmodule YaBTT do
   def insert_or_update(conn) do
     Ecto.Multi.new()
     # Disinfect HTTP parameters, then extract `info_hash` and `peer_id`.
-    |> Ecto.Multi.run(:params, fn _, _ -> YaBTT.Schema.Announce.apply(conn.params) end)
+    |> Ecto.Multi.run(:dec, fn _, _ -> Deconstruct.dec(conn.params) end)
     # Get the `torrent` from database, or create a new one if it doesn't exist.
-    |> Ecto.Multi.insert_or_update(:torrent, fn %{params: %{info_hash: info_hash}} ->
+    |> Ecto.Multi.insert_or_update(:torrent, fn %{dec: %{ids: %{info_hash: info_hash}}} ->
       (get(Torrent, info_hash) || %Torrent{}) |> Torrent.changeset(conn.params)
     end)
     # Get the `peer` from database, or create a new one if it doesn't exist.
-    |> Ecto.Multi.insert_or_update(:peer, fn %{params: %{peer_id: id, key: key}} ->
+    |> Ecto.Multi.insert_or_update(:peer, fn %{dec: %{ids: %{peer_id: id, key: key}}} ->
       (get_by(Peer, [peer_id: id] ++ if(is_nil(key), do: [], else: [key: key])) || %Peer{})
       |> Peer.changeset(conn.params, conn.remote_ip)
     end)
@@ -89,53 +90,28 @@ defmodule YaBTT do
 
   ## Examples
 
-      iex> params = %{info_hash: "info_hash", compact: 1, no_peer_id: 1}
-      iex> YaBTT.query_peers({:ok, %{params: params}})
+      iex> dec = %YaBTT.Dec{
+      ...>   ids: %{info_hash: "f0a15e27fafbffc1c2f18f69fcac2dfa461ff4e7"},
+      ...>   config: %{mode: :compact, query_limit: 50}
+      ...> }
+      iex> YaBTT.query_peers({:ok, %{dec: dec}})
 
       iex> YaBTT.query_peers({:error, :multi_name, %{}, %{}})
 
       iex> YaBTT.query_peers({:error, %{}})
+
+      iex> YaBTT.query_peers(:internal_errors)
   """
   @spec query_peers(t()) :: t()
-  def query_peers({:ok, %{params: %{info_hash: i} = p}}), do: {:ok, query_peers(i, p)}
+  def query_peers({:ok, %{dec: dec}}), do: query_peers(dec)
   def query_peers({:error, _, _, _} = multi), do: multi
   def query_peers({:error, _} = changeset), do: changeset
 
-  @type opts :: %{compact: 0 | 1, no_peer_id: 0 | 1} | Announce.t()
-
-  @doc """
-  Re-export the `YaBTT.Query.Peers.query/2` function.
-
-  But the difference is that the `t:opts/0` parameter is a map with two keys:
-  `:compact` and `:no_peer_id`, we use `0` to represent `false` and non-zero
-  to represent `true`. The `t:opts/0` map will be converted to a list of
-  options (`t:YaBTT.Query.Peers.opts/0`) that will be passed to
-  the `YaBTT.Query.Peers.query/2`.
-
-  Learn [how to limit the number of queries by environment variables](`YaBTT.Query.Peers`).
-
-  ## Parameters
-
-  - `id`: the `torrent` id
-  - `opts`: the options
-
-  ## Examples
-
-      iex> YaBTT.query_peers("info_hash", %{compact: 0, no_peer_id: 0})
-
-      iex> YaBTT.query_peers("info_hash", %{compact: 0, no_peer_id: 1})
-
-      iex> YaBTT.query_peers("info_hash", %{compact: 1, no_peer_id: 1})
-  """
-  @spec query_peers(YaBTT.Query.id(), opts()) :: map()
-  def query_peers(info_hash, opts) do
-    case opts do
-      %{compact: c} when c != 0 -> YaBTT.Query.Peers.query(info_hash, mode: :compact)
-      %{no_peer_id: np} when np != 0 -> YaBTT.Query.Peers.query(info_hash, mode: :no_peer_id)
-      %{compact: 0, no_peer_id: 0} -> YaBTT.Query.Peers.query(info_hash, [])
-    end
-    |> Map.put("interval", Application.get_env(:yabtt, :interval, 1800))
+  def query_peers(dec) when is_struct(dec, Dec) do
+    {:ok, YaBTT.Query.Peers.query(dec)}
   end
+
+  def query_peers(_), do: {:error, "Internal Errors"}
 
   alias YaBTT.Query.State
 

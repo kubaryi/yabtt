@@ -5,11 +5,9 @@ defmodule YaBTT.Dec do
             config: %{mode: nil, query_limit: 50},
             params: nil
 
-  @type t :: %__MODULE__{
-          ids: %{info_hash: binary(), peer_id: binary(), key: binary() | nil},
-          config: %{mode: :compact | :normal | nil, query_limit: integer()},
-          params: map() | nil
-        }
+  @type config :: %{mode: :compact | :normal | nil, query_limit: integer()}
+  @type ids :: %{info_hash: binary(), peer_id: binary(), key: binary() | nil}
+  @type t :: %__MODULE__{ids: ids(), config: config(), params: map() | nil}
 end
 
 defmodule YaBTT.Deconstruct do
