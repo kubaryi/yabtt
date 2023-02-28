@@ -1,4 +1,4 @@
-defmodule YaBTT.Front do
+defmodule YaBTT.Dec do
   @moduledoc false
 
   defstruct ids: %{info_hash: nil, peer_id: nil, key: nil},
@@ -10,17 +10,23 @@ defmodule YaBTT.Front do
           config: %{mode: :compact | :normal | nil, query_limit: integer()},
           params: map() | nil
         }
+end
+
+defmodule YaBTT.Deconstruct do
+  @moduledoc false
+
+  alias YaBTT.Dec
 
   @doc false
-  @spec new(term()) :: {:error, String.t()} | {:ok, t()}
-  def new(kv) when is_map(kv) do
-    with {:ok, struct} <- ids(%__MODULE__{}, kv) do
+  @spec dec(term()) :: {:error, String.t()} | {:ok, Dec.t()}
+  def dec(kv) when is_map(kv) do
+    with {:ok, struct} <- ids(%Dec{}, kv) do
       {:ok, struct |> params(kv) |> config(kv)}
     end
   end
 
-  def new(kv) when is_list(kv), do: new(Map.new(kv))
-  def new(_), do: {:error, "invalid params"}
+  def dec(kv) when is_list(kv), do: dec(Map.new(kv))
+  def dec(_), do: {:error, "invalid params"}
 
   defp ids(struct, %{"info_hash" => _, "peer_id" => _} = params) do
     {:ok, %{struct | ids: do_ids(struct.ids, params)}}
