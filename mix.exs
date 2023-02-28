@@ -79,7 +79,10 @@ defmodule YaBTT.MixProject do
       ],
       groups_for_modules: [
         # YaBTT,
+        # YaBTT.Dec,
+        # YaBTT.Deconstruct,
         # YaBTT.Repo,
+        # YaBTTWeb.Auth,
         Query: [
           YaBTT.Query.State,
           YaBTT.Query.Peers

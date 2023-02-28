@@ -1,5 +1,7 @@
 defmodule YaBTT.Dec do
-  @moduledoc false
+  @moduledoc """
+  To store the deconstruct of the announce request parameters.
+  """
 
   defstruct ids: %{info_hash: nil, peer_id: nil, key: nil},
             config: %{mode: nil, query_limit: 50},
@@ -11,14 +13,20 @@ defmodule YaBTT.Dec do
 end
 
 defmodule YaBTT.Deconstruct do
-  @moduledoc false
+  @moduledoc """
+  To deconstruct the announce request parameters.
+  """
 
-  alias YaBTT.Dec
+  @doc """
+  Deconstruct the announce request parameters.
 
-  @doc false
-  @spec dec(term()) :: {:error, String.t()} | {:ok, Dec.t()}
+  The `params` can be a `t:map/0` or a `t:Keyword.t/0`. If it is a Keyword, it will be converted to
+  a map first. The `params` must contain the `info_hash` and `peer_id` keys. Otherwise, it will
+  return an error. The `params` will be stored in the `t:YaBTT.Dec.t/0` struct.
+  """
+  @spec dec(term()) :: {:error, String.t()} | {:ok, YaBTT.Dec.t()}
   def dec(kv) when is_map(kv) do
-    with {:ok, struct} <- ids(%Dec{}, kv) do
+    with {:ok, struct} <- ids(%YaBTT.Dec{}, kv) do
       {:ok, struct |> params(kv) |> config(kv)}
     end
   end

@@ -34,6 +34,9 @@ defmodule YaBTT.Query.Peers do
   @type id :: integer() | binary()
   @type opts :: YaBTT.Dec.config()
 
+  @doc """
+  Query the peers who hold the target torrent by `t:YaBTT.Deco.t/0`.
+  """
   @spec query(YaBTT.Dec.t()) :: map()
   def query(%{ids: %{info_hash: i}, config: c}), do: query(i, c)
 
