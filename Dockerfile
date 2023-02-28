@@ -32,6 +32,15 @@ RUN mix do compile, release
 # ==== Runtime ====
 FROM debian:${DEBIAN_VERSION} AS app
 
+# Metadata
+LABEL org.opencontainers.image.title         yabtt
+LABEL org.opencontainers.image.source        https://github.com/kubaryi/yabtt
+LABEL org.opencontainers.image.url           https://github.com/kubaryi/yabtt
+LABEL org.opencontainers.image.documentation https://kubaryi.github.io/yabtt
+LABEL org.opencontainers.image.authors       kubaryi
+LABEL org.opencontainers.image.description   Yet Another BitTorrent Tracker
+LABEL org.opencontainers.image.licenses      GPL-3.0
+
 # Set the locale to UTF-8
 ENV LANG=C.UTF-8
 
