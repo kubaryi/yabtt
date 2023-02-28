@@ -66,7 +66,7 @@ defmodule YaBTT.Deconstruct do
     default = Application.get_env(:yabtt, :query_limit, 50)
 
     limit =
-      with %{"num_want" => num_want} <- params,
+      with %{"numwant" => num_want} <- params,
            {num_want, ""} <- Integer.parse(num_want) do
         Enum.min([num_want, default])
       else

@@ -41,8 +41,8 @@ defmodule YaBTT.DeconstructTest do
     assert {:ok, %{config: %{mode: :no_peer_id}}} = Deconstruct.deco(params)
   end
 
-  test "Create %Deconstruct{} with num_want" do
-    params = Map.merge(@params, %{"num_want" => "40"})
+  test "Create %Deconstruct{} with numwant" do
+    params = Map.merge(@params, %{"numwant" => "40"})
     assert {:ok, %{config: %{query_limit: 40}}} = Deconstruct.deco(params)
 
     Application.put_env(:yabtt, :query_limit, 30)

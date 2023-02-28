@@ -85,8 +85,8 @@ defmodule YaBTT.Query.Peers do
 
   defp interval, do: Application.get_env(:yabtt, :interval, 1800)
 
-  defp do_query(info_hash, %{mode: :compact}) do
-    do_query(info_hash)
+  defp do_query(info_hash, %{mode: :compact, query_limit: limit}) do
+    do_query_from(info_hash, limit)
     |> select([p], {fragment("ip"), p.port})
     |> YaBTT.Repo.all()
     |> Enum.reduce({<<>>, <<>>}, fn {ip, port}, {ipv4, ipv6} ->
@@ -102,28 +102,28 @@ defmodule YaBTT.Query.Peers do
     end
   end
 
-  defp do_query(info_hash, %{mode: :no_peer_id}) do
-    do_query(info_hash)
+  defp do_query(info_hash, %{mode: :no_peer_id, query_limit: limit}) do
+    do_query_from(info_hash, limit)
     |> select([p], %{"ip" => p.ip, "port" => p.port})
     |> YaBTT.Repo.all()
     |> (&%{"peers" => &1}).()
   end
 
   defp do_query(info_hash, _opts) do
-    do_query(info_hash)
+    do_query_from(info_hash)
     |> select([p], %{"peer id" => p.peer_id, "ip" => p.ip, "port" => p.port})
     |> YaBTT.Repo.all()
     |> (&%{"peers" => &1}).()
   end
 
-  defp do_query(info_hash) do
+  defp do_query_from(info_hash, limit \\ 50) do
     from(
       p in Peer,
       inner_join: c in Connection,
       on: c.torrent_info_hash == ^info_hash,
       where: p.id == c.peer_id and c.started == true,
       order_by: fragment("RANDOM()"),
-      limit: ^Application.get_env(:yabtt, :query_limit, 50)
+      limit: ^limit
     )
   end
 end
