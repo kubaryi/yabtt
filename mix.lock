@@ -30,5 +30,5 @@
   "ranch": {:hex, :ranch, "1.8.0", "8c7a100a139fd57f17327b6413e4167ac559fbc04ca7448e9be9057311597a1d", [:make, :rebar3], [], "hexpm", "49fbcfd3682fab1f5d109351b61257676da1a2fdbe295904176d5e521a2ddfe5"},
   "statistex": {:hex, :statistex, "1.0.0", "f3dc93f3c0c6c92e5f291704cf62b99b553253d7969e9a5fa713e5481cd858a5", [:mix], [], "hexpm", "ff9d8bee7035028ab4742ff52fc80a2aa35cece833cf5319009b52f1b5a86c27"},
   "telemetry": {:hex, :telemetry, "1.2.1", "68fdfe8d8f05a8428483a97d7aab2f268aaff24b49e0f599faa091f1d4e7f61c", [:rebar3], [], "hexpm", "dad9ce9d8effc621708f99eac538ef1cbe05d6a874dd741de2e689c47feafed5"},
-  "x509": {:hex, :x509, "0.8.5", "22b2c5dfc87b05d46595d3764f41a23fcb7360f891e0464f1a2ec118177cd4e4", [:mix], [], "hexpm", "c63eb89e8bbe8a5e21b6404ad1082faff670e38b74960297f90d023177949e07"},
+  "x509": {:hex, :x509, "0.8.7", "576130ad83731613fdb5787917f2fadbe308b6f5a48ed6e865a4b6be3fa802d0", [:mix], [], "hexpm", "3604125d6a0171da6e8a935810b58c999fccab0e3d20b2ed28d97fa2d9e2f6b4"},
 }
